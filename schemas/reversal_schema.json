@@ -1,0 +1,5 @@
+{
+    "zone": "string",
+    "wall_thinning": "bool",
+    "spoof_stack": "bool"
+}

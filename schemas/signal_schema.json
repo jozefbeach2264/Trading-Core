@@ -1,0 +1,22 @@
+{
+    "signal_id": "int",
+    "type": "buy|sell",
+    "price": "float",
+    "timestamp": "ISO8601",
+    "direction": "LONG|SHORT",
+    "exit_price": "float",
+    "roi": "float",
+    "detonation": "string",
+    "confidence": "float",
+    "predictions": {
+        "price_direction": "up|down",
+        "c1": {"action": "string", "price": "float", "volume": "string"},
+        "c2": {"action": "string", "price": "float", "volume": "string"},
+        "c3": {"action": "string", "price": "float", "volume": "string"},
+        "c4": {"action": "string", "price": "float", "volume": "string"},
+        "c5": {"action": "string", "price": "float", "volume": "string"},
+        "midpoint": "float",
+        "roi_so_far": "string",
+        "expected_move": "string"
+    }
+}

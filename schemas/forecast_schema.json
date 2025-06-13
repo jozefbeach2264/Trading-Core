@@ -1,0 +1,5 @@
+{
+    "direction": "Bullish|Bearish",
+    "conviction_index": "int",
+    "apex_warning": "bool"
+}

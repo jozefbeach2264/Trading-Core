@@ -1,0 +1,5 @@
+{
+    "volume": "string",
+    "speed": "int",
+    "pressure_imbalance": "North xx%|South xx%"
+}

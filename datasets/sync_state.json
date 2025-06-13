@@ -1,0 +1,12 @@
+import json
+import os
+
+def backup_signals(signals, filename="datasets/sync_state.json"):
+    if not os.path.exists("datasets"):
+        os.makedirs("datasets")
+    try:
+        with open(filename, "a") as f:
+            json.dump(signals, f, indent=2)
+            f.write("\n")
+    except Exception as e:
+        print(f"Backup error: {e}")
