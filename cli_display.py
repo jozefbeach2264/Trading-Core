@@ -1,4 +1,4 @@
-from core_loop import run_core_cycle
+from core_loop import run_core_logic
 
 def launch_cli():
     print("Starting core system loop...\n")
