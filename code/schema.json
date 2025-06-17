@@ -1,9 +1,0 @@
-{
-  "type": "object",
-  "properties": {
-    "API_KEY": { "type": "string" },
-    "SECRET_KEY": { "type": "string" },
-    "UID": { "type": "string" }
-  },
-  "required": ["API_KEY", "SECRET_KEY", "UID"]
-}
