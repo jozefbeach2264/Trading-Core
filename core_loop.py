@@ -1,21 +1,32 @@
-from trade_simulator import simulate_trade
-from metric_logger import log_metrics
-from telemetry_stream import stream_telemetry
-from orderbook_reader import fetch_orderbook
-from orderbook_parser import parse_orderbook
+import json
+from strategy_runner import run_strategy
+from trap_signal_handler import evaluate_trap_signals
+from rolling5_module import Rolling5
 
-def run_core_logic():
-    orderbook = fetch_orderbook()
-    bids, asks = parse_orderbook(orderbook)
-    
-    metrics = {
-        "top_bid": bids[0] if bids else (0, 0),
-        "top_ask": asks[0] if asks else (0, 0),
-        "spread": round(asks[0][0] - bids[0][0], 2) if bids and asks else 0
-    }
-    
-    stream_telemetry(metrics)
-    result = simulate_trade(direction="LONG", size=0.001)
-    log_metrics(result)
-    
-    print(f"[EXECUTION] Entry: {result['entry']} | Fill: {result['fill']} | Status: {result['status']}")
+r5 = Rolling5()
+
+def load_schema():
+    with open("schema_link.json", "r") as f:
+        return json.load(f)
+
+def run_core_cycle():
+    schema = load_schema()
+    result = None
+
+    if schema.get("runtime_logging"):
+        print("[CORE] Runtime logging is enabled")
+
+    strategy = schema.get("strategy_mode")
+
+    if strategy == "Rolling5":
+        entry = 2600.0
+        exit = 2615.0
+        result = r5.simulate_trade(entry_price=entry, exit_price=exit)
+    else:
+        if strategy in schema.get("active_modules", []):
+            result = run_strategy(strategy)
+
+    if "TrapX" in schema.get("active_modules", []):
+        evaluate_trap_signals()
+
+    return result

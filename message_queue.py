@@ -1,3 +1,4 @@
+
 from queue import Queue
 
 class MessageQueue:

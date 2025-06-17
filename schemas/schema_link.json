@@ -1,0 +1,7 @@
+{
+  "strategy_mode": "trapx",
+  "active_modules": ["Scalpel", "TrapX", "Rolling5", "Defcon6"],
+  "runtime_logging": true,
+  "socket_bridge": true,
+  "live_override": false
+}
