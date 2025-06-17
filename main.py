@@ -6,7 +6,7 @@ from env_loader import load_env # Ensure environment variables are loaded
 from secret_loader import validate_secrets # Ensure secrets are loaded and validated
 
 from connection_validator import validate_connection
-from receiver import start_receiver
+from receiver_module import start_receiver
 from orderbook_reader import start_feed
 from core_loop import run_core_logic
 from cli_display import display_status
