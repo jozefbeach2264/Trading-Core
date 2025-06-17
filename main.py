@@ -1,12 +1,44 @@
-from aiohttp import web
-import os
+# main.py
 
-async def health_check(request):
-    return web.json_response({"status": "Core is running"})
+import sys
+from env_loader import load_env # Ensure environment variables are loaded
 
-app = web.Application()
-app.add_routes([web.get('/', health_check)])
+from secret_loader import validate_secrets # Ensure secrets are loaded and validated
 
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 8080))
-    web.run_app(app, host='0.0.0.0', port=port)
+from connection_validator import validate_connection
+from receiver import start_receiver
+from orderbook_reader import start_feed
+from core_loop import run_core_logic
+from cli_display import display_status
+from status_monitor import start_status_monitor
+from log_writer import init_logging
+from trade_executor import prepare_trade_executor
+from scheduler import start_scheduler
+from network_bridge import initialize_network_bridge
+
+BASE_URL = "https://fapi.asterdex.com"
+
+def boot_sequence():
+    print("Initializing Trading Reality Core...")
+    
+    load_env()
+    validate_secrets()
+    
+    print("Validating Asterdex connection...")
+    if not validate_connection(BASE_URL):
+        print("❌ Asterdex connection failed. Aborting launch.")
+        sys.exit(1)
+
+    print("✅ Asterdex connection confirmed. Booting subsystems...\n")
+    init_logging()
+    start_status_monitor()
+    start_receiver()
+    start_feed()
+    prepare_trade_executor()
+    start_scheduler()
+    initialize_network_bridge()
+    display_status()
+    run_core_logic()
+
+if __name__ == "__main__":
+    boot_sequence()
