@@ -1,17 +1,3 @@
-from core_loop import run_core_cycle
-from cli_display import display_status_info
-from status_info import display_status_info as status_debug
-from core_socket_client import start_core_socket  # NEW: socket communication
+from rolling5_engine import Rolling5
 
-def main():
-    print("[SYSTEM] Starting simulation + socket bridge...")
-    start_core_socket()  # <-- Non-blocking socket listener
-    display_status_info()
-    status_debug()
-
-    for _ in range(3):  # simulate 3 core loop cycles
-        result = run_core_cycle()
-        print(f"[RESULT] {result}")
-
-if __name__ == "__main__":
-    main()
+if name == "main": r5 = Rolling5() for _ in range(10): entry = random.uniform(2500, 2700) exit = entry + random.uniform(-25, 25) r5.simulate_trade(entry_price=entry, exit_price=exit) time.sleep(1)
