@@ -1,6 +1,13 @@
-import time import random from decimal import Decimal from core_initializer import CoreSystemConfig
+import time
+import random
+from decimal import Decimal
+from core_initializer import CoreSystemConfig
 
-class Rolling5: def init(self): self.config = CoreSystemConfig() self.balance = self.config.balance self.trade_log = []
+class Rolling5:
+    def __init__(self):
+        self.config = CoreSystemConfig()
+        self.balance = self.config.balance
+        self.trade_log = []
 
 def calculate_fee(self, amount):
     return (self.config.trade_fee_percent / Decimal("100")) * amount
