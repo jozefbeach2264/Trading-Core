@@ -1,10 +1,8 @@
+from secure_fetcher import fetch_private
 
-import time
-import requests
+def get_server_time():
+    result = fetch_private("/fapi/v1/time")
+    print("Server Time:", result)
 
-def get_server_timestamp(base_url="https://fapi.asterdex.com"):
-    try:
-        response = requests.get(f"{base_url}/fapi/v1/time")
-        return response.json()["serverTime"]
-    except:
-        return int(time.time() * 1000)
+if __name__ == "__main__":
+    get_server_time()

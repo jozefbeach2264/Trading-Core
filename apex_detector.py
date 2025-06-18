@@ -1,14 +1,10 @@
-def detect_apex(candles):
-    if len(candles) < 3:
-        return False
+class ApexDetector:
+    def __init__(self, sensitivity=3):
+        self.sensitivity = sensitivity
 
-    prev = float(candles[-2][4])
-    curr = float(candles[-1][4])
-    earlier = float(candles[-3][4])
-
-    if curr < prev > earlier:
-        return "top"
-    elif curr > prev < earlier:
-        return "bottom"
-    else:
-        return False
+    def is_apex(self, candles):
+        if len(candles) < self.sensitivity + 2:
+            return False
+        mid_idx = len(candles) // 2
+        mid = candles[mid_idx]["high"]
+        return all(mid > c["high"] for i, c in enumerate(candles) if i != mid_idx)

@@ -1,12 +1,8 @@
-from request_wrapper import send_request
-from secret_loader import get_keys
-from signature_auth import generate_signature
-from timestamp_sync import get_current_timestamp
+from secure_fetcher import fetch_private
 
-def ping():
-    keys = get_keys()
-    ts = get_current_timestamp()
-    sig = generate_signature(keys['SECRET_KEY'], ts)
-    url = "https://fapi.asterdex.com/fapi/v1/ping"
-    response = send_request("get", url, keys['API_KEY'], sig, ts)
-    return response.status_code == 200
+def test_ping():
+    result = fetch_private("/fapi/v1/ping")
+    print("Ping:", result)
+
+if __name__ == "__main__":
+    test_ping()
