@@ -1,41 +1,68 @@
-from chart_reader import ChartReader
-from signal_interpreter import SignalInterpreter
-from validator_stack import ValidatorStack
-from strategy_router import StrategyRouter
-from dan1_core import core_logic_dan1
-from log_handler import LogHandler
-from error_reporter import ErrorReporter
+# main.py
+import asyncio
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 
-# Optional modules if present
-# from trap_signature import TrapSignature
-# from spoof_filter import SpoofFilter
+# Import all the new, consolidated modules we created
+from config import Config
+from api_client import ApiClient
+from trading_engine import TradingEngine
+from neurosync_client import NeuroSyncClient
 
-def main():
-    chart = ChartReader()
-    validator = ValidatorStack()
-    log = LogHandler()
-    error_reporter = ErrorReporter(log)
-    interpreter = SignalInterpreter(chart, validator)
+# A global dictionary to hold our running service instances
+services = {}
 
-    try:
-        signal = interpreter.generate_signal()
-        if not signal:
-            print("[Main] No valid signal generated.")
-            return
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Manages the startup and shutdown of our application's background services.
+    This code runs once when the Uvicorn server starts.
+    """
+    print("--- Trading-Core Service is starting up... ---")
+    
+    # 1. Initialize all our core components in the correct order
+    config = Config()
+    api_client = ApiClient(config)
+    trading_engine = TradingEngine(config, api_client)
+    neurosync_client = NeuroSyncClient(config, trading_engine)
+    
+    # 2. Store instances in the services dictionary for access elsewhere
+    services["config"] = config
+    services["api_client"] = api_client
+    services["engine"] = trading_engine
+    services["neurosync_client"] = neurosync_client
+    
+    # 3. Start the long-running background tasks
+    asyncio.create_task(trading_engine.start_main_loop())
+    asyncio.create_task(neurosync_client.connect_and_listen())
+    
+    print("--- All services started. Trading-Core is now running. ---")
+    
+    yield # The application runs while the 'yield' is active
+    
+    # This code runs when the server is shutting down (e.g., you press Ctrl+C)
+    print("--- Trading-Core Service is shutting down... ---")
+    if "engine" in services:
+        await services["engine"].stop()
+    if "neurosync_client" in services:
+        await services["neurosync_client"].stop()
+    print("--- All services stopped gracefully. ---")
 
-        # Validate signal
-        result = validator.run_all(signal)
-        if not result["pass"]:
-            print(f"[Main] Signal rejected by validator: {result['reason']}")
-            return
+# Create the main FastAPI application instance
+app = FastAPI(lifespan=lifespan)
 
-        # Process through DAN1 core
-        is_valid = core_logic_dan1(signal)
-        print(f"[Main] DAN1 decision: {is_valid}")
-        log.log({"signal": signal, "accepted": is_valid})
+# --- API Endpoints from your Design Document ---
 
-    except Exception as e:
-        error_reporter.capture(e, context="main()")
+@app.get("/status", tags=["Health"])
+async def get_status():
+    """Endpoint for NeuroSync to check app health and readiness."""
+    return {"status": "ok", "service": "Trading-Core", "engine_running": services.get("engine", {}).running}
 
-if __name__ == "__main__":
-    main()
+@app.post("/signal", tags=["Trading"])
+async def receive_external_signal(signal: dict):
+    """Endpoint to receive external trade calls."""
+    print(f"Received external signal via API: {signal}")
+    # You can pass this signal to the trading engine
+    # await services["engine"].process_signal_from_neurosync(signal)
+    return {"status": "signal received"}
+

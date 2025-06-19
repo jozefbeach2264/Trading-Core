@@ -1,32 +1,20 @@
-entrypoint = "main.py"
 modules = ["python-3.11"]
-
+# This sets the entire environment to use a recent Python version (3.11+)
 [nix]
-channel = "stable-24_05"
-packages = ["glibcLocales", "zip", "unzipNLS"]
+channel = "stable-23_11"
 
-[unitTest]
-language = "python3"
-
-[gitHubImport]
-requiredFiles = [".replit", "replit.nix"]
-
+# This configures the main "Run" button with the more reliable command
 [deployment]
-run = ["python3", "main.py"]
-deploymentTarget = "cloudrun"
-
-[[ports]]
-localPort = 8080
-externalPort = 80
+run = ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 [workflows]
-runButton = "Run"
+runButton = "GET MONEY"
 
 [[workflows.workflow]]
-name = "Run"
-author = 42692233
+name = "GET MONEY"
 mode = "sequential"
+author = 42692233
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
+args = "python -m uvicorn main:app --reload"
