@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 
-NETWORK_URL = "wss://neurosync.jozefbeach2264.repl.co"
+NETWORK_URL = "wss://neurosync.jozefbeach2264.repl.co/ws"
 
 async def send_to_network(message: str):
     try:

@@ -1,0 +1,29 @@
+REPLIT DEV / WEBSOCKET URLs
+
+NEUROSYNC:
+https://replit.com/@jbanner683/NeuroSync?s=app
+
+*IN TC*
+wss://NeuroSync.jbanner683.repl.dev/ws
+
+Websocket:
+wss://NeuroSync.jbanner683.repl.co/ws
+
+TELEGRAM ROLLING5 BOT:
+https://replit.com/@jbanner683/Rolling5?s=app
+
+*IN NS*
+https://Rolling5.jbanner683.replit.dev/health
+
+Websocket:
+wss://Rolling5.jbanner683.repl.co/ws
+
+TRADING CORE:
+https://replit.com/@jbanner683/TradingCore?s=app
+
+*IN NS*
+https://TradingCore.jbanner683.replit.dev/status
+
+Websocket:
+wss://TradingCore.jbanner683.repl.co/ws
+___________

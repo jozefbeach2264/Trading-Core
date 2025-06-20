@@ -1,4 +1,4 @@
-modules = ["python-3.11"]
+modules = ["nodejs-20", "python-3.11"]
 # This sets the entire environment to use a recent Python version (3.11+)
 [nix]
 channel = "stable-23_11"
@@ -18,3 +18,8 @@ author = 42692233
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python -m uvicorn main:app --reload"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+exposeLocalhost = true
