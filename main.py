@@ -1,68 +1,51 @@
-# main.py
-import asyncio
+# TradingCore/main.py (Simplified)
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-# Import all the new, consolidated modules we created
 from config import Config
-from api_client import ApiClient
-from trading_engine import TradingEngine
-from neurosync_client import NeuroSyncClient
+from rolling5_manager import Rolling5Manager # Import the new manager
 
-# A global dictionary to hold our running service instances
-services = {}
+manager = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Manages the startup and shutdown of our application's background services.
-    This code runs once when the Uvicorn server starts.
+    The FastAPI lifespan manager. It now only deals with the top-level manager.
     """
-    print("--- Trading-Core Service is starting up... ---")
+    print("--- Trading-Core application starting... ---")
+    global manager
     
-    # 1. Initialize all our core components in the correct order
+    # Initialize the master manager with the application config
     config = Config()
-    api_client = ApiClient(config)
-    trading_engine = TradingEngine(config, api_client)
-    neurosync_client = NeuroSyncClient(config, trading_engine)
+    manager = Rolling5Manager(config)
     
-    # 2. Store instances in the services dictionary for access elsewhere
-    services["config"] = config
-    services["api_client"] = api_client
-    services["engine"] = trading_engine
-    services["neurosync_client"] = neurosync_client
+    # Setup and start all modules through the manager
+    manager.setup_modules()
+    await manager.start()
     
-    # 3. Start the long-running background tasks
-    asyncio.create_task(trading_engine.start_main_loop())
-    asyncio.create_task(neurosync_client.connect_and_listen())
-    
-    print("--- All services started. Trading-Core is now running. ---")
-    
-    yield # The application runs while the 'yield' is active
-    
-    # This code runs when the server is shutting down (e.g., you press Ctrl+C)
-    print("--- Trading-Core Service is shutting down... ---")
-    if "engine" in services:
-        await services["engine"].stop()
-    if "neurosync_client" in services:
-        await services["neurosync_client"].stop()
-    print("--- All services stopped gracefully. ---")
+    yield
+    # --- Code below this line runs on shutdown ---
+    print("--- Trading-Core application shutting down... ---")
+    await manager.stop()
 
-# Create the main FastAPI application instance
+# Create the FastAPI app
 app = FastAPI(lifespan=lifespan)
 
-# --- API Endpoints from your Design Document ---
-
-@app.get("/status", tags=["Health"])
+# Your API endpoints remain the same
+@app.get("/status")
 async def get_status():
-    """Endpoint for NeuroSync to check app health and readiness."""
-    return {"status": "ok", "service": "Trading-Core", "engine_running": services.get("engine", {}).running}
+    """Health check endpoint for NeuroSync to ping."""
+    return {"status": "ok", "service": "Trading-Core"}
 
-@app.post("/signal", tags=["Trading"])
-async def receive_external_signal(signal: dict):
-    """Endpoint to receive external trade calls."""
-    print(f"Received external signal via API: {signal}")
-    # You can pass this signal to the trading engine
-    # await services["engine"].process_signal_from_neurosync(signal)
-    return {"status": "signal received"}
+@app.get("/market_state")
+async def get_market_state():
+    """An endpoint to view the current market state."""
+    # Ensure manager is initialized before accessing state
+    if manager and "market_state" in manager.app_state:
+        async with manager.app_state["market_state"].lock:
+            # Return a copy for thread-safety
+            return manager.app_state["market_state"].__dict__.copy()
+    return {"error": "Market state not initialized."}
+
+
 

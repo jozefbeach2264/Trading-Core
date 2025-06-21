@@ -1,97 +1,84 @@
-# trading_engine.py
+# TradingCore/trading_engine.py (Updated)
 import asyncio
 
-# We import the classes from your core logic files that we kept.
-# We will fix any errors in these files later.
-from api_client import ApiClient
-from chart_reader import ChartReader
-from signal_interpreter import SignalInterpreter
-from validator_stack import ValidatorStack
-from strategy_router import StrategyRouter
-from log_handler import LogHandler
-from error_reporter import ErrorReporter
-# ... and so on for your other logic modules.
+from sensors.apex_detector import ApexDetector
+from sensors.compression_trap_sensor import CompressionTrapSensor
+from filters.time_of_day_filter import TimeOfDayFilter
+from filters.low_volume_guard import LowVolumeGuard
+from filters.multi_candle_trend_confirmation import MultiCandleTrendConfirmation
+from tuning.rolling_extension_module import RollingExtensionModule # New
+from execution_module import ExecutionModule
 
 class TradingEngine:
-    """
-    The heart of the application. It initializes all trading logic modules
-    and runs the main analysis loop.
-    """
-    def __init__(self, config: object, api_client: ApiClient):
-        self.config = config
-        self.api_client = api_client
+    def __init__(self, market_state, execution_module):
+        self.market_state = market_state
+        self.execution_module = execution_module
         self.running = False
         
-        # --- Initialize All Core Logic Components ---
-        # This is how we "put back" the dependencies. We create one instance of each
-        # class and pass them to the other classes that need them.
-        self.log_handler = LogHandler()
-        self.error_reporter = ErrorReporter(self.log_handler)
+        # --- Initialize all components ---
+        self.sensors = {
+            "apex": ApexDetector(),
+            "compression": CompressionTrapSensor()
+        }
+        self.filters = {
+            "time": TimeOfDayFilter(),
+            "volume": LowVolumeGuard(),
+            "trend": MultiCandleTrendConfirmation()
+        }
+        self.tuning_modules = {
+            "rolling_extension": RollingExtensionModule() # New
+        }
         
-        # The ChartReader needs the ApiClient to fetch data.
-        self.chart_reader = ChartReader(api_client=self.api_client) 
-        
-        # The ValidatorStack will hold our filter and detector modules.
-        self.validator_stack = ValidatorStack() 
-        
-        # The SignalInterpreter needs the ChartReader to get data and the
-        # ValidatorStack to check the signal's quality.
-        self.signal_interpreter = SignalInterpreter(self.chart_reader, self.validator_stack)
-        
-        # The StrategyRouter will decide what to do with a valid signal.
-        self.strategy_router = StrategyRouter()
-        
-        print("TradingEngine: All logic components initialized.")
+        print("TradingEngine Initialized with Tuning & Control.")
 
     async def start_main_loop(self):
-        """The main, persistent trading loop for periodic analysis."""
         self.running = True
-        print("TradingEngine: Main analysis loop started.")
+        print("TradingEngine main analysis loop started.")
+        
         while self.running:
-            try:
-                await self.run_analysis_cycle()
-                # Wait for the next cycle. 60 seconds is just a placeholder.
-                await asyncio.sleep(60) 
+            # --- 1. Run Sensors ---
+            klines_history_placeholder = []
+            apex_signal = self.sensors["apex"].analyze(self.market_state)
+            compression_signal = self.sensors["compression"].analyze(klines_history_placeholder)
+
+            preliminary_signal = None
+            if apex_signal.get("is_apex"):
+                preliminary_signal = {"source": "ApexDetector", "side": "SELL", "details": apex_signal}
+            elif compression_signal.get("is_compressed"):
+                 preliminary_signal = {"source": "CompressionTrapSensor", "side": "BUY", "details": compression_signal}
+
+            # --- 2. Run Filters ---
+            if preliminary_signal:
+                print(f"\n[Engine Cycle] Preliminary signal found: {preliminary_signal['source']}")
                 
-            except asyncio.CancelledError:
-                self.running = False
-                print("TradingEngine: Main loop stopped.")
-                break
-            except Exception as e:
-                # Use our error reporter to log any unexpected failures.
-                self.error_reporter.capture(e, context="trading_engine_main_loop")
-                await asyncio.sleep(30) # Wait a bit after an error.
+                filter_results = {
+                    "TimeOfDay": self.filters["time"].check(),
+                    "LowVolume": self.filters["volume"].check(self.market_state),
+                    "Trend": self.filters["trend"].check(klines_history_placeholder, preliminary_signal['side'])
+                }
 
-    async def run_analysis_cycle(self):
-        """
-        Represents a single cycle of fetching data and analyzing it for a signal.
-        This replaces the logic from your old 'main.txt' script.
-        """
-        try:
-            print("[Engine Cycle] Generating signal...")
-            signal = self.signal_interpreter.generate_signal()
+                if all(filter_results.values()):
+                    print(f"[Engine Cycle] ✅ Signal VALIDATED by all filters.")
+                    
+                    # --- 3. Tune Signal ---
+                    tuned_signal = self.tuning_modules["rolling_extension"].adjust_signal(
+                        preliminary_signal, self.market_state
+                    )
+                    
+                    # --- 4. Execute Trade ---
+                    await self.execution_module.place_market_order(
+                        symbol="ETHUSDT",
+                        side=tuned_signal['side'],
+                        quantity=0.01
+                    )
+                else:
+                    failed_filters = [name for name, passed in filter_results.items() if not passed]
+                    print(f"[Engine Cycle] ❌ Signal REJECTED by filters: {failed_filters}")
             
-            if not signal:
-                print("[Engine Cycle] No valid signal generated.")
-                return
-
-            print(f"[Engine Cycle] Signal generated: {signal}. Validating...")
-            # In the future, we will have the validator stack process the signal.
-            # validation_result = self.validator_stack.run_all(signal)
+            await asyncio.sleep(5)
             
-            # For now, we'll just log it.
-            self.log_handler.log({"type": "signal_generated", "signal": signal})
-
-        except Exception as e:
-            self.error_reporter.capture(e, context="run_analysis_cycle")
-
-    async def process_signal_from_neurosync(self, signal_data: dict):
-        """This method will be called by the NeuroSync client when a real-time signal arrives."""
-        print(f"TradingEngine: Received real-time signal from NeuroSync: {signal_data}")
-        # Add logic here to process the incoming signal immediately.
-        pass
+        print("TradingEngine main loop stopped.")
 
     async def stop(self):
-        """Stops the main loop gracefully."""
         self.running = False
 

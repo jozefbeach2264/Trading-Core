@@ -1,56 +1,57 @@
-# neurosync_client.py
+# TradingCore/neurosync_client.py
 import asyncio
-import json
 import websockets
-from trading_engine import TradingEngine
-from config import Config
 
 class NeuroSyncClient:
     """
-    Handles the persistent WebSocket connection to the NeuroSync service,
-    listening for and processing real-time signals.
+    Handles the WebSocket connection from TradingCore to the NeuroSync server.
     """
-    def __init__(self, config: Config, trading_engine: TradingEngine):
+    def __init__(self, config):
         self.ws_url = config.neurosync_ws_url
-        self.trading_engine = trading_engine
-        self.running = False
         self.connection = None
-        print("NeuroSyncClient: Initialized.")
+        self.running = False
+        print("NeuroSyncClient Initialized.")
 
     async def connect_and_listen(self):
         """Connects to NeuroSync and listens for incoming signals."""
         self.running = True
-        print(f"NeuroSyncClient: Starting connection to {self.ws_url}")
-        
+        print(f"NeuroSyncClient: Attempting to connect to {self.ws_url}")
+
+        # Define the required Origin Header for Replit's security
+        # This prevents the '403 Forbidden' error
+        origin_url = self.ws_url.replace("wss://", "https://").split("/ws")[0]
+        extra_headers = {"Origin": origin_url}
+        print(f"NeuroSyncClient: Using Origin header: {origin_url}")
+
         while self.running:
             try:
-                async with websockets.connect(self.ws_url) as ws:
+                # Add the extra_headers to the connect call
+                async with websockets.connect(self.ws_url, extra_headers=extra_headers) as ws:
                     self.connection = ws
-                    print("NeuroSyncClient: Connection established. Listening for signals...")
-                    while True:
-                        message = await ws.recv()
-                        try:
-                            # We assume signals from NeuroSync are JSON strings
-                            signal_data = json.loads(message)
-                            # Pass the structured data to the trading engine
-                            await self.trading_engine.process_signal_from_neurosync(signal_data)
-                        except json.JSONDecodeError:
-                            print(f"NeuroSyncClient: Received non-JSON message: {message}")
+                    print("NeuroSyncClient: Successfully connected to NeuroSync WebSocket.")
+                    
+                    # Announce connection to the server
+                    await ws.send("Trading-Core is connected.")
+                    
+                    async for message in ws:
+                        print(f"Message from NeuroSync: {message}")
 
-            except (websockets.exceptions.ConnectionClosed, ConnectionRefusedError) as e:
-                print(f"NeuroSyncClient: Connection closed ({e}). Reconnecting in 5 seconds...")
             except Exception as e:
-                print(f"NeuroSyncClient: An unexpected error occurred: {e}. Reconnecting in 5 seconds...")
-            
-            self.connection = None
-            await asyncio.sleep(5)
+                print(f"NeuroSyncClient: An error occurred: {e}. Reconnecting in 5 seconds...")
+                self.connection = None
+                await asyncio.sleep(5)
+
+    async def send(self, message):
+        """Sends a message to the NeuroSync server if connected."""
+        if self.connection:
+            await self.connection.send(message)
+        else:
+            print("NeuroSyncClient: Cannot send message, not connected.")
 
     async def stop(self):
         """Stops the client and closes the connection."""
         self.running = False
         if self.connection:
             await self.connection.close()
-        print("NeuroSyncClient: Stopped.")
-
-
+        print("NeuroSyncClient stopped.")
 
