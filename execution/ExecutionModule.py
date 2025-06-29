@@ -16,7 +16,7 @@ class ExecutionModule:
     async def enter_trade(self, trade_details: Dict[str, Any]):
         """Placeholder for entering a new position."""
         symbol = trade_details.get('symbol')
-        direction = trade_details.get('direction')
+        direction = trade_details.get('direction', 'long') # Assume long for placeholder
         logger.info(f"EXECUTION: Firing placeholder entry order for {symbol} {direction}.")
         # Real logic to place a market/limit order would go here.
         return {"status": "success", "order_id": "mock_entry_123"}
