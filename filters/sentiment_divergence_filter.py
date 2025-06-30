@@ -1,86 +1,56 @@
 import logging
 from typing import Dict, Any
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class SentimentDivergenceFilter:
     """
-    Validates trade signals by checking for divergence between price action and market sentiment.
-    Rejects signals where price movement conflicts with funding rate (e.g., rising price with negative
-    funding rate), indicating a weak trend. Optimized for ETH trading with robust input handling.
+    Detects divergences between price action and market sentiment indicators like
+    funding rate or open interest to identify potential reversals or exhaustion.
     """
-
-    def __init__(self) -> None:
-        """
-        Initializes the SentimentDivergenceFilter.
-
-        No configurable parameters are required.
-        """
+    def __init__(self):
         logger.info("SentimentDivergenceFilter initialized.")
+        # Thresholds are conceptual and should be tuned
+        self.price_change_threshold = 0.001 # 0.1%
+        self.oi_change_threshold_pct = 0.01 # 1%
 
-    async def validate(self, signal_data: Dict[str, Any]) -> bool:
+    async def validate(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Validates a trade signal based on sentiment divergence between price action and funding rate.
+        Checks for divergences between price and other sentiment metrics.
 
         Args:
-            signal_data (Dict[str, Any]): Signal data containing:
-                - 'symbol': str (optional, for logging, e.g., 'ETHUSD')
-                - 'funding_rate': float (market sentiment indicator, e.g., from perpetual futures)
-                - 'price_change_1m': float (1-minute price change as a percentage, e.g., 0.5 for 0.5%)
+            signal_data (Dict[str, Any]): The market state data.
 
         Returns:
-            bool: True if no divergence detected (signal passes), False if divergence detected
-                  (signal rejected).
-
-        Raises:
-            ValueError: If signal_data is invalid.
+            Dict[str, Any]: A dictionary containing the analysis result.
         """
-        # Validate input
-        if not isinstance(signal_data, dict):
-            logger.error("Invalid signal_data: must be a dictionary")
-            raise ValueError("signal_data must be a dictionary")
+        price_change_1m = signal_data.get('price_change_1m', 0.0)
+        open_interest = signal_data.get('open_interest', 0.0)
+        prev_open_interest = signal_data.get('previous_open_interest', 0.0)
 
-        symbol = signal_data.get("symbol", "unknown")
-        if not isinstance(symbol, str):
-            logger.warning("Invalid symbol: expected string, got %s", type(symbol))
-            symbol = "unknown"
+        if prev_open_interest == 0:
+            oi_change_pct = 0.0
+        else:
+            oi_change_pct = (open_interest - prev_open_interest) / prev_open_interest
 
-        logger.debug("Running SentimentDivergenceFilter validation for %s", symbol)
+        # Your proprietary logic for what constitutes a "divergence" goes here.
+        # Example: Price is rising, but open interest is falling significantly.
+        divergence_detected = False
+        reason = "No significant sentiment divergence detected."
+        
+        if price_change_1m > self.price_change_threshold and oi_change_pct < -self.oi_change_threshold_pct:
+            divergence_detected = True
+            reason = "Bearish divergence: Price rising while Open Interest is falling."
+        
+        elif price_change_1m < -self.price_change_threshold and oi_change_pct > self.oi_change_threshold_pct:
+            divergence_detected = True
+            reason = "Bullish divergence: Price falling while Open Interest is rising."
 
-        funding_rate = signal_data.get("funding_rate")
-        price_change_1m = signal_data.get("price_change_1m")
-
-        # Validate funding rate and price change
-        try:
-            funding = float(funding_rate) if funding_rate is not None else None
-            price_change = float(price_change_1m) if price_change_1m is not None else None
-        except (ValueError, TypeError):
-            logger.warning("Invalid data for %s: funding_rate=%s, price_change_1m=%s. Signal passed.",
-                           symbol, funding_rate, price_change_1m)
-            return True
-
-        if funding is None or price_change is None:
-            logger.warning("Missing data for %s: funding_rate=%s, price_change_1m=%s. Signal passed.",
-                           symbol, funding_rate, price_change_1m)
-            return True
-
-        # Divergence Logic: Reject if price rises with negative funding or falls with positive funding
-        divergence_detected = (
-            (price_change > 0 and funding < 0) or
-            (price_change < 0 and funding > 0)
-        )
-
-        if divergence_detected:
-            logger.warning(
-                "Signal REJECTED for %s by SentimentDivergenceFilter: "
-                "funding_rate=%.6f, price_change_1m=%.2f%%",
-                symbol, funding, price_change
-            )
-            return False
-
-        logger.info("Signal PASSED for %s by SentimentDivergenceFilter: "
-                    "funding_rate=%.6f, price_change_1m=%.2f%%",
-                    symbol, funding, price_change)
-        return True
+        return {
+            "filter_name": "SentimentDivergenceFilter",
+            "status": "fail" if divergence_detected else "pass",
+            "divergence_detected": divergence_detected,
+            "price_change_1m": price_change_1m,
+            "oi_change_pct": oi_change_pct,
+            "reason": reason
+        }

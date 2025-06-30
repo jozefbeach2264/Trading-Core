@@ -1,4 +1,3 @@
-# TradingCore/sensors/OrderBookReversalZoneDetector.py
 import logging
 from typing import Dict, Any, List
 
@@ -11,40 +10,67 @@ class OrderBookReversalZoneDetector:
     """
     def __init__(self):
         logger.info("OrderBookReversalZoneDetector initialized.")
+        # Define what constitutes a "large" wall relative to other levels
+        self.wall_size_multiplier = 10.0 
 
-    async def check_for_failure(self, signal_data: Dict[str, Any]) -> bool:
+    async def validate(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Placeholder for the logic that checks the order book for reversal signs.
-        A real implementation would parse the 'depth' data.
+        Analyzes the order book depth to identify significant liquidity walls.
+
+        Args:
+            signal_data (Dict[str, Any]): Market state data, must include 'depth_20'.
 
         Returns:
-            bool: True if a reversal sign is detected, False otherwise.
+            Dict[str, Any]: A dictionary containing the analysis result.
         """
-        symbol = signal_data.get('symbol', 'unknown')
-        # Use the deeper d20 order book for a better view of potential walls
-        depth_data = signal_data.get('depth_20', {}) 
-        bids: List[List[str]] = depth_data.get('bids', [])
-        asks: List[List[str]] = depth_data.get('asks', [])
-
-        logger.info(f"ReversalDetector: Checking for failure signs on {symbol}.")
-
-        # Placeholder logic: A real implementation would analyze the size and
-        # proximity of large orders (walls) in the order book.
-        # For now, we will assume no reversal signs are detected, so we return False.
+        depth = signal_data.get('depth_20', {})
+        bids = depth.get('bids', [])
+        asks = depth.get('asks', [])
         
-        # Example of what real logic might look like in the future:
-        #
-        # large_wall_threshold = 500000  # e.g., a $500k wall
-        # for price_str, qty_str in asks:
-        #     wall_size = float(price_str) * float(qty_str)
-        #     if wall_size > large_wall_threshold:
-        #         logger.warning(f"Large sell wall detected at {price_str} for {symbol}!")
-        #         return True  # Signal a failure/reversal
-        #
-        # for price_str, qty_str in bids:
-        #     wall_size = float(price_str) * float(qty_str)
-        #     if wall_size > large_wall_threshold:
-        #         logger.warning(f"Large buy wall detected at {price_str} for {symbol}!")
-        #         return True # Signal a failure/reversal
+        result = {
+            "filter_name": "OrderBookReversalZoneDetector",
+            "wall_detected": False,
+            "wall_type": None,
+            "wall_price": None,
+            "wall_size": None,
+            "reason": "No significant liquidity walls detected."
+        }
 
-        return False
+        if not bids or not asks:
+            result["reason"] = "Order book data is incomplete."
+            return result
+
+        try:
+            # Calculate average size of the first 10 levels
+            avg_bid_size = sum(qty for _, qty in bids[:10]) / 10 if bids[:10] else 1
+            avg_ask_size = sum(qty for _, qty in asks[:10]) / 10 if asks[:10] else 1
+
+            # Check for a large bid wall
+            for price, qty in bids[:10]:
+                if qty > avg_bid_size * self.wall_size_multiplier:
+                    result.update({
+                        "wall_detected": True,
+                        "wall_type": "SUPPORT",
+                        "wall_price": price,
+                        "wall_size": qty,
+                        "reason": f"Large support wall detected at {price} ({qty:.2f})."
+                    })
+                    return result
+
+            # Check for a large ask wall
+            for price, qty in asks[:10]:
+                if qty > avg_ask_size * self.wall_size_multiplier:
+                    result.update({
+                        "wall_detected": True,
+                        "wall_type": "RESISTANCE",
+                        "wall_price": price,
+                        "wall_size": qty,
+                        "reason": f"Large resistance wall detected at {price} ({qty:.2f})."
+                    })
+                    return result
+        
+        except (ValueError, TypeError, ZeroDivisionError) as e:
+            logger.error(f"Error processing order book data in ReversalZoneDetector: {e}")
+            result["reason"] = "Malformed order book data."
+
+        return result

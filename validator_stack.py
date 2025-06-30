@@ -1,59 +1,65 @@
-# TradingCore/validator_stack.py
 import logging
-from typing import Dict, Any
+import asyncio
+from typing import Dict, Any, List
 
-# --- Import all filter classes from the 'filters' package ---
-# Note: We are creating a placeholder for TimeOfDayFilter as it's the last one.
-from filters.spoof_filter import SpoofFilter
-from filters.cts_filter import CtsFilter
-from filters.compression_detector import CompressionDetector
-from filters.breakout_zone_origin_filter import BreakoutZoneOriginFilter
-from filters.retest_entry_logic import RetestEntryLogic
-from filters.low_volume_guard import LowVolumeGuard
-from filters.sentiment_divergence_filter import SentimentDivergenceFilter
-
-# --- Placeholder class for the final filter ---
-class TimeOfDayFilter:
-    """Placeholder filter."""
-    def __init__(self):
-        logging.info("TimeOfDayFilter initialized (placeholder).")
-    async def validate(self, signal_data: Dict[str, Any]) -> bool:
-        logging.debug("Signal PASSED TimeOfDayFilter (placeholder).")
-        return True
+# Import all filter classes
+from .filters.spoof_filter import SpoofFilter
+from .filters.cts_filter import CtsFilter
+from .filters.compression_detector import CompressionDetector
+from .filters.breakout_zone_origin_filter import BreakoutZoneOriginFilter
+from .filters.retest_entry_logic import RetestEntryLogic
+from .filters.low_volume_guard import LowVolumeGuard
+from .filters.sentiment_divergence_filter import SentimentDivergenceFilter
+from .filters.time_of_day_filter import TimeOfDayFilter
 
 logger = logging.getLogger(__name__)
 
 class ValidatorStack:
+    """
+    Reworked to act as a "report compiler" for the AI-Assisted Hybrid Model.
+    It runs a signal through all filters and compiles their JSON outputs into
+    a single Pre-Analysis Report.
+    """
     def __init__(self):
-        """
-        Initializes the ValidatorStack and loads all filter modules.
-        This class acts as the single point of contact for all pre-trade validation.
-        """
-        # --- Instantiate all your filter classes ---
+        # Instantiate all filter classes
         self.filters = [
             SpoofFilter(),
-            CtsFilter(),
+            # CtsFilter(), # Consolidating into CompressionDetector
             CompressionDetector(),
             BreakoutZoneOriginFilter(),
             RetestEntryLogic(),
             LowVolumeGuard(),
             SentimentDivergenceFilter(),
-            TimeOfDayFilter(), # Using the placeholder for now
+            TimeOfDayFilter(),
         ]
-        logger.info("ValidatorStack initialized with %d filters.", len(self.filters))
+        logger.info("ValidatorStack (Report Compiler) initialized with %d filters.", len(self.filters))
 
-    async def run_all(self, signal_data: Dict[str, Any]) -> bool:
+    async def generate_report(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Runs the signal sequentially through every filter in the stack.
-        If any single filter returns False, the entire stack fails.
+        Runs the signal through every filter and compiles their results into a single report.
+
+        Args:
+            signal_data (Dict[str, Any]): The initial market state data.
+
+        Returns:
+            Dict[str, Any]: The consolidated Pre-Analysis Report.
         """
-        logger.info("--- Running signal through Validator Stack ---")
-        for f in self.filters:
-            is_valid = await f.validate(signal_data)
-            if not is_valid:
-                # The filter itself is responsible for logging the reason for rejection.
-                logger.error("--- Signal FAILED validation at: %s ---", f.__class__.__name__)
-                return False
+        logger.info("--- Generating Pre-Analysis Report from Validator Stack ---")
         
-        logger.info("--- Signal PASSED all %d filters in ValidatorStack. ---", len(self.filters))
-        return True
+        # Run all filters concurrently
+        tasks = [f.validate(signal_data) for f in self.filters]
+        filter_results = await asyncio.gather(*tasks)
+
+        # Compile the report
+        pre_analysis_report = {
+            "initial_signal": signal_data.get("trigger_type", "unknown"),
+            "timestamp": signal_data.get("timestamp", 0),
+            "filters": {}
+        }
+
+        for result in filter_results:
+            filter_name = result.pop("filter_name", "unknown_filter")
+            pre_analysis_report["filters"][filter_name] = result
+
+        logger.info("--- Pre-Analysis Report Generated. ---")
+        return pre_analysis_report

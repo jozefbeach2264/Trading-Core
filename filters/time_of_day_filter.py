@@ -1,34 +1,48 @@
-# TradingCore/filters/time_of_day_filter.py
+import logging
+from typing import Dict, Any
 from datetime import datetime
 import pytz
 
+logger = logging.getLogger(__name__)
+
 class TimeOfDayFilter:
     """
-    Blocks trades outside of specified trading sessions.
+    Filters trades to only allow execution during pre-defined high-volume trading windows.
     """
     def __init__(self):
-        # Define trading sessions in UTC
-        self.sessions = {
-            "london": (7, 16), # 7:00 - 16:00 UTC
-            "new_york": (12, 21), # 12:00 - 21:00 UTC
-            "tokyo": (23, 8) # 23:00 - 8:00 UTC
+        logger.info("TimeOfDayFilter initialized.")
+        # Define trading windows in UTC
+        self.approved_windows_utc = [
+            {"name": "London Open", "start_hour": 7, "end_hour": 9},    # 7:00 - 9:00 UTC
+            {"name": "NY Open", "start_hour": 13, "end_hour": 15}, # 13:00 - 15:00 UTC
+            {"name": "London Close", "start_hour": 15, "end_hour": 17} # 15:00 - 17:00 UTC
+        ]
+
+    async def validate(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Checks if the current time is within an approved trading window.
+
+        Args:
+            signal_data (Dict[str, Any]): The market state data.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the analysis result.
+        """
+        now_utc = datetime.now(pytz.utc)
+        current_hour = now_utc.hour
+
+        for window in self.approved_windows_utc:
+            if window["start_hour"] <= current_hour < window["end_hour"]:
+                return {
+                    "filter_name": "TimeOfDayFilter",
+                    "status": "pass",
+                    "current_window": window["name"],
+                    "reason": f"Currently within the {window['name']} trading window."
+                }
+        
+        return {
+            "filter_name": "TimeOfDayFilter",
+            "status": "fail",
+            "current_window": None,
+            "reason": "Outside of approved trading windows."
         }
-        self.active_sessions = ["london", "new_york"] # Only trade during these sessions
-        print("TimeOfDayFilter Initialized.")
-
-    def check(self) -> bool:
-        """Returns True if the current time is within an active session, False otherwise."""
-        current_hour = datetime.now(pytz.utc).hour
-        
-        for session_name in self.active_sessions:
-            start_hour, end_hour = self.sessions[session_name]
-            # Handle overnight sessions like Tokyo
-            if start_hour > end_hour:
-                if current_hour >= start_hour or current_hour < end_hour:
-                    return True
-            else:
-                if start_hour <= current_hour < end_hour:
-                    return True
-        
-        return False
-
