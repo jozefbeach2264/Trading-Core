@@ -1,66 +1,48 @@
-import os
-import httpx
 import logging
-from typing import Dict, Any, Optional
+import httpx
+from typing import Dict, Any
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - [%(levelname)s] - %(message)s')
+from config.config import Config
+
 logger = logging.getLogger(__name__)
 
-# Assume the AI provider's URL and API Key are stored in secrets
-AI_PROVIDER_URL = os.getenv("AI_PROVIDER_URL")
-AI_PROVIDER_API_KEY = os.getenv("AI_PROVIDER_API_KEY")
-
-async def send_to_ai(pre_analysis_report: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+class AIClient:
     """
-    Sends the compiled Pre-Analysis Report to the external AI model for a final verdict.
-
-    This function handles the secure communication, authentication, and error handling
-    for the AI API call.
-
-    Args:
-        pre_analysis_report (Dict[str, Any]): The consolidated JSON report from all filters.
-
-    Returns:
-        Optional[Dict[str, Any]]: A dictionary containing the AI's verdict, confidence,
-                                  and reasoning, or None if the request fails.
+    Handles sending requests to the external AI provider and returning the verdict.
     """
-    if not AI_PROVIDER_URL or not AI_PROVIDER_API_KEY:
-        logger.error("AI_PROVIDER_URL or AI_PROVIDER_API_KEY is not set in environment secrets.")
-        return None
+    def __init__(self, config: Config):
+        self.config = config
+        headers = {"Authorization": f"Bearer {self.config.ai_provider_api_key}"}
+        
+        # The httpx client is configured with the URL, headers, and timeout from the config file
+        self.client = httpx.AsyncClient(
+            base_url=self.config.ai_provider_url,
+            headers=headers,
+            timeout=self.config.ai_client_timeout
+        )
+        logger.info(f"AIClient initialized for URL: {self.config.ai_provider_url}")
 
-    headers = {
-        "Authorization": f"Bearer {AI_PROVIDER_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    # The prompt is structured to ask the AI to act as an expert adjudicator
-    payload = {
-        "model": "dan-expert-adjudicator-v1", # Example model name
-        "prompt": "You are an expert trading supervisor. Based on the following pre-analysis report from your team of automated filters, provide a final verdict on whether to take this trade.",
-        "report_data": pre_analysis_report,
-        "response_format": {
-            "verdict": "GO or NO GO",
-            "confidence": "float (0.0 to 1.0)",
-            "reasoning": "string"
-        }
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
-            response = await client.post(AI_PROVIDER_URL, headers=headers, json=payload)
-            response.raise_for_status()  # Raise an exception for non-2xx responses
-            
-            logger.info("Successfully received AI verdict.")
+    async def get_ai_verdict(self, report: Dict[str, Any]) -> Dict[str, Any]:
+        """Sends the Pre-Analysis Report to the AI and returns its decision."""
+        try:
+            logger.info("Sending Pre-Analysis Report to AI provider...")
+            # The endpoint name "/adjudicate" is assumed, but could be configured.
+            response = await self.client.post("/adjudicate", json=report)
+            response.raise_for_status() # Raises an exception for 4xx or 5xx status codes
+            logger.info("Received verdict from AI provider.")
             return response.json()
+            
+        except httpx.TimeoutException:
+            logger.error("Request to AI provider timed out.")
+            return {"verdict": "NO GO", "reasoning": "AI provider request timed out."}
+        except httpx.RequestError as e:
+            logger.error(f"Could not connect to AI provider: {e}")
+            return {"verdict": "NO GO", "reasoning": "AI provider connection error."}
+        except Exception as e:
+            logger.error(f"An unexpected error occurred with AI provider: {e}", exc_info=True)
+            return {"verdict": "NO GO", "reasoning": "A general error occurred with the AI provider."}
 
-    except httpx.RequestError as e:
-        logger.error(f"AI API Request Error: Could not connect to {e.request.url}.")
-        return None
-    except httpx.HTTPStatusError as e:
-        logger.error(f"AI API Status Error: Received status {e.response.status_code}. Response: {e.response.text}")
-        return None
-    except Exception as e:
-        logger.error(f"An unexpected error occurred while communicating with the AI: {e}")
-        return None
-
+    async def close(self):
+        """Closes the HTTP client session."""
+        await self.client.aclose()
+        logger.info("AIClient session closed.")

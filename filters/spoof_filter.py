@@ -5,39 +5,21 @@ logger = logging.getLogger(__name__)
 
 class SpoofFilter:
     """
-    Detects spoofing behavior based on rapid size changes in key order book walls.
-    Returns a JSON object with the filter's analysis.
+    Generates a report on potential spoofing activity by analyzing order book depth.
     """
     def __init__(self):
-        logger.info("SpoofFilter initialized.")
-        self.spoof_threshold = 0.15  # 15% wall delta within X seconds
-        self.detection_window = 5  # seconds (conceptual, as snapshot is point-in-time)
-        # In a real implementation, you'd track wall states over time.
-
-    async def validate(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Validates the signal against spoofing criteria.
-
-        Args:
-            signal_data (Dict[str, Any]): The market state data.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the analysis result.
-        """
-        # This logic is a placeholder for a more complex, stateful analysis.
-        # It assumes a simple snapshot comparison for demonstration.
-        # The proprietary logic would involve comparing current walls to historical states.
+        logger.info("SpoofFilter Initialized.")
         
-        spoof_alert = {
-            "filter_name": "SpoofFilter",
-            "spoof_detected": False,
-            "thinning_rate": None,
-            "affected_price": None,
-            "reason": "No significant wall size changes detected."
+    def generate_report(self, market_state: Any) -> Dict[str, Any]:
+        """Analyzes order book for signs of spoofing."""
+        # This is a simplified logic placeholder. A real implementation would require
+        # tracking order book changes over time.
+        total_bid_volume = market_state.depth.get("total_bid_volume", 0)
+        total_ask_volume = market_state.depth.get("total_ask_volume", 0)
+        imbalance = (total_bid_volume - total_ask_volume) / (total_bid_volume + total_ask_volume + 1e-6)
+
+        return {
+            "filter_name": self.__class__.__name__,
+            "spoofing_detected": abs(imbalance) > 0.7, # Example threshold
+            "orderbook_imbalance": round(imbalance, 4)
         }
-        
-        # Example logic: a real implementation depends on stream tracking of orderbook walls
-        # For now, this is a conceptual placeholder as we do not have historical snapshots here.
-        # This is where your proprietary logic for comparing wall states over time would be inserted.
-
-        return spoof_alert

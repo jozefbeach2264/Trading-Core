@@ -1,126 +1,123 @@
 import asyncio
 import logging
-from fastapi import FastAPI, HTTPException
-from typing import Dict, Any
-import time
+import aiohttp
+import httpx
+from contextlib import asynccontextmanager
+from typing import Optional
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+import os
 
-# Import all necessary components using absolute imports
-from config import Config
-from market_state import MarketState
-from exchange_client import ExchangeClient
-from internal_api_client import InternalApiClient
-from strategy_router import StrategyRouter
-from ai_strategy import AIStrategy
-from trade_lifecycle_manager import TradeLifecycleManager
-from risk.risk_management import CapitalManager
-from simulation_account import SimulationAccount
-from execution.ExecutionModule import ExecutionModule
+from config.config import config
+from data_managers.market_data_manager import MarketDataManager
+from system_managers.partner_checker import PartnerChecker
+from system_managers.trade_executor import TradeExecutor
+from console_display import format_market_state_for_console
 
-# --- Application Setup ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - [%(levelname)s] - %(message)s')
+# --- Application Setup: File-Based Logging ---
+
+# Ensure the log directory exists
+log_dir = os.path.dirname(config.log_file_path)
+if log_dir and not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Get the root logger and set its level
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+
+# Create a formatter
+formatter = logging.Formatter('%(asctime)s - [%(levelname)s] - (%(name)s) - %(message)s')
+
+# Create a file handler
+file_handler = logging.FileHandler(config.log_file_path)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+# Create a stream handler for console output
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+stream_handler.setFormatter(formatter)
+
+# Add both handlers to the root logger
+if not root_logger.handlers:
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(stream_handler)
+
+# Quieten noisy third-party libraries
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("watchfiles").setLevel(logging.WARNING)
+logging.getLogger("uvicorn").setLevel(logging.WARNING)
+
+# --- ADDED: Define the logger for this module ---
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="TradingCore API")
-config = Config()
+# This will hold shared instances of our manager classes
+app_state: dict = {}
 
-# --- Global State and Module Initialization ---
-app_state: Dict[str, Any] = {}
+class TradeAlert(BaseModel):
+    """Defines the structure for an incoming trade alert."""
+    symbol: str
+    signal: str
+    confidence: Optional[float] = None
 
-@app.on_event("startup")
-async def startup_event():
-    """Initializes all required modules on application startup."""
-    logger.info("--- TradingCore Startup ---")
-    symbol = "ETHUSDT" # Example symbol
-    
-    market_state = MarketState(symbol)
-    exchange_client = ExchangeClient() # Authenticated client for exchange data
-    internal_client = InternalApiClient(config) # Client for service-to-service communication
-    
-    setattr(config, 'dry_run_mode', True) 
-    simulation_account = SimulationAccount(leverage=config.leverage)
-    execution_module = ExecutionModule(config, simulation_account=simulation_account)
-
-    app_state[symbol] = {
-        "market_state": market_state,
-        "exchange_client": exchange_client,
-        "internal_client": internal_client,
-        "strategy_router": StrategyRouter(),
-        "ai_strategy": AIStrategy(),
-        "trade_lifecycle_manager": TradeLifecycleManager(config, execution_module, market_state),
-        "capital_manager": CapitalManager(config)
-    }
-    
-    app_state[symbol]["trade_lifecycle_manager"].start()
-    asyncio.create_task(data_fetch_loop(symbol))
-    logger.info("--- TradingCore is Running ---")
-
-# ... (data_fetch_loop, shutdown, and API endpoints remain the same, but with corrected client usage) ...
-async def data_fetch_loop(symbol: str):
-    """A background loop to continuously fetch market data."""
-    state = app_state[symbol]
-    exchange_client = state["exchange_client"]
-    internal_client = state["internal_client"]
-    market_state = state["market_state"]
-    
+async def console_display_loop():
+    """The main display loop."""
     while True:
-        try:
-            # Fetch data from exchange and internal services
-            tasks = [
-                exchange_client.get_klines(symbol, "1m", 100),
-                exchange_client.get_depth(symbol, 20),
-                exchange_client.get_premium_index(symbol),
-                internal_client.get_volume_data_from_neurosync() # Fetching from NeuroSync
-            ]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            if not isinstance(results[0], Exception): market_state.update_klines(results[0])
-            if not isinstance(results[1], Exception): market_state.update_depth_20(results[1])
-            if not isinstance(results[2], Exception): market_state.update_premium_index(results[2])
-            # We don't update volume here, as NeuroSync is the source of truth for that now
-            
-        except Exception as e:
-            logger.error(f"Error in data fetch loop: {e}")
-        
-        await asyncio.sleep(5)
+        manager = app_state.get("market_data_manager")
+        if manager:
+            display_string = format_market_state_for_console(manager.market_state)
+            print(display_string, end="")
+        await asyncio.sleep(1)
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Gracefully shuts down all background tasks and connections."""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("--- TradingCore Startup ---")
+    
+    aiohttp_session = aiohttp.ClientSession()
+    httpx_client = httpx.AsyncClient()
+    
+    market_manager = MarketDataManager(config, aiohttp_session, httpx_client)
+    partner_checker = PartnerChecker(config, httpx_client)
+    trade_executor = TradeExecutor(config, market_manager.market_state, httpx_client)
+    await trade_executor.initialize()
+    
+    app_state["market_data_manager"] = market_manager
+    app_state["partner_checker"] = partner_checker
+    app_state["trade_executor"] = trade_executor
+    
+    market_manager.start()
+    partner_checker.start()
+
+    console_task = asyncio.create_task(console_display_loop())
+    logger.info("--- TradingCore Startup Complete. All services running. ---")
+    
+    yield
+
     logger.info("--- TradingCore Shutdown ---")
-    for symbol, state in app_state.items():
-        await state["trade_lifecycle_manager"].stop()
-        await state["exchange_client"].close()
-        await state["internal_client"].close()
-    logger.info("--- TradingCore Shutdown Complete ---")
-
-# --- API Endpoints ---
-@app.get("/status")
-async def get_status():
-    """Returns the current status of the TradingCore."""
-    return {"status": "ok", "message": "TradingCore is running."}
-
-@app.post("/command/trigger-strategy")
-async def trigger_strategy(command: Dict[str, Any]):
-    # ... (logic remains the same)
-    strategy_name = command.get("strategy")
-    symbol = command.get("symbol", "ETHUSDT")
-
-    if not strategy_name:
-        raise HTTPException(status_code=400, detail="Strategy name is required.")
+    if console_task: console_task.cancel()
+    await partner_checker.stop()
+    await market_manager.stop()
     
-    state = app_state.get(symbol)
-    if not state:
-        raise HTTPException(status_code=404, detail=f"State for symbol {symbol} not found.")
+    await aiohttp_session.close()
+    await httpx_client.aclose()
+    logger.info("Network sessions closed.")
 
-    signal = await state["strategy_router"].run_strategy(strategy_name, state["market_state"])
-    if not signal:
-        return {"status": "ignored", "reason": "Strategy did not generate a signal."}
+app = FastAPI(title="TradingCore API", lifespan=lifespan)
 
-    ai_decision = await state["ai_strategy"].get_trade_decision(state["market_state"])
+@app.get("/status", tags=["Health"])
+def get_status():
+    """Provides a simple 200 OK health check."""
+    return {"status": "ok", "service": "TradingCore"}
+
+@app.post("/api/v1/alert", tags=["Trading"])
+async def receive_alert(alert: TradeAlert, request: Request):
+    """Receives a validated trade alert and forwards it to the executor."""
+    logger.info(f"Signal received: {alert.signal} for {alert.symbol}")
     
-    if ai_decision.get("verdict") == "GO":
-        trade_id = f"{strategy_name}_{int(time.time())}"
-        state["trade_lifecycle_manager"].start_new_trade(trade_id, signal)
-        return {"status": "EXECUTING", "decision": ai_decision, "signal": signal}
-    else:
-        return {"status": "REJECTED", "decision": ai_decision}
+    trade_executor: TradeExecutor = request.app.state["trade_executor"]
+    await trade_executor.execute_trade(alert)
+
+    return {
+        "status": "signal_received_and_forwarded_to_executor",
+        "details": alert.dict()
+    }

@@ -7,42 +7,32 @@ logger = logging.getLogger(__name__)
 
 class TimeOfDayFilter:
     """
-    Filters trades to only allow execution during pre-defined high-volume trading windows.
+    Checks if the current time is within an approved, high-volume trading window.
+    The windows are hardcoded here as per the design.
     """
     def __init__(self):
-        logger.info("TimeOfDayFilter initialized.")
-        # Define trading windows in UTC
-        self.approved_windows_utc = [
-            {"name": "London Open", "start_hour": 7, "end_hour": 9},    # 7:00 - 9:00 UTC
-            {"name": "NY Open", "start_hour": 13, "end_hour": 15}, # 13:00 - 15:00 UTC
-            {"name": "London Close", "start_hour": 15, "end_hour": 17} # 15:00 - 17:00 UTC
+        # The approved trading windows are defined here, in UTC time.
+        # Example below represents the London/New York overlap session.
+        self.approved_windows = [
+            (13, 00, 21, 00), 
         ]
+        logger.info("TimeOfDayFilter Initialized.")
 
-    async def validate(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Checks if the current time is within an approved trading window.
-
-        Args:
-            signal_data (Dict[str, Any]): The market state data.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the analysis result.
-        """
+    def generate_report(self, market_state: Any) -> Dict[str, Any]:
+        """Generates a report indicating if the current time is approved for trading."""
         now_utc = datetime.now(pytz.utc)
-        current_hour = now_utc.hour
-
-        for window in self.approved_windows_utc:
-            if window["start_hour"] <= current_hour < window["end_hour"]:
-                return {
-                    "filter_name": "TimeOfDayFilter",
-                    "status": "pass",
-                    "current_window": window["name"],
-                    "reason": f"Currently within the {window['name']} trading window."
-                }
+        current_time = now_utc.time()
+        
+        is_in_window = False
+        for start_hour, start_min, end_hour, end_min in self.approved_windows:
+            start_time = datetime.strptime(f"{start_hour}:{start_min}", "%H:%M").time()
+            end_time = datetime.strptime(f"{end_hour}:{end_min}", "%H:%M").time()
+            if start_time <= current_time <= end_time:
+                is_in_window = True
+                break
         
         return {
-            "filter_name": "TimeOfDayFilter",
-            "status": "fail",
-            "current_window": None,
-            "reason": "Outside of approved trading windows."
+            "filter_name": self.__class__.__name__,
+            "is_in_approved_window": is_in_window,
+            "current_utc_time": current_time.strftime("%H:%M:%S")
         }

@@ -1,48 +1,32 @@
 import logging
 from typing import Dict, Any, Optional
 
-# Import strategy modules
-from .trade_module_scalpel import ScalpelStrategy
+from managers.market_state import MarketState
+from trade_module_scalpel import TradeModuleScalpel
+from trade_module_trapx import TradeModuleTrapx # <-- NEW IMPORT
 
 logger = logging.getLogger(__name__)
 
 class StrategyRouter:
     """
-    Selects and executes a specific trading strategy module based on an
-    incoming command or signal trigger.
+    Selects and runs the appropriate initial signal generation strategy.
+    Updated to handle both 'scalpel' and 'trapx' strategies.
     """
     def __init__(self):
-        # Map strategy names to their respective class instances
         self.strategies = {
-            "scalpel": ScalpelStrategy(),
-            # "trapx": TrapXStrategy(), # Add other strategies here
+            "scalpel": TradeModuleScalpel(),
+            "trapx": TradeModuleTrapx() # <-- NEW STRATEGY ADDED
         }
-        logger.info(f"StrategyRouter initialized with available strategies: {list(self.strategies.keys())}")
+        logger.info("StrategyRouter initialized with available strategies: %s", list(self.strategies.keys()))
 
-    async def run_strategy(self, strategy_name: str, market_state: Any) -> Optional[Dict[str, Any]]:
+    def run_strategy(self, strategy_name: str, market_state: MarketState) -> Optional[Dict[str, Any]]:
         """
-        Runs the specified strategy to generate a potential trade signal.
-
-        Args:
-            strategy_name (str): The name of the strategy to run (e.g., 'scalpel').
-            market_state (Any): The current MarketState object.
-
-        Returns:
-            Optional[Dict[str, Any]]: A dictionary representing a trade signal if one
-                                      is generated, otherwise None.
+        Looks up the strategy by name and calls its signal generation method.
         """
-        strategy_name = strategy_name.lower()
-        strategy_module = self.strategies.get(strategy_name)
-
-        if not strategy_module:
-            logger.error(f"Strategy '{strategy_name}' not found.")
+        strategy = self.strategies.get(strategy_name.lower())
+        
+        if not strategy:
+            logger.warning(f"Strategy '{strategy_name}' not found in router.")
             return None
-
-        logger.info(f"Running strategy: '{strategy_name}'")
-        signal = await strategy_module.generate_signal(market_state)
-        
-        if signal:
-            logger.info(f"Strategy '{strategy_name}' generated a trade signal.")
-            return signal
-        
-        return None
+            
+        return strategy.generate_signal(market_state)
