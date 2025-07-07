@@ -26,10 +26,47 @@ class Config:
         self.exchange_fee_rate_taker: float = float(os.getenv('EXCHANGE_FEE_RATE_TAKER', '0.08'))
         self.max_roi_limit: float = float(os.getenv('MAX_ROI_LIMIT', '0'))
 
+        # === Autonomous Mode ===
+        self.autonomous_mode_enabled: bool = os.getenv('AUTONOMOUS_MODE_ENABLED', 'False').lower() == 'true'
+        self.trade_windows: str = os.getenv('TRADE_WINDOWS', '0-23')
+        
+        # === CTS Filter Parameters ===
+        self.cts_lookback_period: int = int(os.getenv('CTS_LOOKBACK_PERIOD', '20'))
+        self.cts_narrow_range_ratio: float = float(os.getenv('CTS_NARROW_RANGE_RATIO', '0.5'))
+        self.cts_wick_rejection_multiplier: float = float(os.getenv('CTS_WICK_REJECTION_MULTIPLIER', '2.0'))
+
+        # === Spoof Filter Parameters ===
+        self.spoof_imbalance_threshold: float = float(os.getenv('SPOOF_IMBALANCE_THRESHOLD', '0.70'))
+        self.spoof_distance_percent: float = float(os.getenv('SPOOF_DISTANCE_PERCENT', '2.0'))
+        self.spoof_large_order_multiplier: float = float(os.getenv('SPOOF_LARGE_ORDER_MULTIPLIER', '0'))
+
+        # === Compression Detector Parameters ===
+        self.compression_lookback_period: int = int(os.getenv('COMPRESSION_LOOKBACK_PERIOD', '15'))
+        self.compression_range_ratio: float = float(os.getenv('COMPRESSION_RANGE_RATIO', '0.6'))
+
+        # === Breakout Zone Origin Filter Parameters ===
+        self.breakout_zone_lookback: int = int(os.getenv('BREAKOUT_ZONE_LOOKBACK', '10'))
+        self.breakout_zone_volatility_ratio: float = float(os.getenv('BREAKOUT_ZONE_VOLATILITY_RATIO', '0.4'))
+
+        # === Retest Entry Logic Parameters ===
+        self.retest_lookback: int = int(os.getenv('RETEST_LOOKBACK', '50'))
+        self.retest_proximity_percent: float = float(os.getenv('RETEST_PROXIMITY_PERCENT', '0.1'))
+
+        # === Low Volume Guard Parameters ===
+        self.low_volume_lookback: int = int(os.getenv('LOW_VOLUME_LOOKBACK', '100'))
+        self.low_volume_ratio: float = float(os.getenv('LOW_VOLUME_RATIO', '0.5'))
+
+        # === Sentiment Divergence Filter Parameters ===
+        self.sentiment_divergence_lookback: int = int(os.getenv('SENTIMENT_DIVERGENCE_LOOKBACK', '14'))
+
+        # === OrderBook Reversal Zone Detector Parameters ===
+        self.orderbook_reversal_depth_percent: float = float(os.getenv('ORDERBOOK_REVERSAL_DEPTH_PERCENT', '1.0'))
+        self.orderbook_reversal_wall_multiplier: float = float(os.getenv('ORDERBOOK_REVERSAL_WALL_MULTIPLIER', '15'))
+
         # === Guardian & Filter Parameters ===
-        self.use_time_filter: bool = os.getenv('USE_TIME_OF_DAY_FILTER', 'True').lower() == 'true'
-        self.trading_start_hour: int = int(os.getenv('TRADING_START_HOUR', '0')) # Hour in UTC (0-23)
-        self.trading_end_hour: int = int(os.getenv('TRADING_END_HOUR', '23'))   # Hour in UTC (0-23)
+        self.use_time_of_day_filter: bool = os.getenv('USE_TIME_OF_DAY_FILTER', 'True').lower() == 'true'
+        self.trading_start_hour: int = int(os.getenv('TRADING_START_HOUR', '0'))
+        self.trading_end_hour: int = int(os.getenv('TRADING_END_HOUR', '23'))
 
         # === Operational & Module Parameters ===
         self.dry_run_mode: bool = os.getenv('DRY_RUN_MODE', 'True').lower() == 'true'
@@ -43,6 +80,16 @@ class Config:
         # === File Paths ===
         self.log_file_path: str = os.getenv("LOG_FILE_PATH", "./logs/system.log")
         self.simulation_state_file_path: str = os.getenv("SIMULATION_STATE_FILE_PATH", "./simulation_state.json")
+        
+        # === Module Log Paths ===
+        self.cts_filter_log_path: str = os.getenv("CTS_FILTER_LOG_PATH", "./logs/cts_filter.log")
+        self.spoof_filter_log_path: str = os.getenv("SPOOF_FILTER_LOG_PATH", "./logs/spoof_filter.log")
+        self.compression_detector_log_path: str = os.getenv("COMPRESSION_DETECTOR_LOG_PATH", "./logs/compression_detector.log")
+        self.breakout_filter_log_path: str = os.getenv("BREAKOUT_FILTER_LOG_PATH", "./logs/breakout_filter.log")
+        self.retest_logic_log_path: str = os.getenv("RETEST_LOGIC_LOG_PATH", "./logs/retest_logic.log")
+        self.low_volume_guard_log_path: str = os.getenv("LOW_VOLUME_GUARD_LOG_PATH", "./logs/low_volume_guard.log")
+        self.sentiment_filter_log_path: str = os.getenv("SENTIMENT_FILTER_LOG_PATH", "./logs/sentiment_filter.log")
+        self.orderbook_reversal_log_path: str = os.getenv("ORDERBOOK_REVERSAL_LOG_PATH", "./logs/orderbook_reversal.log")
 
         # === Simulation Only Parameters ===
         self.simulation_initial_capital: float = float(os.getenv("SIMULATION_INITIAL_CAPITAL", "10.00"))

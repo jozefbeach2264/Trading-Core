@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 from ai_client import AIClient
 from validator_stack import ValidatorStack
-from managers.market_state import MarketState
+from data_managers.market_state import MarketState
 
 logger = logging.getLogger(__name__)
 

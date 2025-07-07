@@ -1,38 +1,58 @@
 import logging
 from typing import Dict, Any
 from datetime import datetime
-import pytz
 
-logger = logging.getLogger(__name__)
+from config.config import Config
+from data_managers.market_state import MarketState
+
+logger = logging.getLogger("TimeOfDayFilter")
+logger.setLevel(logging.INFO)
 
 class TimeOfDayFilter:
     """
-    Checks if the current time is within an approved, high-volume trading window.
-    The windows are hardcoded here as per the design.
+    Checks if the current time is within the allowed trading hours.
     """
-    def __init__(self):
-        # The approved trading windows are defined here, in UTC time.
-        # Example below represents the London/New York overlap session.
-        self.approved_windows = [
-            (13, 00, 21, 00), 
-        ]
-        logger.info("TimeOfDayFilter Initialized.")
+    def __init__(self, config: Config):
+        self.config = config
+        self.start_hour = self.config.trading_start_hour
+        self.end_hour = self.config.trading_end_hour
 
-    def generate_report(self, market_state: Any) -> Dict[str, Any]:
-        """Generates a report indicating if the current time is approved for trading."""
-        now_utc = datetime.now(pytz.utc)
-        current_time = now_utc.time()
-        
-        is_in_window = False
-        for start_hour, start_min, end_hour, end_min in self.approved_windows:
-            start_time = datetime.strptime(f"{start_hour}:{start_min}", "%H:%M").time()
-            end_time = datetime.strptime(f"{end_hour}:{end_min}", "%H:%M").time()
-            if start_time <= current_time <= end_time:
-                is_in_window = True
-                break
-        
-        return {
-            "filter_name": self.__class__.__name__,
-            "is_in_approved_window": is_in_window,
-            "current_utc_time": current_time.strftime("%H:%M:%S")
+        logger.info(
+            f"[INIT] TimeOfDayFilter: Trading allowed between {self.start_hour}:00 and {self.end_hour}:59 UTC."
+        )
+
+    async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        """
+        Generates a report indicating if the current time is valid for trading.
+        """
+        now = datetime.utcnow()
+        current_hour = now.hour
+
+        valid = False
+        window_type = "standard"
+
+        if self.start_hour <= self.end_hour:
+            if self.start_hour <= current_hour <= self.end_hour:
+                valid = True
+        else:
+            window_type = "overnight"
+            if current_hour >= self.start_hour or current_hour <= self.end_hour:
+                valid = True
+
+        report = {
+            "filter_name": "TimeOfDayFilter",
+            "time_is_valid": valid,
+            "current_hour_utc": current_hour,
+            "window_type": window_type
         }
+
+        logger.info({
+            "timestamp": now.isoformat() + "Z",
+            "hour": current_hour,
+            "start_hour": self.start_hour,
+            "end_hour": self.end_hour,
+            "window_type": window_type,
+            "result": valid
+        })
+
+        return report

@@ -1,99 +1,93 @@
 import asyncio
+import json
 import logging
+from typing import Callable
+
 import aiohttp
-from typing import Callable, Optional, List
+import websockets
+from config.config import Config
 
 logger = logging.getLogger(__name__)
 
 class AsterdexWsClient:
-    _REST_BASE_URL = "https://fapi.asterdex.com"
-    _WS_BASE_URL = "wss://fstream.asterdex.com/ws/"
-
     def __init__(self, api_key: str, on_message_callback: Callable, session: aiohttp.ClientSession):
-        self.api_key = api_key
+        self._base_ws_url = "wss://fstream.asterdex.com/ws/"
+        self._base_api_url = "https://fapi.asterdex.com"
+        self._api_key = api_key
         self.on_message_callback = on_message_callback
-        self.session = session
-        self.listen_key: Optional[str] = None
-        self._tasks: List[asyncio.Task] = []
-        self.running = False
+        self._aiohttp_session = session
+        self.ws = None
+        self._running = False
+        self._listen_key = None
+        self._tasks = []
 
-    async def _get_listen_key(self) -> Optional[str]:
-        url = f"{self._REST_BASE_URL}/fapi/v1/listenKey"
-        headers = {'X-MBX-APIKEY': self.api_key}
-        try:
-            async with self.session.post(url, headers=headers, timeout=10) as response:
-                response.raise_for_status()
-                data = await response.json()
-                key = data.get('listenKey')
-                if key:
-                    logger.info("Successfully obtained new listen key.")
-                    return key
-        except Exception as e:
-            logger.error("Error getting listen key: %s", e)
-        return None
+    async def _get_listen_key(self) -> str:
+        url = f"{self._base_api_url}/fapi/v1/listenKey"
+        headers = {'X-MBX-APIKEY': self._api_key}
+        async with self._aiohttp_session.post(url, headers=headers) as response:
+            response.raise_for_status()
+            data = await response.json()
+            return data['listenKey']
 
     async def _keep_listen_key_alive(self):
-        url = f"{self._REST_BASE_URL}/fapi/v1/listenKey"
-        headers = {'X-MBX-APIKEY': self.api_key}
-        while self.running:
+        url = f"{self._base_api_url}/fapi/v1/listenKey"
+        headers = {'X-MBX-APIKEY': self._api_key}
+        while self._running:
+            await asyncio.sleep(30 * 60) # Keep alive every 30 minutes
             try:
-                await asyncio.sleep(30 * 60) # Sleep for 30 minutes
-                if self.listen_key and not self.session.closed:
-                        await self.session.put(url, headers=headers, timeout=10)
-            except asyncio.CancelledError:
-                # This is expected on shutdown, break the loop
-                break
+                async with self._aiohttp_session.put(url, headers=headers) as response:
+                    if response.status == 200:
+                        logger.info("Listen key kept alive.")
+                    else:
+                        logger.warning("Failed to keep listen key alive, will get new one on next reconnect.")
             except Exception as e:
-                logger.warning("Failed to send listen key keep-alive: %s", e)
+                logger.error(f"Error keeping listen key alive: {e}")
 
-
-    async def _connection_loop(self):
-        while self.running:
-            self.listen_key = await self._get_listen_key()
-            if not self.listen_key:
-                await asyncio.sleep(20)
-                continue
-            
-            ws_url = self._WS_BASE_URL + self.listen_key
+    async def _main_loop(self):
+        while self._running:
             try:
-                async with self.session.ws_connect(ws_url, heartbeat=30) as ws:
+                self._listen_key = await self._get_listen_key()
+                logger.info("Successfully obtained new listen key.")
+                url = self._base_ws_url + self._listen_key
+                
+                async with websockets.connect(url) as ws:
+                    self.ws = ws
                     logger.info("User Data Stream WebSocket connected.")
-                    async for msg in ws:
-                        if msg.type == aiohttp.WSMsgType.TEXT:
-                            await self.on_message_callback(msg.json())
-                        elif msg.type == aiohttp.WSMsgType.ERROR:
-                            break
-            except asyncio.CancelledError:
-                break # Expected on shutdown
-            except Exception:
-                # A_E: Removed detailed exception logging to reduce spam, just log reconnect
-                pass
-            
-            if not self.running:
-                break
+                    try:
+                        async for msg in self.ws:
+                            # --- ADDED DIAGNOSTIC LOGGING ---
+                            logger.info("Received message on Private User Data Stream.")
+                            data = json.loads(msg)
+                            await self.on_message_callback(data)
+                    except websockets.exceptions.ConnectionClosed as e:
+                        logger.warning(f"User Data Stream WS connection closed: {e}. Reconnecting...")
+                    except Exception as e:
+                        logger.error(f"Error in User Data Stream WS message loop: {e}", exc_info=True)
 
-            logger.info("WebSocket disconnected. Reconnecting in 10 seconds.")
-            await asyncio.sleep(10)
+            except Exception as e:
+                logger.error(f"Failed to connect to User Data Stream WS: {e}. Retrying in 10s.")
+
+            if self._running:
+                await asyncio.sleep(10)
 
     def start(self):
-        if not self.running:
-            self.running = True
-            # Create tasks individually and store them
-            self._tasks.append(asyncio.create_task(self._connection_loop()))
+        if not self._running:
+            self._running = True
+            self._tasks.append(asyncio.create_task(self._main_loop()))
             self._tasks.append(asyncio.create_task(self._keep_listen_key_alive()))
-            logger.info("AsterdexWsClient started with %d background tasks.", len(self._tasks))
+            logger.info(f"AsterdexWsClient started with {len(self._tasks)} background tasks.")
 
     async def stop(self):
-        if self.running:
-            self.running = False
-            # Cancel all running tasks for this client
+        if self._running:
+            self._running = False
+            if self.ws:
+                await self.ws.close()
             for task in self._tasks:
-                if not task.done():
-                    task.cancel()
-            
-            # Wait for all tasks to acknowledge cancellation
-            if self._tasks:
-                await asyncio.gather(*self._tasks, return_exceptions=True)
-            
-            self._tasks.clear()
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+            self._tasks = []
             logger.info("AsterdexWsClient stopped.")
+

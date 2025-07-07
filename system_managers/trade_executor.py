@@ -3,9 +3,10 @@ import hmac
 import hashlib
 import json
 import logging
-from typing import Dict, Any, Tuple  # <-- FIXED: Added Tuple
+from typing import Dict, Any, Tuple
 from decimal import Decimal, ROUND_DOWN
-from datetime import datetime      # <-- ADDED: Missing import for simulation
+from datetime import datetime
+import os
 
 import httpx
 from config.config import Config
@@ -47,8 +48,8 @@ class TradeExecutor:
         if not self.exchange_info:
             raise ValueError("Exchange info not initialized.")
         
-        tick_size = Decimal("0.01") # Default
-        step_size = Decimal("0.001") # Default
+        tick_size = Decimal("0.01")
+        step_size = Decimal("0.001")
 
         for f in self.exchange_info.get('filters', []):
             if f['filterType'] == 'PRICE_FILTER':
@@ -68,27 +69,23 @@ class TradeExecutor:
             logger.error("Cannot execute live trade: Missing account balance or mark price.")
             return
 
-        # 1. Calculate position size
         risk_amount_usd = Decimal(self.market_state.account_balance) * Decimal(self.config.risk_cap_percent)
         position_size_qty = risk_amount_usd / Decimal(self.market_state.mark_price)
         
-        # 2. Adjust to exchange filters
         try:
             final_qty, _ = self._adjust_to_filters(position_size_qty, Decimal(self.market_state.mark_price))
         except ValueError as e:
             logger.error(f"Could not place order: {e}")
             return
             
-        # 3. Prepare order payload
         params = {
             "symbol": self.config.symbol,
             "side": alert.signal,
             "type": "MARKET",
-            "quantity": f"{final_qty:.3f}",
+            "quantity": f"{final_qty}",
             "timestamp": int(time.time() * 1000)
         }
         
-        # 4. Generate signature and send order
         params['signature'] = self._get_signature(params)
         headers = {'X-MBX-APIKEY': self.config.asterdex_api_key}
         url = f"{self.base_url}/fapi/v1/order"
@@ -100,21 +97,71 @@ class TradeExecutor:
         except httpx.HTTPStatusError as e:
             logger.error(f"Error placing order: {e.response.status_code} - {e.response.text}")
 
+    def _get_simulation_state(self) -> Dict[str, Any]:
+        """Loads the simulation state from file, or creates it if it doesn't exist."""
+        path = self.config.simulation_state_file_path
+        if not os.path.exists(path):
+            logger.info(f"Simulation state file not found. Creating at {path}")
+            state = {
+                "balance": self.config.simulation_initial_capital,
+                "positions": {},
+                "history": []
+            }
+            return state
+        try:
+            with open(path, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            logger.error(f"Error reading simulation state file: {e}. Starting fresh.")
+            return {"balance": self.config.simulation_initial_capital, "positions": {}, "history": []}
+
+    def _save_simulation_state(self, state: Dict[str, Any]):
+        """Saves the updated simulation state to file."""
+        path = self.config.simulation_state_file_path
+        try:
+            with open(path, 'w') as f:
+                json.dump(state, f, indent=4)
+        except IOError as e:
+            logger.error(f"Could not save simulation state to file: {e}")
+
     async def _execute_simulated_trade(self, alert: 'TradeAlert'):
         """Simulates a trade and updates the simulation state file."""
         logger.info(f"Executing SIMULATED trade for {alert.signal} {self.config.symbol}")
         
-        log_entry = {
+        if self.market_state.mark_price is None:
+            logger.error("Cannot simulate trade: Mark price is not available.")
+            return
+
+        state = self._get_simulation_state()
+        entry_price = self.market_state.mark_price
+        
+        risk_amount_usd = Decimal(state['balance']) * Decimal(self.config.risk_cap_percent)
+        position_size_qty = risk_amount_usd / Decimal(entry_price)
+
+        fee = risk_amount_usd * Decimal(self.config.leverage) * Decimal(self.config.exchange_fee_rate_taker)
+        
+        state['balance'] -= float(fee)
+
+        trade_record = {
             "timestamp": datetime.utcnow().isoformat(),
-            "alert": alert.dict(),
-            "message": "Simulated trade executed successfully."
+            "symbol": alert.symbol,
+            "signal": alert.signal,
+            "quantity": float(position_size_qty),
+            "entry_price": entry_price,
+            "fee": float(fee)
         }
-        logger.info(f"SIMULATION: {log_entry}")
+        
+        state['history'].append(trade_record)
+        state['positions'][alert.symbol] = trade_record
+
+        self._save_simulation_state(state)
+        logger.info(f"SIMULATION: Trade recorded. New balance: {state['balance']:.2f}")
 
     async def execute_trade(self, alert: 'TradeAlert'):
         """Public method to execute a trade, switching between live and simulation."""
+        logger.info(f"[AUTONOMOUS CYCLE] Trade execution requested: {alert.signal} | Mode: {'SIM' if self.config.dry_run_mode else 'LIVE'}")
+        
         if self.config.dry_run_mode:
             await self._execute_simulated_trade(alert)
         else:
             await self._execute_live_trade(alert)
-

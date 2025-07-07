@@ -1,123 +1,130 @@
-import asyncio
 import logging
-import aiohttp
 import httpx
+import asyncio
 from contextlib import asynccontextmanager
-from typing import Optional
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from typing import Dict, Any
+from fastapi import FastAPI
 import os
 
-from config.config import config
-from data_managers.market_data_manager import MarketDataManager
-from system_managers.partner_checker import PartnerChecker
-from system_managers.trade_executor import TradeExecutor
-from console_display import format_market_state_for_console
+from config.config import Config
+from data_managers.market_state import (
+    MarketState
+)
+from data_managers.market_data_manager import (
+    MarketDataManager
+)
+from validator_stack import ValidatorStack
+from system_managers.trade_executor import (
+    TradeExecutor
+)
+from rolling5_engine import Rolling5Engine
+from ai_client import AIClient
 
-# --- Application Setup: File-Based Logging ---
-
-# Ensure the log directory exists
-log_dir = os.path.dirname(config.log_file_path)
+# --- Logging Setup ---
+log_dir = os.path.dirname(Config().log_file_path)
 if log_dir and not os.path.exists(log_dir):
     os.makedirs(log_dir)
-
-# Get the root logger and set its level
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
-
-# Create a formatter
-formatter = logging.Formatter('%(asctime)s - [%(levelname)s] - (%(name)s) - %(message)s')
-
-# Create a file handler
-file_handler = logging.FileHandler(config.log_file_path)
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-
-# Create a stream handler for console output
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-stream_handler.setFormatter(formatter)
-
-# Add both handlers to the root logger
-if not root_logger.handlers:
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(stream_handler)
-
-# Quieten noisy third-party libraries
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("watchfiles").setLevel(logging.WARNING)
-logging.getLogger("uvicorn").setLevel(logging.WARNING)
-
-# --- ADDED: Define the logger for this module ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - [%(levelname)s] - (%(name)s) - %(message)s',
+    handlers=[
+        logging.FileHandler(Config().log_file_path),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
-# This will hold shared instances of our manager classes
-app_state: dict = {}
 
-class TradeAlert(BaseModel):
-    """Defines the structure for an incoming trade alert."""
-    symbol: str
-    signal: str
-    confidence: Optional[float] = None
-
-async def console_display_loop():
-    """The main display loop."""
-    while True:
-        manager = app_state.get("market_data_manager")
-        if manager:
-            display_string = format_market_state_for_console(manager.market_state)
-            print(display_string, end="")
-        await asyncio.sleep(1)
+# --- App Lifespan Manager ---
+app_state: Dict[str, Any] = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("--- TradingCore Startup ---")
+    """
+    Manages the application's startup
+    and shutdown procedures.
+    """
+    logger.info(
+        "--- TradingCore Starting Up ---"
+    )
     
-    aiohttp_session = aiohttp.ClientSession()
-    httpx_client = httpx.AsyncClient()
+    # 1. Initialize core components
+    config = Config()
+    app_state["config"] = config
     
-    market_manager = MarketDataManager(config, aiohttp_session, httpx_client)
-    partner_checker = PartnerChecker(config, httpx_client)
-    trade_executor = TradeExecutor(config, market_manager.market_state, httpx_client)
-    await trade_executor.initialize()
+    # ✅ NECESSARY UPDATE: Using the REST URL from the provided documentation.
+    http_client = httpx.AsyncClient(
+        base_url="https://eea.okx.com"
+    )
+    app_state["http_client"] = http_client
     
-    app_state["market_data_manager"] = market_manager
-    app_state["partner_checker"] = partner_checker
-    app_state["trade_executor"] = trade_executor
+    market_state = MarketState(
+        config=config, symbol=config.symbol
+    )
+    app_state["market_state"] = market_state
     
-    market_manager.start()
-    partner_checker.start()
+    market_data_manager = MarketDataManager(
+        config=config,
+        market_state=market_state,
+        httpx_client=http_client
+    )
+    app_state["market_data_manager"] = (
+        market_data_manager
+    )
+    
+    trade_executor = TradeExecutor(
+        config=config,
+        market_state=market_state,
+        httpx_client=http_client
+    )
+    app_state["trade_executor"] = (
+        trade_executor
+    )
+    
+    # 2. Initialize autonomous components
+    app_state["validator_stack"] = (
+        ValidatorStack(config)
+    )
+    app_state["ai_client"] = AIClient(config)
+    app_state["engine"] = Rolling5Engine(
+        config=config,
+        market_state=market_state,
+        validator_stack=(
+            app_state["validator_stack"]
+        ),
+        trade_executor=trade_executor,
+        ai_client=app_state["ai_client"]
+    )
+    
+    # 3. Start background tasks
+    await app_state["market_data_manager"].start()
+    await app_state["engine"].start()
+    
+    logger.info(
+        "--- TradingCore Startup Complete ---"
+    )
+    
+    try:
+        yield
+    finally:
+        # 4. Gracefully shut down
+        logger.info(
+            "--- TradingCore Shutting Down ---"
+        )
+        await app_state["engine"].stop()
+        await app_state["ai_client"].close()
+        await (
+            app_state["market_data_manager"]
+            .stop()
+        )
+        await app_state["http_client"].aclose()
+        logger.info(
+            "--- TradingCore Shutdown Complete ---"
+        )
 
-    console_task = asyncio.create_task(console_display_loop())
-    logger.info("--- TradingCore Startup Complete. All services running. ---")
-    
-    yield
+app = FastAPI(lifespan=lifespan)
 
-    logger.info("--- TradingCore Shutdown ---")
-    if console_task: console_task.cancel()
-    await partner_checker.stop()
-    await market_manager.stop()
-    
-    await aiohttp_session.close()
-    await httpx_client.aclose()
-    logger.info("Network sessions closed.")
-
-app = FastAPI(title="TradingCore API", lifespan=lifespan)
-
-@app.get("/status", tags=["Health"])
-def get_status():
-    """Provides a simple 200 OK health check."""
-    return {"status": "ok", "service": "TradingCore"}
-
-@app.post("/api/v1/alert", tags=["Trading"])
-async def receive_alert(alert: TradeAlert, request: Request):
-    """Receives a validated trade alert and forwards it to the executor."""
-    logger.info(f"Signal received: {alert.signal} for {alert.symbol}")
-    
-    trade_executor: TradeExecutor = request.app.state["trade_executor"]
-    await trade_executor.execute_trade(alert)
-
-    return {
-        "status": "signal_received_and_forwarded_to_executor",
-        "details": alert.dict()
-    }
+# --- API Endpoints ---
+@app.get("/status")
+async def get_status():
+    return {"status": "ok"}
