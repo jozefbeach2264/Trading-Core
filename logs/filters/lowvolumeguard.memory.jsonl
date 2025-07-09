@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.783822Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:02:31.099692Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 6.359"}
-{"timestamp": "2025-07-05T19:03:44.140296Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.6364"}
-{"timestamp": "2025-07-05T19:04:55.762644Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9301"}
-{"timestamp": "2025-07-05T19:06:10.821420Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.8961"}
-{"timestamp": "2025-07-05T19:07:25.850356Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4.02 is below threshold of average 10.84."}
-{"timestamp": "2025-07-05T19:08:18.386822Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:09:32.387873Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.5566"}
-{"timestamp": "2025-07-05T19:10:47.351886Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.4769"}
-{"timestamp": "2025-07-05T19:12:01.827973Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3575"}
-{"timestamp": "2025-07-05T19:13:16.324836Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.8196"}
-{"timestamp": "2025-07-05T19:14:27.733825Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.7522"}
-{"timestamp": "2025-07-05T19:15:42.317279Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 3.42 is below threshold of average 12.18."}
-{"timestamp": "2025-07-05T19:37:55.209689Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:46:39.954687Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:47:40.468790Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4.80 is below threshold of average 16.30."}
-{"timestamp": "2025-07-05T19:48:11.539981Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:51:46.896726Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:52:32.141126Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T19:53:49.726678Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 5.81 is below threshold of average 19.40."}
-{"timestamp": "2025-07-05T20:04:28.017750Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T20:05:29.826719Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.0697"}
-{"timestamp": "2025-07-05T20:06:31.964709Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3378"}
-{"timestamp": "2025-07-05T20:07:34.988335Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.1373"}
-{"timestamp": "2025-07-05T20:08:13.610155Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T20:09:15.356163Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.91."}
-{"timestamp": "2025-07-05T20:10:17.244664Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.11 is below threshold of average 7.91."}
-{"timestamp": "2025-07-05T20:11:20.475341Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 6.80."}
-{"timestamp": "2025-07-05T20:12:22.849766Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2.27 is below threshold of average 6.80."}
-{"timestamp": "2025-07-05T20:30:36.428156Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T20:31:38.356748Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 11.09."}
-{"timestamp": "2025-07-05T20:32:40.832585Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3687"}
-{"timestamp": "2025-07-05T20:33:43.310679Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3687"}
-{"timestamp": "2025-07-05T20:34:45.888940Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 5.39."}
-{"timestamp": "2025-07-05T20:35:48.361076Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 5.39."}
-{"timestamp": "2025-07-05T20:36:50.694361Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 5.39."}
-{"timestamp": "2025-07-05T20:37:52.938123Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.97."}
-{"timestamp": "2025-07-05T20:38:54.953005Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.53."}
-{"timestamp": "2025-07-05T20:39:57.400977Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.53."}
-{"timestamp": "2025-07-05T20:40:59.713844Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.61 is below threshold of average 1.53."}
-{"timestamp": "2025-07-05T20:42:01.965248Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.5672"}
-{"timestamp": "2025-07-05T20:43:04.526950Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.07 is below threshold of average 0.49."}
-{"timestamp": "2025-07-05T21:35:08.585960Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T21:36:10.736725Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 6.11."}
-{"timestamp": "2025-07-05T21:37:04.349306Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T21:38:06.224295Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.3239"}
-{"timestamp": "2025-07-05T21:39:08.147767Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.80."}
-{"timestamp": "2025-07-05T21:40:10.851669Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.1094"}
-{"timestamp": "2025-07-05T21:41:12.711799Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9592"}
-{"timestamp": "2025-07-05T21:42:15.360603Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.5124"}
-{"timestamp": "2025-07-05T21:43:17.493678Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 6.40."}
-{"timestamp": "2025-07-05T21:44:19.324104Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.01 is below threshold of average 4.90."}
-{"timestamp": "2025-07-05T21:45:21.876008Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.06."}
-{"timestamp": "2025-07-05T21:46:24.460681Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.53 is below threshold of average 4.06."}
-{"timestamp": "2025-07-05T21:47:26.836129Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 8.4498"}
-{"timestamp": "2025-07-05T21:48:29.274890Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 7.94."}
-{"timestamp": "2025-07-05T21:49:31.611890Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 7.94."}
-{"timestamp": "2025-07-05T21:50:33.360057Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.01 is below threshold of average 6.57."}
-{"timestamp": "2025-07-05T21:51:44.488868Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.2458"}
-{"timestamp": "2025-07-05T21:52:46.944302Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.2751"}
-{"timestamp": "2025-07-05T21:53:48.758453Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 12.28."}
-{"timestamp": "2025-07-05T21:54:51.942809Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.21 is below threshold of average 13.24."}
-{"timestamp": "2025-07-05T21:55:54.275494Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.20 is below threshold of average 12.49."}
-{"timestamp": "2025-07-05T21:56:56.618140Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.20 is below threshold of average 12.49."}
-{"timestamp": "2025-07-05T21:57:58.729548Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 8.09."}
-{"timestamp": "2025-07-05T21:59:00.667658Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 8.08."}
-{"timestamp": "2025-07-05T22:00:02.371690Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 4.1246"}
-{"timestamp": "2025-07-05T22:01:04.219046Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.8676"}
-{"timestamp": "2025-07-05T22:01:35.995896Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:02:37.812961Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (2/9)."}
-{"timestamp": "2025-07-05T22:03:39.551602Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (3/9)."}
-{"timestamp": "2025-07-05T22:03:51.507250Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:04:53.655212Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (1/9)."}
-{"timestamp": "2025-07-05T22:05:36.069933Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:06:38.149544Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (2/9)."}
-{"timestamp": "2025-07-05T22:07:39.769472Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (3/9)."}
-{"timestamp": "2025-07-05T22:08:50.673188Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:09:52.374484Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (2/9)."}
-{"timestamp": "2025-07-05T22:10:53.937796Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (2/9)."}
-{"timestamp": "2025-07-05T22:11:55.910284Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (3/9)."}
-{"timestamp": "2025-07-05T22:12:57.524609Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (4/9)."}
-{"timestamp": "2025-07-05T22:13:59.522502Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (6/9)."}
-{"timestamp": "2025-07-05T22:15:01.675105Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (6/9)."}
-{"timestamp": "2025-07-05T22:15:21.733038Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:16:23.667685Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 1.96."}
-{"timestamp": "2025-07-05T22:17:27.107126Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.93."}
-{"timestamp": "2025-07-05T22:18:29.440632Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.93."}
-{"timestamp": "2025-07-05T22:19:31.286895Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.00."}
-{"timestamp": "2025-07-05T22:20:33.852181Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:21:35.506630Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.00."}
-{"timestamp": "2025-07-05T22:22:37.877205Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 426.0"}
-{"timestamp": "2025-07-05T22:23:40.340832Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 246.3066"}
-{"timestamp": "2025-07-05T22:24:42.363712Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.44 is below threshold of average 2.60."}
-{"timestamp": "2025-07-05T22:25:44.367806Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.44 is below threshold of average 2.60."}
-{"timestamp": "2025-07-05T22:26:46.953623Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.65."}
-{"timestamp": "2025-07-05T22:27:49.019961Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.65."}
-{"timestamp": "2025-07-05T22:28:51.557359Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.65."}
-{"timestamp": "2025-07-05T22:29:53.455858Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.65."}
-{"timestamp": "2025-07-05T22:30:55.694072Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.65."}
-{"timestamp": "2025-07-05T22:31:58.067027Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.62."}
-{"timestamp": "2025-07-05T22:33:00.692920Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 91.8095"}
-{"timestamp": "2025-07-05T22:34:02.946825Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.1991"}
-{"timestamp": "2025-07-05T22:35:05.645520Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.89."}
-{"timestamp": "2025-07-05T22:36:00.468906Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:37:02.361378Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.89."}
-{"timestamp": "2025-07-05T22:38:05.377483Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.89."}
-{"timestamp": "2025-07-05T22:38:45.197995Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:39:46.989446Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.02 is below threshold of average 0.89."}
-{"timestamp": "2025-07-05T22:40:49.406455Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.02 is below threshold of average 0.89."}
-{"timestamp": "2025-07-05T22:41:51.138792Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 25.6532"}
-{"timestamp": "2025-07-05T22:42:53.571297Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 15.3439"}
-{"timestamp": "2025-07-05T22:43:55.491904Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 7.5499"}
-{"timestamp": "2025-07-05T22:44:57.491136Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.186"}
-{"timestamp": "2025-07-05T22:45:59.535401Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.186"}
-{"timestamp": "2025-07-05T22:46:27.002849Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:47:28.768826Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.6933"}
-{"timestamp": "2025-07-05T22:48:30.871003Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.6261"}
-{"timestamp": "2025-07-05T22:49:33.062325Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4.00 is below threshold of average 11.92."}
-{"timestamp": "2025-07-05T22:50:35.358307Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.5362"}
-{"timestamp": "2025-07-05T22:51:37.819630Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.30 is below threshold of average 13.55."}
-{"timestamp": "2025-07-05T22:52:39.640103Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.30 is below threshold of average 13.55."}
-{"timestamp": "2025-07-05T22:53:41.380487Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.8021"}
-{"timestamp": "2025-07-05T22:54:43.242724Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.40 is below threshold of average 13.02."}
-{"timestamp": "2025-07-05T22:55:45.577590Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.0491"}
-{"timestamp": "2025-07-05T22:56:24.506278Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T22:57:26.363014Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 11.02."}
-{"timestamp": "2025-07-05T22:58:28.512793Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.4286"}
-{"timestamp": "2025-07-05T22:59:30.794383Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 9.88."}
-{"timestamp": "2025-07-05T23:00:32.908577Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 7.54."}
-{"timestamp": "2025-07-05T23:01:35.355456Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.95 is below threshold of average 7.54."}
-{"timestamp": "2025-07-05T23:02:37.960787Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.4801"}
-{"timestamp": "2025-07-05T23:03:40.441076Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.16 is below threshold of average 5.46."}
-{"timestamp": "2025-07-05T23:04:43.260835Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.8259"}
-{"timestamp": "2025-07-05T23:05:45.097436Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 5.05."}
-{"timestamp": "2025-07-05T23:06:46.821671Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 5.05."}
-{"timestamp": "2025-07-05T23:07:49.148362Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.0561"}
-{"timestamp": "2025-07-05T23:08:10.529887Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-05T23:09:12.313397Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 6.68."}
-{"timestamp": "2025-07-05T23:10:14.453497Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.20 is below threshold of average 6.56."}
-{"timestamp": "2025-07-05T23:11:16.538802Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 4.68."}
-{"timestamp": "2025-07-05T23:12:18.446945Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 4.68."}
-{"timestamp": "2025-07-05T23:13:21.327509Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.01."}
-{"timestamp": "2025-07-05T23:14:23.622187Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.40 is below threshold of average 3.77."}
-{"timestamp": "2025-07-05T23:15:25.755293Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.40 is below threshold of average 3.26."}
-{"timestamp": "2025-07-05T23:16:28.616132Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.9677"}
-{"timestamp": "2025-07-05T23:17:30.854868Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.59 is below threshold of average 2.87."}
-{"timestamp": "2025-07-05T23:18:33.359196Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.1671"}
-{"timestamp": "2025-07-05T23:19:35.739494Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.16 is below threshold of average 5.99."}
-{"timestamp": "2025-07-05T23:20:38.034603Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.7037"}
-{"timestamp": "2025-07-05T23:21:40.122124Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.2238"}
-{"timestamp": "2025-07-05T23:22:42.566643Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 9.97."}
-{"timestamp": "2025-07-05T23:23:44.676662Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 8.44."}
-{"timestamp": "2025-07-05T23:24:47.293985Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.53."}
-{"timestamp": "2025-07-05T23:25:59.042301Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.59 is below threshold of average 7.06."}
-{"timestamp": "2025-07-05T23:27:01.690104Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.59 is below threshold of average 7.06."}
-{"timestamp": "2025-07-05T23:28:03.907445Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.06."}
-{"timestamp": "2025-07-05T23:29:06.169657Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 1.40."}
-{"timestamp": "2025-07-05T23:30:08.057186Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 40.7126"}
-{"timestamp": "2025-07-05T23:31:11.104104Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.45."}
-{"timestamp": "2025-07-05T23:32:13.073156Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.45."}
-{"timestamp": "2025-07-05T23:33:15.205465Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.45."}
-{"timestamp": "2025-07-05T23:34:17.397507Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.45."}
-{"timestamp": "2025-07-05T23:35:19.815491Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.7884"}
-{"timestamp": "2025-07-05T23:36:21.647253Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 4.42."}
-{"timestamp": "2025-07-05T23:37:23.922466Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.051"}
-{"timestamp": "2025-07-05T23:38:26.477165Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.547"}
-{"timestamp": "2025-07-05T23:39:28.798826Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.1875"}
-{"timestamp": "2025-07-05T23:40:30.720668Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.76."}
-{"timestamp": "2025-07-05T23:41:34.912048Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.76."}
-{"timestamp": "2025-07-05T23:42:37.193021Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.76."}
-{"timestamp": "2025-07-05T23:43:39.425795Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.76."}
-{"timestamp": "2025-07-05T23:44:41.778448Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 4.3894"}
-{"timestamp": "2025-07-05T23:45:44.310586Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 7.1078"}
-{"timestamp": "2025-07-05T23:46:46.845783Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.16 is below threshold of average 5.52."}
-{"timestamp": "2025-07-05T23:47:49.077499Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.2316"}
-{"timestamp": "2025-07-05T23:48:51.269289Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.0544"}
-{"timestamp": "2025-07-05T23:49:52.944111Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.3213"}
-{"timestamp": "2025-07-05T23:50:55.247181Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.1052"}
-{"timestamp": "2025-07-05T23:51:57.455183Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.1052"}
-{"timestamp": "2025-07-05T23:52:59.436402Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.4281"}
-{"timestamp": "2025-07-05T23:54:02.018283Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.7884"}
-{"timestamp": "2025-07-05T23:55:04.677100Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 5.83."}
-{"timestamp": "2025-07-05T23:56:07.145944Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.98."}
-{"timestamp": "2025-07-05T23:57:09.355546Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 7.9767"}
-{"timestamp": "2025-07-05T23:58:11.969601Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 8.74."}
-{"timestamp": "2025-07-05T23:59:14.316528Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.36 is below threshold of average 7.33."}
-{"timestamp": "2025-07-06T00:00:16.551501Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.6837"}
-{"timestamp": "2025-07-06T00:01:18.959188Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.0762"}
-{"timestamp": "2025-07-06T00:02:21.528323Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.5652"}
-{"timestamp": "2025-07-06T00:03:23.712394Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.6597"}
-{"timestamp": "2025-07-06T00:04:26.109884Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.0584"}
-{"timestamp": "2025-07-06T00:05:27.987840Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.38 is below threshold of average 6.71."}
-{"timestamp": "2025-07-06T00:06:30.033811Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3022"}
-{"timestamp": "2025-07-06T00:07:31.989101Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.10 is below threshold of average 7.80."}
-{"timestamp": "2025-07-06T00:08:34.213204Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.20 is below threshold of average 7.80."}
-{"timestamp": "2025-07-06T00:09:36.420496Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.34."}
-{"timestamp": "2025-07-06T00:10:38.236169Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 5.32."}
-{"timestamp": "2025-07-06T00:11:39.974385Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9875"}
-{"timestamp": "2025-07-06T00:12:42.047643Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.31."}
-{"timestamp": "2025-07-06T00:13:44.272641Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.5817"}
-{"timestamp": "2025-07-06T00:14:46.957010Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.3112"}
-{"timestamp": "2025-07-06T00:15:49.182444Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.03 is below threshold of average 4.39."}
-{"timestamp": "2025-07-06T00:16:52.090210Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.01 is below threshold of average 4.77."}
-{"timestamp": "2025-07-06T00:17:54.012547Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.9658"}
-{"timestamp": "2025-07-06T00:18:56.734842Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.10 is below threshold of average 6.22."}
-{"timestamp": "2025-07-06T00:19:59.595196Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.10 is below threshold of average 6.22."}
-{"timestamp": "2025-07-06T00:21:01.913812Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.5159"}
-{"timestamp": "2025-07-06T00:22:04.353562Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.15."}
-{"timestamp": "2025-07-06T00:23:06.699604Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.7043"}
-{"timestamp": "2025-07-06T00:24:09.043018Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.80."}
-{"timestamp": "2025-07-06T00:25:11.552429Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.44 is below threshold of average 7.40."}
-{"timestamp": "2025-07-06T00:26:13.150571Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T00:27:15.452951Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 7.04."}
-{"timestamp": "2025-07-06T00:28:17.984987Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.0305"}
-{"timestamp": "2025-07-06T00:29:20.200209Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 6.88."}
-{"timestamp": "2025-07-06T00:30:22.376367Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 4.12."}
-{"timestamp": "2025-07-06T00:31:24.261196Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 4.1657"}
-{"timestamp": "2025-07-06T00:32:26.493150Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 4.1966"}
-{"timestamp": "2025-07-06T00:33:28.671731Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 3.01."}
-{"timestamp": "2025-07-06T00:34:30.960692Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9636"}
-{"timestamp": "2025-07-06T00:35:33.463879Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9636"}
-{"timestamp": "2025-07-06T00:36:35.959136Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.57 is below threshold of average 1.53."}
-{"timestamp": "2025-07-06T00:37:38.372696Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 6.8918"}
-{"timestamp": "2025-07-06T00:38:40.745435Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.5862"}
-{"timestamp": "2025-07-06T00:39:43.547271Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 3.77."}
-{"timestamp": "2025-07-06T00:40:45.452928Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.27 is below threshold of average 2.73."}
-{"timestamp": "2025-07-06T00:41:47.587425Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.21 is below threshold of average 2.76."}
-{"timestamp": "2025-07-06T00:42:20.558344Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T00:43:22.531165Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 3.12."}
-{"timestamp": "2025-07-06T00:44:25.203265Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 3.12."}
-{"timestamp": "2025-07-06T00:45:27.676769Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 3.6178"}
-{"timestamp": "2025-07-06T00:45:52.233627Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T00:46:54.137691Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 1.69."}
-{"timestamp": "2025-07-06T00:47:56.318792Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.9592"}
-{"timestamp": "2025-07-06T00:48:58.391822Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.10."}
-{"timestamp": "2025-07-06T00:50:00.268293Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.56"}
-{"timestamp": "2025-07-06T00:51:03.135951Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 2.44."}
-{"timestamp": "2025-07-06T00:52:05.793617Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 1.64."}
-{"timestamp": "2025-07-06T00:53:08.118483Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 1.63."}
-{"timestamp": "2025-07-06T00:54:10.375191Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 1.63."}
-{"timestamp": "2025-07-06T00:55:12.767898Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.82."}
-{"timestamp": "2025-07-06T00:56:15.145359Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.40."}
-{"timestamp": "2025-07-06T00:57:17.174132Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.40."}
-{"timestamp": "2025-07-06T00:58:19.667969Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.06 is below threshold of average 0.40."}
-{"timestamp": "2025-07-06T00:59:22.149902Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 18.9402"}
-{"timestamp": "2025-07-06T01:00:24.108700Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 403.2137"}
-{"timestamp": "2025-07-06T01:01:26.822232Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:02:29.042080Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:03:31.151076Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:04:33.078702Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:05:35.588199Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:06:38.161225Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.75."}
-{"timestamp": "2025-07-06T01:07:39.982848Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.5335"}
-{"timestamp": "2025-07-06T01:08:42.292011Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.00 is below threshold of average 0.79."}
-{"timestamp": "2025-07-06T17:27:10.477983Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T17:34:02.216686Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T17:49:17.749547Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:39:15.544184Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:40:17.209965Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:41:14.740223Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:42:16.712824Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:43:18.273834Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:44:19.507006Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T18:45:21.027515Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:20:31.075045Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:34:21.117797Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:38:07.259196Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:39:09.268330Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:39:52.271488Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:39:58.983608Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:40:14.592319Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:41:16.777907Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:41:50.572024Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:41:57.428451Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T19:43:49.639876Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:07:25.129336Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:08:26.856134Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:09:28.245246Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:10:22.338956Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:10:44.712775Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:11:46.418986Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:12:47.845118Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:13:49.409173Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:14:50.882208Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:15:52.666310Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:17:00.681194Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:18:02.297623Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:19:03.646853Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:20:05.112672Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:21:06.637625Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:22:08.714645Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:23:10.217742Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:50:12.847224Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T20:54:56.468648Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
-{"timestamp": "2025-07-06T21:19:13.459551Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline data (0/9)."}
+{"timestamp": "2025-07-08T23:51:00.664011Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (10/20)."}
+{"timestamp": "2025-07-08T23:52:02.148733Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (11/20)."}
+{"timestamp": "2025-07-08T23:59:00.164506Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (4/20)."}
+{"timestamp": "2025-07-09T00:00:01.536694Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (5/20)."}
+{"timestamp": "2025-07-09T00:01:03.106399Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (6/20)."}
+{"timestamp": "2025-07-09T00:02:04.461440Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (7/20)."}
+{"timestamp": "2025-07-09T00:03:06.759059Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (8/20)."}
+{"timestamp": "2025-07-09T00:04:08.576202Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (9/20)."}
+{"timestamp": "2025-07-09T00:05:10.129744Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (10/20)."}
+{"timestamp": "2025-07-09T00:06:11.313976Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (11/20)."}
+{"timestamp": "2025-07-09T00:07:12.795209Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (12/20)."}
+{"timestamp": "2025-07-09T00:08:14.454143Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (13/20)."}
+{"timestamp": "2025-07-09T00:09:16.245294Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (14/20)."}
+{"timestamp": "2025-07-09T00:10:17.922672Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (15/20)."}
+{"timestamp": "2025-07-09T00:11:19.676579Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (16/20)."}
+{"timestamp": "2025-07-09T00:12:21.374885Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (17/20)."}
+{"timestamp": "2025-07-09T00:13:23.409509Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (18/20)."}
+{"timestamp": "2025-07-09T00:14:24.776071Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Not enough kline history to calculate average volume (19/20)."}
+{"timestamp": "2025-07-09T00:15:26.177329Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2794.16 is below threshold."}
+{"timestamp": "2025-07-09T00:16:28.180113Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.6117"}
+{"timestamp": "2025-07-09T00:17:30.393171Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.9836"}
+{"timestamp": "2025-07-09T00:18:32.438107Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2396.24 is below threshold."}
+{"timestamp": "2025-07-09T00:30:24.408115Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 6.02 is below threshold."}
+{"timestamp": "2025-07-09T00:31:26.076529Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2880.43 is below threshold."}
+{"timestamp": "2025-07-09T00:32:27.993209Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.5955"}
+{"timestamp": "2025-07-09T00:33:30.318621Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 0.6431"}
+{"timestamp": "2025-07-09T00:35:06.609366Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 540.18 is below threshold."}
+{"timestamp": "2025-07-09T00:36:19.358228Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2926.00 is below threshold."}
+{"timestamp": "2025-07-09T00:37:21.430266Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2081.19 is below threshold."}
+{"timestamp": "2025-07-09T00:42:28.964686Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 45.06 is below threshold."}
+{"timestamp": "2025-07-09T02:20:22.095597Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1.70 is below threshold."}
+{"timestamp": "2025-07-09T02:20:37.398747Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 14.05 is below threshold."}
+{"timestamp": "2025-07-09T02:22:45.406403Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 522.79 is below threshold."}
+{"timestamp": "2025-07-09T02:25:19.060970Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 15.36 is below threshold."}
+{"timestamp": "2025-07-09T02:31:11.413527Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4.10 is below threshold."}
+{"timestamp": "2025-07-09T02:32:13.265829Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1997.43 is below threshold."}
+{"timestamp": "2025-07-09T02:33:15.377433Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1351.31 is below threshold."}
+{"timestamp": "2025-07-09T02:34:17.356640Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1083.04 is below threshold."}
+{"timestamp": "2025-07-09T02:35:19.672053Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4007.00 is below threshold."}
+{"timestamp": "2025-07-09T02:36:40.283542Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 352.31 is below threshold."}
+{"timestamp": "2025-07-09T02:37:42.772318Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4388.59 is below threshold."}
+{"timestamp": "2025-07-09T02:38:44.994010Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4145.04 is below threshold."}
+{"timestamp": "2025-07-09T02:39:47.044301Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 3795.03 is below threshold."}
+{"timestamp": "2025-07-09T02:40:49.288908Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4227.34 is below threshold."}
+{"timestamp": "2025-07-09T02:53:38.601614Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 230.47 is below threshold."}
+{"timestamp": "2025-07-09T02:54:21.695405Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 212.45 is below threshold."}

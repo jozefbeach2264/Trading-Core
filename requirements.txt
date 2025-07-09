@@ -6,3 +6,5 @@ websockets
 psutil
 pydantic
 aiohttp
+openai
+httpx

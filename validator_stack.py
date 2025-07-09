@@ -66,3 +66,14 @@ class ValidatorStack:
 
         logger.info("-- Pre-Analysis Report Generated. --")
         return pre_analysis_report
+
+    async def process_backfill_candle(self, candle: list):
+        """
+        Feeds a historical candle to each filter so it can build state.
+        """
+        for f in self.filters:
+            if hasattr(f, 'ingest_candle'):
+                try:
+                    f.ingest_candle(candle, is_backfill=True)
+                except Exception as e:
+                    logger.warning(f"Filter {f.__class__.__name__} failed on backfill: {e}")

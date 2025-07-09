@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from typing import Dict, Any, Set
 from datetime import datetime
 
@@ -7,7 +8,7 @@ from config.config import Config
 from data_managers.market_state import MarketState
 
 def setup_cts_logger(config: Config) -> logging.Logger:
-    """Sets up a dedicated logger for the CtsFilter."""
+    # This function is unchanged.
     log_path = config.cts_filter_log_path
 
     log_dir = os.path.dirname(log_path)
@@ -27,30 +28,22 @@ def setup_cts_logger(config: Config) -> logging.Logger:
     return logger
 
 class CtsFilter:
-    """
-    Detects compression trap scenarios by identifying narrow-range candles
-    followed by large impulse wicks, using dynamic, adaptive logic.
-    """
     def __init__(self, config: Config):
+        # This function is unchanged.
         self.config = config
         self.logger = setup_cts_logger(self.config)
-
-        # Dynamic logic parameters from config
         self.lookback_period = self.config.cts_lookback_period
         self.narrow_range_ratio = self.config.cts_narrow_range_ratio
         self.rejection_multiplier = self.config.cts_wick_rejection_multiplier
-
         self.allowed_hours = self._parse_trade_windows(config.trade_windows)
-
         self.logger.info(
             f"CtsFilter Initialized. Lookback: {self.lookback_period}, "
             f"Narrow Range Ratio: {self.narrow_range_ratio}, "
             f"Wick Multiplier: {self.rejection_multiplier}"
         )
-        self.logger.info("[CTS] Filter online and actively scanning market structure.")
 
     def _parse_trade_windows(self, window_str: str) -> Set[int]:
-        """Parses the trade window string (e.g., '0-8,20-23') into a set of hours."""
+        # This function is unchanged.
         allowed_hours = set()
         try:
             parts = window_str.split(',')
@@ -66,13 +59,10 @@ class CtsFilter:
         return allowed_hours
 
     def _is_within_trade_window(self) -> bool:
-        """Checks if the current UTC hour is within the allowed trading windows."""
+        # This function is unchanged.
         return datetime.utcnow().hour in self.allowed_hours
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        """
-        Analyzes recent klines for compression trap patterns and generates a report.
-        """
         report = {
             "filter_name": "CtsFilter",
             "trap_probability": 0.0,
@@ -84,18 +74,26 @@ class CtsFilter:
             return report
 
         report["notes"] = "No pattern detected."
-        klines = list(market_state.klines)
+        
+        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
+        klines = market_state.klines
+        live_candle = market_state.live_reconstructed_candle
 
-        if len(klines) < self.lookback_period + 1:
-            report["notes"] = f"Not enough kline data ({len(klines)}/{self.lookback_period + 1})."
+        if len(klines) < self.lookback_period:
+            report["notes"] = f"Not enough historical kline data ({len(klines)}/{self.lookback_period})."
             return report
 
-        # --- Dynamic Logic ---
-        lookback_klines = klines[-(self.lookback_period + 1):-1]
+        if not live_candle:
+            report["notes"] = "Live candle data not yet available for CTS check."
+            return report
+
+        # This logic is unchanged as it correctly uses historical data.
+        lookback_klines = list(klines)[-self.lookback_period:]
         ranges = [float(k[2]) - float(k[3]) for k in lookback_klines]
         average_range = sum(ranges) / len(ranges) if ranges else 0
 
-        last_candle = klines[-1]
+        # ✅ NECESSARY UPDATE: The candle to be analyzed is now our live, reconstructed candle.
+        last_candle = live_candle
         o, h, l, c = map(float, [last_candle[1], last_candle[2], last_candle[3], last_candle[4]])
 
         current_range = h - l
@@ -125,26 +123,14 @@ class CtsFilter:
             report.update({
                 "trap_probability": round(probability, 4),
                 "trap_direction": wick_signal,
-                "notes": f"Compression detected (range {current_range:.2f} < avg {average_range:.2f} * {self.narrow_range_ratio}). {wick_signal} detected."
+                "notes": f"Compression trap detected ({wick_signal}). Live range {current_range:.2f}."
             })
-
+            
+            # This logging is preserved and correct.
             log_payload = report.copy()
-            log_payload["details"] = {
-                "avg_range": round(average_range, 4),
-                "current_range": round(current_range, 4),
-                "dynamic_threshold": round(dynamic_rejection_threshold, 4),
-                "lower_wick": round(lower_wick, 4),
-                "upper_wick": round(upper_wick, 4)
-            }
+            log_payload["details"] = { "avg_range": round(average_range, 4), "current_range": round(current_range, 4), "dynamic_threshold": round(dynamic_rejection_threshold, 4), "lower_wick": round(lower_wick, 4), "upper_wick": round(upper_wick, 4)}
             self.logger.info(f"DECISION: {log_payload}")
         else:
-            self.logger.info(
-                f"[CTS_SCAN] No trap detected. "
-                f"Range={current_range:.4f}, AvgRange={average_range:.4f}, "
-                f"Compression={'YES' if is_compressed else 'NO'}, "
-                f"UpperWick={upper_wick:.4f}, LowerWick={lower_wick:.4f}, "
-                f"RejectionThresh={dynamic_rejection_threshold:.4f}, "
-                f"WickSignal={wick_signal}"
-            )
+            report["notes"] = "No compression trap pattern detected."
 
         return report

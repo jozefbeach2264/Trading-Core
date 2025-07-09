@@ -2,7 +2,7 @@ modules = ["nodejs-20", "python-3.11"]
 # This sets the entire environment to use a recent Python version (3.11+)
 [nix]
 channel = "stable-23_11"
-packages = ["pkg"]
+packages = ["pkg", "mailutils"]
 
 # This configures the main "Run" button with the more reliable command
 [deployment]

@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.783295Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:02:31.099291Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:03:44.140043Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2500"}
-{"timestamp": "2025-07-05T19:04:55.762315Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:06:10.821153Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:07:25.849963Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3714"}
-{"timestamp": "2025-07-05T19:08:18.382699Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:09:32.387621Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.3286"}
-{"timestamp": "2025-07-05T19:10:47.351574Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:12:01.827681Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:13:16.324461Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:14:27.733311Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T19:15:42.316970Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.6857"}
-{"timestamp": "2025-07-05T19:37:55.209267Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:46:39.954344Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:47:40.468321Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.4286"}
-{"timestamp": "2025-07-05T19:48:11.539473Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:51:46.891830Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:52:32.140806Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T19:53:49.726284Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.3000 vs Avg=0.5929"}
-{"timestamp": "2025-07-05T20:04:28.017399Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T20:05:29.826423Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:06:31.964331Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2500"}
-{"timestamp": "2025-07-05T20:07:34.988094Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:08:13.609776Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T20:09:15.355887Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2786"}
-{"timestamp": "2025-07-05T20:10:17.244261Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2786"}
-{"timestamp": "2025-07-05T20:11:20.474947Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:12:22.849361Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:30:36.425876Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T20:31:38.356345Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3286"}
-{"timestamp": "2025-07-05T20:32:40.832323Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.3286"}
-{"timestamp": "2025-07-05T20:33:43.310060Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.3286"}
-{"timestamp": "2025-07-05T20:34:45.888540Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3357"}
-{"timestamp": "2025-07-05T20:35:48.360843Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3214"}
-{"timestamp": "2025-07-05T20:36:50.694060Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2786"}
-{"timestamp": "2025-07-05T20:37:52.937814Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2143"}
-{"timestamp": "2025-07-05T20:38:54.952667Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2143"}
-{"timestamp": "2025-07-05T20:39:57.400542Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1929"}
-{"timestamp": "2025-07-05T20:40:59.713329Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:42:01.965061Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T20:43:04.526522Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T21:35:08.585544Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T21:36:10.736376Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=1.2571"}
-{"timestamp": "2025-07-05T21:37:04.348938Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T21:38:06.223908Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=1.2214"}
-{"timestamp": "2025-07-05T21:39:08.147338Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=1.2214"}
-{"timestamp": "2025-07-05T21:40:10.851243Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.7071"}
-{"timestamp": "2025-07-05T21:41:12.710463Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.6000"}
-{"timestamp": "2025-07-05T21:42:15.360252Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3286"}
-{"timestamp": "2025-07-05T21:43:17.493266Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2929"}
-{"timestamp": "2025-07-05T21:44:19.323807Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2929"}
-{"timestamp": "2025-07-05T21:45:21.875728Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1286"}
-{"timestamp": "2025-07-05T21:46:24.460308Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T21:47:26.835792Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T21:48:29.274465Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2857"}
-{"timestamp": "2025-07-05T21:49:31.611453Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2857"}
-{"timestamp": "2025-07-05T21:50:33.359625Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1643"}
-{"timestamp": "2025-07-05T21:51:44.488337Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T21:52:46.943806Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T21:53:48.758030Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2571"}
-{"timestamp": "2025-07-05T21:54:51.942592Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2571"}
-{"timestamp": "2025-07-05T21:55:54.275112Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2643"}
-{"timestamp": "2025-07-05T21:56:56.617764Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2643"}
-{"timestamp": "2025-07-05T21:57:58.729220Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2643"}
-{"timestamp": "2025-07-05T21:59:00.667141Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2643"}
-{"timestamp": "2025-07-05T22:00:02.371323Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:01:04.218715Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:01:35.995581Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:02:37.812503Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (2/15)"}
-{"timestamp": "2025-07-05T22:03:39.551122Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (3/15)"}
-{"timestamp": "2025-07-05T22:03:51.507013Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:04:53.654857Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (1/15)"}
-{"timestamp": "2025-07-05T22:05:36.069477Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:06:38.149245Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (2/15)"}
-{"timestamp": "2025-07-05T22:07:39.769007Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (3/15)"}
-{"timestamp": "2025-07-05T22:08:50.672826Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:09:52.374094Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (2/15)"}
-{"timestamp": "2025-07-05T22:10:53.937341Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (2/15)"}
-{"timestamp": "2025-07-05T22:11:55.909827Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (3/15)"}
-{"timestamp": "2025-07-05T22:12:57.524234Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (4/15)"}
-{"timestamp": "2025-07-05T22:13:59.522221Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (6/15)"}
-{"timestamp": "2025-07-05T22:15:01.674700Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (6/15)"}
-{"timestamp": "2025-07-05T22:15:21.732748Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:16:23.667294Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1929"}
-{"timestamp": "2025-07-05T22:17:27.106744Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1357"}
-{"timestamp": "2025-07-05T22:18:29.440245Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0357"}
-{"timestamp": "2025-07-05T22:19:31.286510Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0143"}
-{"timestamp": "2025-07-05T22:20:33.850591Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:21:35.506207Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0143"}
-{"timestamp": "2025-07-05T22:22:37.876838Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0143"}
-{"timestamp": "2025-07-05T22:23:40.339999Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Avg range is zero. Invalid."}
-{"timestamp": "2025-07-05T22:24:42.360598Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:25:44.367393Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:26:46.953224Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:27:49.019644Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:28:51.555775Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:29:53.455492Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:30:55.693629Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:31:58.066586Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0286"}
-{"timestamp": "2025-07-05T22:33:00.692589Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:34:02.946490Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:35:05.645119Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1214"}
-{"timestamp": "2025-07-05T22:36:00.468404Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:37:02.361040Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1214"}
-{"timestamp": "2025-07-05T22:38:05.377110Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1214"}
-{"timestamp": "2025-07-05T22:38:45.197704Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:39:46.987930Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0929"}
-{"timestamp": "2025-07-05T22:40:49.406030Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0929"}
-{"timestamp": "2025-07-05T22:41:51.138469Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0929"}
-{"timestamp": "2025-07-05T22:42:53.570998Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:43:55.491576Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:44:57.490846Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:45:59.535026Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:46:27.002461Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/15)"}
-{"timestamp": "2025-07-05T22:47:28.767521Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:48:30.870674Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3857"}
-{"timestamp": "2025-07-05T22:49:33.062052Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3857"}
-{"timestamp": "2025-07-05T22:50:35.358029Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:51:37.819270Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.5071"}
-{"timestamp": "2025-07-05T22:52:39.639747Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.5071"}
-{"timestamp": "2025-07-05T22:53:41.380169Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.5071"}
-{"timestamp": "2025-07-05T22:54:43.242334Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.5143"}
-{"timestamp": "2025-07-05T22:55:45.577295Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T22:56:24.506024Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-05T22:57:26.362709Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4400"}
-{"timestamp": "2025-07-05T22:58:28.512355Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4400"}
-{"timestamp": "2025-07-05T22:59:30.794071Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4400"}
-{"timestamp": "2025-07-05T23:00:32.908179Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4400"}
-{"timestamp": "2025-07-05T23:01:35.355105Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:02:37.960325Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4500"}
-{"timestamp": "2025-07-05T23:03:40.440307Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.4050"}
-{"timestamp": "2025-07-05T23:04:43.260483Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:05:45.097098Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3250"}
-{"timestamp": "2025-07-05T23:06:46.821270Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3250"}
-{"timestamp": "2025-07-05T23:07:49.147765Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2900"}
-{"timestamp": "2025-07-05T23:08:10.529656Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-05T23:09:12.313028Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2450"}
-{"timestamp": "2025-07-05T23:10:14.453148Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2450"}
-{"timestamp": "2025-07-05T23:11:16.538388Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1600"}
-{"timestamp": "2025-07-05T23:12:18.446659Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1600"}
-{"timestamp": "2025-07-05T23:13:21.327272Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1600"}
-{"timestamp": "2025-07-05T23:14:23.621904Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2000"}
-{"timestamp": "2025-07-05T23:15:25.754983Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-05T23:16:28.615853Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-05T23:17:30.854481Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-05T23:18:33.358913Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:19:35.739052Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:20:38.034234Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:21:40.121455Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:22:42.565838Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2400"}
-{"timestamp": "2025-07-05T23:23:44.676361Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2400"}
-{"timestamp": "2025-07-05T23:24:47.293628Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2250"}
-{"timestamp": "2025-07-05T23:25:59.041907Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:27:01.689792Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:28:03.907163Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:29:06.169314Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:30:08.056781Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:31:11.103758Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:32:13.072856Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:33:15.205165Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:34:17.397262Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:35:19.815140Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:36:21.646971Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1350"}
-{"timestamp": "2025-07-05T23:37:23.922044Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:38:26.476890Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1400"}
-{"timestamp": "2025-07-05T23:39:28.798455Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:40:30.720080Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1200"}
-{"timestamp": "2025-07-05T23:41:34.911675Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0850"}
-{"timestamp": "2025-07-05T23:42:37.192655Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0550"}
-{"timestamp": "2025-07-05T23:43:39.425430Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0550"}
-{"timestamp": "2025-07-05T23:44:41.778108Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:45:44.310246Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:46:46.845416Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0700"}
-{"timestamp": "2025-07-05T23:47:49.077232Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.0700"}
-{"timestamp": "2025-07-05T23:48:51.268937Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:49:52.943823Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:50:55.246707Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:51:57.454860Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:52:59.436038Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:54:02.017939Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:55:04.676743Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1750"}
-{"timestamp": "2025-07-05T23:56:07.145564Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1650"}
-{"timestamp": "2025-07-05T23:57:09.355095Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-05T23:58:11.969285Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1850"}
-{"timestamp": "2025-07-05T23:59:14.316149Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-06T00:00:16.551135Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:01:18.958819Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:02:21.527977Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1800"}
-{"timestamp": "2025-07-06T00:03:23.712013Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:04:26.109585Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:05:27.987608Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:06:30.033480Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:07:31.988592Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3250"}
-{"timestamp": "2025-07-06T00:08:34.212778Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3250"}
-{"timestamp": "2025-07-06T00:09:36.420297Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3250"}
-{"timestamp": "2025-07-06T00:10:38.235844Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2950"}
-{"timestamp": "2025-07-06T00:11:39.974073Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2950"}
-{"timestamp": "2025-07-06T00:12:42.047354Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2800"}
-{"timestamp": "2025-07-06T00:13:44.272296Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.2550"}
-{"timestamp": "2025-07-06T00:14:46.956661Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2600"}
-{"timestamp": "2025-07-06T00:15:49.182093Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.1000 vs Avg=0.2650"}
-{"timestamp": "2025-07-06T00:16:52.089993Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2700"}
-{"timestamp": "2025-07-06T00:17:54.012307Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:18:56.734490Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2800"}
-{"timestamp": "2025-07-06T00:19:59.594864Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2800"}
-{"timestamp": "2025-07-06T00:21:01.913422Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:22:04.353286Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.3300"}
-{"timestamp": "2025-07-06T00:23:06.699138Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:24:09.042758Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2850"}
-{"timestamp": "2025-07-06T00:25:11.552129Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:26:13.150196Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T00:27:15.452711Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2050"}
-{"timestamp": "2025-07-06T00:28:17.984537Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2050"}
-{"timestamp": "2025-07-06T00:29:20.199968Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2050"}
-{"timestamp": "2025-07-06T00:30:22.376115Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2050"}
-{"timestamp": "2025-07-06T00:31:24.260832Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2050"}
-{"timestamp": "2025-07-06T00:32:26.492699Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:33:28.671310Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.2200"}
-{"timestamp": "2025-07-06T00:34:30.960355Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1800"}
-{"timestamp": "2025-07-06T00:35:33.463491Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1800"}
-{"timestamp": "2025-07-06T00:36:35.958768Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-06T00:37:38.372315Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1700"}
-{"timestamp": "2025-07-06T00:38:40.744483Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:39:43.546998Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Cur=0.0000 vs Avg=0.1200"}
-{"timestamp": "2025-07-06T00:40:45.452593Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:41:47.587113Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T00:42:20.557899Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T00:43:22.530873Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:44:25.201798Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:45:27.675352Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:45:52.233167Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T00:46:54.137260Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:47:56.318255Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:48:58.391450Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:50:00.267985Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:51:03.135489Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:52:05.793180Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:53:08.118028Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:54:10.374808Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:55:12.767447Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:56:15.144574Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:57:17.173772Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:58:19.667535Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T00:59:22.149494Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T01:00:24.108142Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not in trade window or off."}
-{"timestamp": "2025-07-06T01:01:26.821841Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:02:29.041774Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:03:31.150795Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:04:33.078381Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:05:35.587889Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:06:38.160968Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:07:39.982321Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T01:08:42.291766Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Current candle has zero or negative range (0.0000). Ignoring."}
-{"timestamp": "2025-07-06T17:27:10.474597Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T17:34:02.215091Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T17:49:17.745965Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:39:15.543811Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:40:17.209512Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:41:14.739889Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:42:16.712504Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:43:18.273356Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:44:19.506549Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T18:45:21.027127Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:20:31.073074Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:34:21.113762Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:38:07.258739Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:39:09.267958Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:39:52.270229Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:39:58.983211Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:40:14.591943Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:41:16.777585Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:41:50.571643Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:41:57.427872Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T19:43:49.638625Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:07:25.126355Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:08:26.855848Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:09:28.244919Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:10:22.338304Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:10:44.712454Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:11:46.418720Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:12:47.844661Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:13:49.407679Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:14:50.881430Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:15:52.665691Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:17:00.680455Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:18:02.295732Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:19:03.646239Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:20:05.110608Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:21:06.637344Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:22:08.714231Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:23:10.217306Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:50:12.842942Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T20:54:56.467967Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
-{"timestamp": "2025-07-06T21:19:13.457519Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough klines (0/21)"}
+{"timestamp": "2025-07-08T23:51:00.663656Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (10/15)"}
+{"timestamp": "2025-07-08T23:52:02.148390Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (11/15)"}
+{"timestamp": "2025-07-08T23:59:00.164206Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (4/15)"}
+{"timestamp": "2025-07-09T00:00:01.536314Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (5/15)"}
+{"timestamp": "2025-07-09T00:01:03.105527Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (6/15)"}
+{"timestamp": "2025-07-09T00:02:04.460918Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (7/15)"}
+{"timestamp": "2025-07-09T00:03:06.758699Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (8/15)"}
+{"timestamp": "2025-07-09T00:04:08.575755Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (9/15)"}
+{"timestamp": "2025-07-09T00:05:10.129434Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (10/15)"}
+{"timestamp": "2025-07-09T00:06:11.313548Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (11/15)"}
+{"timestamp": "2025-07-09T00:07:12.794798Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (12/15)"}
+{"timestamp": "2025-07-09T00:08:14.453733Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (13/15)"}
+{"timestamp": "2025-07-09T00:09:16.244823Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Not enough kline history for average range (14/15)"}
+{"timestamp": "2025-07-09T00:10:17.922360Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:11:19.676072Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:12:21.374558Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0100 vs Avg=1.2467"}
+{"timestamp": "2025-07-09T00:13:23.409109Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:14:24.775667Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:15:26.176498Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.7200 vs Avg=1.2467"}
+{"timestamp": "2025-07-09T00:16:28.179708Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:17:30.392713Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:18:32.437053Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.2700 vs Avg=1.2467"}
+{"timestamp": "2025-07-09T00:30:24.406245Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Live candle has zero or negative range. Ignoring."}
+{"timestamp": "2025-07-09T00:31:26.076245Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.3000 vs Avg=1.3007"}
+{"timestamp": "2025-07-09T00:32:27.992776Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.1100 vs Avg=1.3007"}
+{"timestamp": "2025-07-09T00:33:30.318339Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:35:06.609020Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0100 vs Avg=1.1107"}
+{"timestamp": "2025-07-09T00:36:19.357835Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.2800 vs Avg=1.1107"}
+{"timestamp": "2025-07-09T00:37:21.429946Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T00:42:28.964386Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0100 vs Avg=1.0613"}
+{"timestamp": "2025-07-09T02:20:22.094107Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0600 vs Avg=1.7747"}
+{"timestamp": "2025-07-09T02:20:37.398417Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0100 vs Avg=1.7747"}
+{"timestamp": "2025-07-09T02:22:45.404989Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.1100 vs Avg=1.9167"}
+{"timestamp": "2025-07-09T02:25:19.057155Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Live candle has zero or negative range. Ignoring."}
+{"timestamp": "2025-07-09T02:31:11.410303Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Live candle has zero or negative range. Ignoring."}
+{"timestamp": "2025-07-09T02:32:13.264750Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T02:33:15.377050Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T02:34:17.356236Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.4800 vs Avg=1.6187"}
+{"timestamp": "2025-07-09T02:35:19.666496Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.3200 vs Avg=1.6187"}
+{"timestamp": "2025-07-09T02:36:40.267161Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.5800 vs Avg=1.6187"}
+{"timestamp": "2025-07-09T02:37:42.771925Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T02:38:44.993700Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.9000 vs Avg=1.6187"}
+{"timestamp": "2025-07-09T02:39:47.043947Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.7000 vs Avg=1.6187"}
+{"timestamp": "2025-07-09T02:40:49.288477Z", "filter": "CompressionDetector", "result": false, "denial_reason": "No compression detected."}
+{"timestamp": "2025-07-09T02:53:38.596992Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Live candle has zero or negative range. Ignoring."}
+{"timestamp": "2025-07-09T02:54:21.695025Z", "filter": "CompressionDetector", "result": false, "denial_reason": "Compression detected. Live Range=0.0100 vs Avg=1.4400"}

@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.783630Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:02:31.099567Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2492.08613636 is retesting resistance level at 2494.3."}
-{"timestamp": "2025-07-05T19:03:44.140208Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2491.19522727 is retesting resistance level at 2492.6."}
-{"timestamp": "2025-07-05T19:04:55.762516Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2489.73854545 is retesting resistance level at 2492.6."}
-{"timestamp": "2025-07-05T19:06:10.821331Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2490.10377273 is retesting resistance level at 2492.6."}
-{"timestamp": "2025-07-05T19:07:25.850232Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2490.20340909 is retesting resistance level at 2492.6."}
-{"timestamp": "2025-07-05T19:08:18.385481Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:09:32.387794Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2489.36263636 is retesting resistance level at 2492.0."}
-{"timestamp": "2025-07-05T19:10:47.351793Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2489.86 is retesting resistance level at 2490.2."}
-{"timestamp": "2025-07-05T19:12:01.827884Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2489.72 is retesting resistance level at 2490.4."}
-{"timestamp": "2025-07-05T19:13:16.324730Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2487.20081818 is retesting resistance level at 2490.4."}
-{"timestamp": "2025-07-05T19:14:27.733680Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2487.51259091 is retesting resistance level at 2490.4."}
-{"timestamp": "2025-07-05T19:15:42.317179Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2488.15 is retesting resistance level at 2490.4."}
-{"timestamp": "2025-07-05T19:37:55.209547Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:46:39.954525Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:47:40.468645Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2505.07595455 is retesting resistance level at 2504.4."}
-{"timestamp": "2025-07-05T19:48:11.539735Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:51:46.893625Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:52:32.141028Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T19:53:49.726574Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2504.48622727 is retesting resistance level at 2507.5."}
-{"timestamp": "2025-07-05T20:04:28.017643Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T20:05:29.826622Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2507.43927273 is retesting resistance level at 2506.1."}
-{"timestamp": "2025-07-05T20:06:31.964581Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2505.21281818 is retesting resistance level at 2507.7."}
-{"timestamp": "2025-07-05T20:07:34.988262Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2505.49281818 is retesting resistance level at 2507.7."}
-{"timestamp": "2025-07-05T20:08:13.610038Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T20:09:15.356060Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2502.28218182 is retesting resistance level at 2507.7."}
-{"timestamp": "2025-07-05T20:10:17.244475Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2502.22204545 is retesting resistance level at 2507.7."}
-{"timestamp": "2025-07-05T20:11:20.475215Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2501.44818182 is retesting resistance level at 2505.5."}
-{"timestamp": "2025-07-05T20:12:22.849637Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2502.49927273 is retesting resistance level at 2505.5."}
-{"timestamp": "2025-07-05T20:30:36.427502Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T20:31:38.356617Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2499.35 is retesting resistance level at 2498.6."}
-{"timestamp": "2025-07-05T20:32:40.832489Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2500.40168182 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:33:43.310447Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2499.80759091 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:34:45.888801Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2499.59577273 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:35:48.361003Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2499.31781818 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:36:50.694269Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2500.55190909 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:37:52.938007Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2501.08221531 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:38:54.952901Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2500.38389713 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:39:57.400864Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2500.29135167 is retesting resistance level at 2500.3."}
-{"timestamp": "2025-07-05T20:40:59.713606Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2501.72453349 is retesting resistance level at 2501.2."}
-{"timestamp": "2025-07-05T20:42:01.965190Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2502.46921531 is retesting resistance level at 2501.2."}
-{"timestamp": "2025-07-05T20:43:04.526786Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2502.84375 is retesting resistance level at 2502.6."}
-{"timestamp": "2025-07-05T21:35:08.585854Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T21:36:10.736604Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.70404545 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:37:04.349206Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T21:38:06.224171Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.93768182 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:39:08.147656Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.78959091 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:40:10.851579Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.35536364 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:41:12.711702Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.27186364 is retesting resistance level at 2515.7."}
-{"timestamp": "2025-07-05T21:42:15.360466Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.42122727 is retesting resistance level at 2515.7."}
-{"timestamp": "2025-07-05T21:43:17.493568Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.69059091 is retesting resistance level at 2515.2."}
-{"timestamp": "2025-07-05T21:44:19.324013Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.16554545 is retesting resistance level at 2516.3."}
-{"timestamp": "2025-07-05T21:45:21.875910Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.43213636 is retesting resistance level at 2516.3."}
-{"timestamp": "2025-07-05T21:46:24.460546Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.70645455 is retesting resistance level at 2516.9."}
-{"timestamp": "2025-07-05T21:47:26.836013Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.49804545 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:48:29.274755Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.45740909 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:49:31.611760Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.46 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:50:33.359927Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.94 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:51:44.488698Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.89 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:52:46.944162Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.66627273 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T21:53:48.758333Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.92840909 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:54:51.942741Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.58313636 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:55:54.275376Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.54809091 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:56:56.618005Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.32072727 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:57:58.729438Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.67695455 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T21:59:00.667436Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.5 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-05T22:00:02.371580Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.54640909 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T22:01:04.218933Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.49368182 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T22:01:35.995797Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:02:37.812848Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (2/6)."}
-{"timestamp": "2025-07-05T22:03:39.551422Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (3/6)."}
-{"timestamp": "2025-07-05T22:03:51.507169Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:04:53.655103Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (1/6)."}
-{"timestamp": "2025-07-05T22:05:36.069812Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:06:38.149421Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (2/6)."}
-{"timestamp": "2025-07-05T22:07:39.769289Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (3/6)."}
-{"timestamp": "2025-07-05T22:08:50.673072Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:09:52.374356Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (2/6)."}
-{"timestamp": "2025-07-05T22:10:53.937659Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (2/6)."}
-{"timestamp": "2025-07-05T22:11:55.910173Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (3/6)."}
-{"timestamp": "2025-07-05T22:12:57.524458Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (4/6)."}
-{"timestamp": "2025-07-05T22:13:59.522404Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.69002392 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:15:01.675000Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.08012201 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:15:21.732940Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:16:23.667519Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.5260311 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:17:27.107011Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.97025837 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:18:29.440482Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.37221292 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:19:31.286792Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.36454545 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:20:33.852060Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:21:35.506419Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.88986364 is retesting resistance level at 2513.5."}
-{"timestamp": "2025-07-05T22:22:37.877097Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.94 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-05T22:23:40.340707Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.93977273 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:24:42.361411Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.853 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:25:44.367698Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.77704545 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:26:46.953461Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.61786364 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:27:49.019859Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.639 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:28:51.557221Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.63180144 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:29:53.455750Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.23877273 is retesting resistance level at 2517.2."}
-{"timestamp": "2025-07-05T22:30:55.693926Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.87690191 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:31:58.066899Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.99844737 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:33:00.692809Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.48894737 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:34:02.946726Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.87790191 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:35:05.645381Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.31804545 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:36:00.468772Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:37:02.361250Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.39290909 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T22:38:05.377348Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.55681818 is retesting resistance level at 2515.1."}
-{"timestamp": "2025-07-05T22:38:45.197879Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:39:46.989335Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.66886364 is retesting resistance level at 2515.9."}
-{"timestamp": "2025-07-05T22:40:49.406297Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.51890909 is retesting resistance level at 2515.9."}
-{"timestamp": "2025-07-05T22:41:51.138678Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.02813636 is retesting resistance level at 2515.9."}
-{"timestamp": "2025-07-05T22:42:53.571212Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.2 is retesting resistance level at 2517.7."}
-{"timestamp": "2025-07-05T22:43:55.491791Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.11813636 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T22:44:57.491037Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.52504545 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T22:45:59.535274Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.9835 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T22:46:27.002754Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:47:28.768223Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.89254545 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T22:48:30.870898Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.08472727 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T22:49:33.062240Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.08013636 is retesting resistance level at 2519.9."}
-{"timestamp": "2025-07-05T22:50:35.358216Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.51127273 is retesting resistance level at 2519.9."}
-{"timestamp": "2025-07-05T22:51:37.819503Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.51 is retesting resistance level at 2519.9."}
-{"timestamp": "2025-07-05T22:52:39.639963Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.06 is retesting resistance level at 2519.9."}
-{"timestamp": "2025-07-05T22:53:41.380387Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.22745455 is retesting resistance level at 2518.2."}
-{"timestamp": "2025-07-05T22:54:43.242604Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.22 is retesting resistance level at 2518.2."}
-{"timestamp": "2025-07-05T22:55:45.577482Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.49 is retesting resistance level at 2518.2."}
-{"timestamp": "2025-07-05T22:56:24.506186Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T22:57:26.362913Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.09 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T22:58:28.512675Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.48 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T22:59:30.794271Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.15368182 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T23:00:32.908426Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.56490909 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T23:01:35.355349Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.79 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T23:02:37.960666Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.11 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-05T23:03:40.440898Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.74 is retesting resistance level at 2519.2."}
-{"timestamp": "2025-07-05T23:04:43.260742Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.04 is retesting resistance level at 2520.0."}
-{"timestamp": "2025-07-05T23:05:45.097315Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.01553349 is retesting resistance level at 2520.2."}
-{"timestamp": "2025-07-05T23:06:46.821526Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.81948804 is retesting resistance level at 2520.2."}
-{"timestamp": "2025-07-05T23:07:49.148152Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.84021531 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:08:10.529820Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-05T23:09:12.313307Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.86959091 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:10:14.453388Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.87 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:11:16.538665Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.07595455 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:12:18.446852Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.01477273 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:13:21.327436Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.95353349 is retesting resistance level at 2520.3."}
-{"timestamp": "2025-07-05T23:14:23.622084Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.03096651 is retesting resistance level at 2521.1."}
-{"timestamp": "2025-07-05T23:15:25.755194Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.11073923 is retesting resistance level at 2521.1."}
-{"timestamp": "2025-07-05T23:16:28.616045Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2520.09 is retesting resistance level at 2521.1."}
-{"timestamp": "2025-07-05T23:17:30.854761Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.76996651 is retesting resistance level at 2521.1."}
-{"timestamp": "2025-07-05T23:18:33.359121Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.48727273 is retesting resistance level at 2521.1."}
-{"timestamp": "2025-07-05T23:19:35.739353Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.28918182 is retesting resistance level at 2520.6."}
-{"timestamp": "2025-07-05T23:20:38.034429Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.91 is retesting resistance level at 2520.1."}
-{"timestamp": "2025-07-05T23:21:40.121940Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.45567464 is retesting resistance level at 2520.1."}
-{"timestamp": "2025-07-05T23:22:42.566383Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.0842488 is retesting resistance level at 2520.1."}
-{"timestamp": "2025-07-05T23:23:44.676548Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.55 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:24:47.293873Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.13729426 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:25:59.042139Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.26533493 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:27:01.690004Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.0 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:28:03.907363Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.13 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:29:06.169546Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.7 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:30:08.057076Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.76404545 is retesting resistance level at 2518.9."}
-{"timestamp": "2025-07-05T23:31:11.103951Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.22 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:32:13.073070Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.73122727 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:33:15.205363Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.78981818 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:34:17.397420Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.36986364 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:35:19.815368Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.98022727 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:36:21.647167Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.37695455 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:37:23.922312Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.42 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:38:26.477085Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.43 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:39:28.798729Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.79 is retesting resistance level at 2518.8."}
-{"timestamp": "2025-07-05T23:40:30.720438Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.07 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:41:34.911910Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.1 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:42:37.192891Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.1 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:43:39.425690Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.12 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:44:41.778343Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.61 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:45:44.310461Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.6 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:46:46.845698Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.57 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:47:49.077400Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.01 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:48:51.269186Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.51 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:49:52.943994Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.67783971 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:50:55.247020Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.51729426 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:51:57.455080Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.1037488 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:52:59.436303Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.37847608 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:54:02.018181Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.36886364 is retesting resistance level at 2517.1."}
-{"timestamp": "2025-07-05T23:55:04.676952Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.87 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:56:07.145827Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.99 is retesting resistance level at 2516.7."}
-{"timestamp": "2025-07-05T23:57:09.355362Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.9 is retesting resistance level at 2516.4."}
-{"timestamp": "2025-07-05T23:58:11.969486Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.7587823 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-05T23:59:14.316352Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.53986124 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:00:16.551359Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.10786124 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:01:18.959074Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.5854067 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:02:21.528206Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.41845215 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:03:23.712261Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.36604545 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:04:26.109790Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.85245455 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:05:27.987752Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.99859091 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:06:30.033695Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.82018182 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:07:31.989014Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.07 is retesting resistance level at 2515.2."}
-{"timestamp": "2025-07-06T00:08:34.213040Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.26 is retesting resistance level at 2515.2."}
-{"timestamp": "2025-07-06T00:09:36.420436Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.84480861 is retesting resistance level at 2514.7."}
-{"timestamp": "2025-07-06T00:10:38.236064Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.42354545 is retesting resistance level at 2514.7."}
-{"timestamp": "2025-07-06T00:11:39.974263Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.09456459 is retesting resistance level at 2514.7."}
-{"timestamp": "2025-07-06T00:12:42.047540Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2512.59012201 is retesting resistance level at 2514.2."}
-{"timestamp": "2025-07-06T00:13:44.272507Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2512.04481818 is retesting resistance level at 2514.2."}
-{"timestamp": "2025-07-06T00:14:46.956903Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.04140909 is retesting resistance level at 2514.2."}
-{"timestamp": "2025-07-06T00:15:49.182329Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2512.61026555 is retesting resistance level at 2513.1."}
-{"timestamp": "2025-07-06T00:16:52.090150Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.07205263 is retesting resistance level at 2513.2."}
-{"timestamp": "2025-07-06T00:17:54.012472Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2511.98920096 is retesting resistance level at 2513.2."}
-{"timestamp": "2025-07-06T00:18:56.734734Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2512.11490909 is retesting resistance level at 2513.2."}
-{"timestamp": "2025-07-06T00:19:59.595078Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.07618182 is retesting resistance level at 2513.2."}
-{"timestamp": "2025-07-06T00:21:01.913680Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.92086364 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:22:04.353457Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.29904545 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:23:06.699403Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.56368182 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:24:09.042934Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.50763636 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:25:11.552333Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.17018182 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:26:13.150440Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T00:27:15.452865Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.54077273 is retesting resistance level at 2515.8."}
-{"timestamp": "2025-07-06T00:28:17.984855Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.70777273 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:29:20.200110Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.94259091 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:30:22.376281Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.73140909 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:31:24.261079Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.14981818 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:32:26.493017Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2513.60004545 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:33:28.671569Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.23 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:34:30.960599Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.04263636 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:35:33.463741Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.51640909 is retesting resistance level at 2516.0."}
-{"timestamp": "2025-07-06T00:36:35.959015Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.74963636 is retesting resistance level at 2514.6."}
-{"timestamp": "2025-07-06T00:37:38.372574Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.84286364 is retesting resistance level at 2514.6."}
-{"timestamp": "2025-07-06T00:38:40.744954Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.02668182 is retesting resistance level at 2514.8."}
-{"timestamp": "2025-07-06T00:39:43.547183Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2514.72527273 is retesting resistance level at 2514.8."}
-{"timestamp": "2025-07-06T00:40:45.452815Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.01 is retesting resistance level at 2517.0."}
-{"timestamp": "2025-07-06T00:41:47.587317Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.30286364 is retesting resistance level at 2517.4."}
-{"timestamp": "2025-07-06T00:42:20.558237Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T00:43:22.531067Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.16490909 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:44:25.202797Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.99336364 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:45:27.676302Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.22809091 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:45:52.233446Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T00:46:54.137496Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.40968182 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:47:56.318542Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.85163636 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:48:58.391725Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2515.96495455 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:50:00.268189Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.35845455 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:51:03.135810Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.51495455 is retesting resistance level at 2517.8."}
-{"timestamp": "2025-07-06T00:52:05.793465Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.95381818 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-06T00:53:08.118351Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.23795455 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-06T00:54:10.375055Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.34172727 is retesting resistance level at 2516.5."}
-{"timestamp": "2025-07-06T00:55:12.767758Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.35363636 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:56:15.144873Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.46918421 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:57:17.174010Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.35411005 is retesting resistance level at 2516.2."}
-{"timestamp": "2025-07-06T00:58:19.667828Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.36010526 is retesting resistance level at 2518.3."}
-{"timestamp": "2025-07-06T00:59:22.149802Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.75020813 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:00:24.108473Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2519.04243541 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:01:26.822110Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.6264067 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:02:29.041980Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.57848804 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:03:31.150993Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2517.42677273 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:04:33.078605Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.0 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:05:35.588066Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.25059091 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:06:38.161150Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.28481818 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:07:39.982686Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2518.30368182 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T01:08:42.291921Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Price 2516.81109091 is retesting resistance level at 2519.8."}
-{"timestamp": "2025-07-06T17:27:10.475878Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T17:34:02.216127Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T17:49:17.747367Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:39:15.544055Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:40:17.209738Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:41:14.740074Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:42:16.712720Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:43:18.273679Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:44:19.506849Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T18:45:21.027322Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:20:31.074584Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:34:21.116856Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:38:07.259049Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:39:09.268244Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:39:52.270446Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:39:58.983450Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:40:14.592210Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:41:16.777804Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:41:50.571914Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:41:57.428304Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T19:43:49.638876Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:07:25.127350Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:08:26.856039Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:09:28.245137Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:10:22.338723Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:10:44.712674Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:11:46.418903Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:12:47.844984Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:13:49.408701Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:14:50.882095Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:15:52.666109Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:17:00.680969Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:18:02.296824Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:19:03.646637Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:20:05.112558Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:21:06.637528Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:22:08.714510Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:23:10.217558Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:50:12.846311Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T20:54:56.468412Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
-{"timestamp": "2025-07-06T21:19:13.458781Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline data (0/6)."}
+{"timestamp": "2025-07-08T23:51:00.663869Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (10/20)."}
+{"timestamp": "2025-07-08T23:52:02.148627Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (11/20)."}
+{"timestamp": "2025-07-08T23:59:00.164412Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (4/20)."}
+{"timestamp": "2025-07-09T00:00:01.536559Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (5/20)."}
+{"timestamp": "2025-07-09T00:01:03.106083Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (6/20)."}
+{"timestamp": "2025-07-09T00:02:04.461249Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (7/20)."}
+{"timestamp": "2025-07-09T00:03:06.758939Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (8/20)."}
+{"timestamp": "2025-07-09T00:04:08.576102Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (9/20)."}
+{"timestamp": "2025-07-09T00:05:10.129642Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (10/20)."}
+{"timestamp": "2025-07-09T00:06:11.313825Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (11/20)."}
+{"timestamp": "2025-07-09T00:07:12.795058Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (12/20)."}
+{"timestamp": "2025-07-09T00:08:14.454050Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (13/20)."}
+{"timestamp": "2025-07-09T00:09:16.245133Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (14/20)."}
+{"timestamp": "2025-07-09T00:10:17.922576Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (15/20)."}
+{"timestamp": "2025-07-09T00:11:19.676395Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (16/20)."}
+{"timestamp": "2025-07-09T00:12:21.374780Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (17/20)."}
+{"timestamp": "2025-07-09T00:13:23.409401Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (18/20)."}
+{"timestamp": "2025-07-09T00:14:24.775950Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Not enough kline history to establish levels (19/20)."}
+{"timestamp": "2025-07-09T00:15:26.177063Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2608.28 is retesting support at 2607.31."}
+{"timestamp": "2025-07-09T00:16:28.179995Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2606.77 is retesting support at 2607.31."}
+{"timestamp": "2025-07-09T00:17:30.393017Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2607.02 is retesting support at 2607.31."}
+{"timestamp": "2025-07-09T00:18:32.437736Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2606.73 is retesting support at 2607.31."}
+{"timestamp": "2025-07-09T00:30:24.406910Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:31:26.076439Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:32:27.993041Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:33:30.318537Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:35:06.609281Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:36:19.358081Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:37:21.430159Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T00:42:28.964589Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2608.24 is retesting support at 2609.24."}
+{"timestamp": "2025-07-09T02:20:22.094980Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T02:20:37.398634Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T02:22:45.405801Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T02:25:19.058634Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T02:31:11.412886Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2606.0 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:32:13.265653Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2606.72 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:33:15.377305Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2607.0 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:34:17.356517Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.94 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:35:19.671421Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.5 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:36:40.282725Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.91 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:37:42.772188Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2605.02 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:38:44.993923Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.0 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:39:47.044186Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2603.99 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:40:49.288817Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.0 is retesting resistance at 2604.99."}
+{"timestamp": "2025-07-09T02:53:38.600919Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2603.4 is retesting support at 2601.13."}
+{"timestamp": "2025-07-09T02:54:21.695272Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2602.64 is retesting support at 2600.67."}

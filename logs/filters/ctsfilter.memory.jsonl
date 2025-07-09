@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.782884Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:02:31.099037Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:03:44.139824Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:04:55.762051Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:06:10.820914Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:07:25.849720Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:08:18.379448Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:09:32.387361Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:10:47.351274Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:12:01.827389Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:13:16.324235Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:14:27.732986Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:15:42.316729Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:37:55.208967Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:46:39.954084Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:47:40.467970Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T19:48:11.539220Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:51:46.883084Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:52:32.140479Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T19:53:49.726023Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:04:28.017078Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T20:05:29.825516Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:06:31.964031Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:07:34.987895Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:08:13.609465Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T20:09:15.355642Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:10:17.243985Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:11:20.474662Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:12:22.849077Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:30:36.424911Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T20:31:38.356080Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:32:40.832075Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:33:43.309792Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:34:45.888282Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:35:48.360627Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:36:50.693849Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:37:52.937508Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:38:54.952404Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:39:57.400222Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:40:59.713065Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:42:01.964845Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T20:43:04.526245Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:35:08.583990Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T21:36:10.736048Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:37:04.342601Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T21:38:06.223612Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:39:08.146973Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:40:10.850952Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:41:12.709205Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:42:15.360033Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:43:17.492850Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:44:19.323526Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:45:21.875451Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:46:24.460048Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:47:26.835512Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:48:29.274164Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:49:31.611207Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:50:33.359198Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:51:44.487909Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:52:46.943457Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:53:48.757693Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:54:51.942370Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:55:54.274811Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:56:56.617494Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:57:58.728964Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T21:59:00.666702Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:00:02.371009Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:01:04.218437Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:01:35.994105Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:02:37.812182Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (2/17)."}
-{"timestamp": "2025-07-05T22:03:39.550752Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (3/17)."}
-{"timestamp": "2025-07-05T22:03:51.506776Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:04:53.654540Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (1/17)."}
-{"timestamp": "2025-07-05T22:05:36.069112Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:06:38.148989Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (2/17)."}
-{"timestamp": "2025-07-05T22:07:39.768655Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (3/17)."}
-{"timestamp": "2025-07-05T22:08:50.672467Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:09:52.373757Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (2/17)."}
-{"timestamp": "2025-07-05T22:10:53.937010Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (2/17)."}
-{"timestamp": "2025-07-05T22:11:55.909428Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (3/17)."}
-{"timestamp": "2025-07-05T22:12:57.523929Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (4/17)."}
-{"timestamp": "2025-07-05T22:13:59.521951Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (6/17)."}
-{"timestamp": "2025-07-05T22:15:01.674300Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (6/17)."}
-{"timestamp": "2025-07-05T22:15:21.732400Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:16:23.666946Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:17:27.106399Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:18:29.439960Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:19:31.286256Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:20:33.850157Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:21:35.505934Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:22:37.876467Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:23:40.338999Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:24:42.360240Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:25:44.367071Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:26:46.952934Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:27:49.019281Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:28:51.555181Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:29:53.455238Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:30:55.693277Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:31:58.066291Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:33:00.692296Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:34:02.946156Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:35:05.644826Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:36:00.468126Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:37:02.360782Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:38:05.376839Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:38:45.197433Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:39:46.987654Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:40:49.405744Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:41:51.138221Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:42:53.570711Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:43:55.491323Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:44:57.490544Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:45:59.534752Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:46:27.002236Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:47:28.766872Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:48:30.870329Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:49:33.061809Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:50:35.357781Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:51:37.818994Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:52:39.639286Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:53:41.379865Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:54:43.242116Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:55:45.577044Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:56:24.505797Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T22:57:26.362447Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:58:28.511993Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T22:59:30.793854Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:00:32.907918Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:01:35.354849Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:02:37.960004Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:03:40.439425Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:04:43.260197Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:05:45.096825Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:06:46.820898Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:07:49.147295Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:08:10.529416Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-05T23:09:12.312753Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:10:14.452871Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:11:16.538089Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:12:18.446386Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:13:21.327072Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:14:23.621701Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:15:25.754711Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:16:28.615648Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:17:30.854197Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:18:33.358582Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:19:35.738763Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:20:38.033988Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:21:40.121033Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:22:42.565103Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:23:44.676106Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:24:47.293306Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:25:59.041629Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:27:01.689466Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:28:03.906938Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:29:06.169039Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:30:08.056519Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:31:11.103511Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:32:13.072489Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:33:15.204922Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:34:17.397042Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:35:19.814872Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:36:21.646692Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:37:23.921725Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:38:26.476606Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:39:28.798142Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:40:30.719797Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:41:34.911360Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:42:37.192351Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:43:39.425199Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:44:41.777837Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:45:44.309994Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:46:46.845126Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:47:49.077020Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:48:51.268666Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:49:52.943540Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:50:55.246363Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:51:57.454604Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:52:59.435723Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:54:02.017700Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:55:04.676427Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:56:07.145295Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:57:09.354770Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:58:11.969048Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-05T23:59:14.315898Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:00:16.550876Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:01:18.958512Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:02:21.527727Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:03:23.711743Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:04:26.109342Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:05:27.987398Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:06:30.033203Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:07:31.988332Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:08:34.212344Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:09:36.420112Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:10:38.235508Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:11:39.973831Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:12:42.047134Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:13:44.272057Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:14:46.956381Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:15:49.181839Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:16:52.089794Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:17:54.012085Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:18:56.734261Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:19:59.594612Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:21:01.913127Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:22:04.353061Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:23:06.698969Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:24:09.042473Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:25:11.551882Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:26:13.149901Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T00:27:15.452446Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:28:17.984254Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:29:20.199713Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:30:22.375880Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:31:24.260517Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:32:26.492322Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:33:28.671078Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:34:30.960144Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:35:33.463197Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:36:35.957729Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:37:38.372017Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:38:40.744028Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:39:43.546765Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:40:45.450389Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:41:47.586849Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:42:20.557625Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T00:43:22.530658Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:44:25.200654Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:45:27.672913Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:45:52.232420Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T00:46:54.136975Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:47:56.317933Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:48:58.391147Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:50:00.267726Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:51:03.135226Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:52:05.792808Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:53:08.117740Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:54:10.374529Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:55:12.767104Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:56:15.138949Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:57:17.173517Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:58:19.667249Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T00:59:22.149220Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:00:24.107828Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:01:26.821581Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:02:29.041497Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:03:31.150511Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:04:33.078161Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:05:35.587695Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:06:38.160685Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:07:39.982061Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T01:08:42.291523Z", "filter": "CtsFilter", "result": false, "denial_reason": "No pattern detected."}
-{"timestamp": "2025-07-06T17:27:10.471262Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T17:34:02.213999Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T17:49:17.743993Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:39:15.543533Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:40:17.209067Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:41:14.739642Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:42:16.712228Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:43:18.272943Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:44:19.506223Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T18:45:21.026821Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:20:31.071969Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:34:21.110619Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:38:07.257783Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:39:09.267709Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:39:52.269900Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:39:58.982740Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:40:14.591740Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:41:16.777329Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:41:50.570943Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:41:57.427147Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T19:43:49.638353Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:07:25.123904Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:08:26.855563Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:09:28.244637Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:10:22.337966Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:10:44.712191Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:11:46.418512Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:12:47.844437Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:13:49.406776Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:14:50.881152Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:15:52.665206Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:17:00.678363Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:18:02.294854Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:19:03.645577Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:20:05.109179Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:21:06.637145Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:22:08.713979Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:23:10.216956Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:50:12.838052Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T20:54:56.467580Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
-{"timestamp": "2025-07-06T21:19:13.456065Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough kline data (0/17)."}
+{"timestamp": "2025-07-08T23:51:00.663403Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (10/20)."}
+{"timestamp": "2025-07-08T23:52:02.148142Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (11/20)."}
+{"timestamp": "2025-07-08T23:59:00.163959Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (4/20)."}
+{"timestamp": "2025-07-09T00:00:01.536035Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (5/20)."}
+{"timestamp": "2025-07-09T00:01:03.105130Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (6/20)."}
+{"timestamp": "2025-07-09T00:02:04.460628Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (7/20)."}
+{"timestamp": "2025-07-09T00:03:06.758433Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (8/20)."}
+{"timestamp": "2025-07-09T00:04:08.575422Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (9/20)."}
+{"timestamp": "2025-07-09T00:05:10.129176Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (10/20)."}
+{"timestamp": "2025-07-09T00:06:11.313240Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (11/20)."}
+{"timestamp": "2025-07-09T00:07:12.794442Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (12/20)."}
+{"timestamp": "2025-07-09T00:08:14.453506Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (13/20)."}
+{"timestamp": "2025-07-09T00:09:16.244559Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (14/20)."}
+{"timestamp": "2025-07-09T00:10:17.922050Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (15/20)."}
+{"timestamp": "2025-07-09T00:11:19.675500Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (16/20)."}
+{"timestamp": "2025-07-09T00:12:21.374320Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (17/20)."}
+{"timestamp": "2025-07-09T00:13:23.408768Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (18/20)."}
+{"timestamp": "2025-07-09T00:14:24.775406Z", "filter": "CtsFilter", "result": false, "denial_reason": "Not enough historical kline data (19/20)."}
+{"timestamp": "2025-07-09T00:15:26.176270Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:16:28.179280Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:17:30.392435Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:18:32.436533Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:30:24.404898Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:31:26.075984Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:32:27.992491Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.11."}
+{"timestamp": "2025-07-09T00:33:30.318038Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:35:06.608795Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bear_trap). Live range 0.01."}
+{"timestamp": "2025-07-09T00:36:19.357591Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.28."}
+{"timestamp": "2025-07-09T00:37:21.429669Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T00:42:28.964135Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:20:21.946531Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:20:37.398144Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:22:45.403860Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:25:19.051991Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:31:11.408795Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:32:13.264423Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:33:15.376654Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:34:17.355868Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:35:19.662418Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:36:40.264066Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:37:42.771636Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:38:44.993475Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:39:47.043613Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:40:49.288234Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:53:38.595827Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T02:54:21.694755Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}

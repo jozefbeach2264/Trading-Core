@@ -10,6 +10,7 @@ from data_managers.market_state import MarketState
 def setup_compression_logger(
     config: Config
 ) -> logging.Logger:
+    # This function is unchanged.
     log_path = config.compression_detector_log_path
     log_dir = os.path.dirname(log_path)
     if log_dir and not os.path.exists(
@@ -34,6 +35,7 @@ def setup_compression_logger(
 
 class CompressionDetector:
     def __init__(self, config: Config):
+        # This function is unchanged.
         self.config = config
         self.logger = (
             setup_compression_logger(config)
@@ -59,6 +61,7 @@ class CompressionDetector:
     def _parse_trade_windows(
         self, window_str: str
     ) -> Set[int]:
+        # This function is unchanged.
         allowed = set()
         try:
             for part in window_str.split(','):
@@ -77,6 +80,7 @@ class CompressionDetector:
         return allowed
 
     def _is_within_trade_window(self) -> bool:
+        # This function is unchanged.
         return datetime.utcnow().hour in (
             self.allowed_hours
         )
@@ -96,20 +100,23 @@ class CompressionDetector:
         ):
             return report
 
-        klines = list(market_state.klines)
-        if len(klines) < (
-            self.lookback_period + 1
-        ):
+        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
+        klines = market_state.klines
+        live_candle = market_state.live_reconstructed_candle
+
+        if len(klines) < self.lookback_period:
             report["notes"] = (
-                f"Not enough klines "
-                f"({len(klines)}/"
-                f"{self.lookback_period + 1})"
+                f"Not enough kline history for average range ({len(klines)}/"
+                f"{self.lookback_period})"
             )
             return report
 
-        lookback_klines = klines[
-            -(self.lookback_period + 1):-1
-        ]
+        if not live_candle:
+            report["notes"] = "Live candle data not yet available for compression check."
+            return report
+
+        # Calculate average range from historical klines.
+        lookback_klines = list(klines)[-self.lookback_period:]
         ranges = [
             float(k[2]) - float(k[3])
             for k in lookback_klines
@@ -119,30 +126,23 @@ class CompressionDetector:
             if ranges else 0
         )
 
-        last_candle = klines[-1]
-        h, l = float(last_candle[2]), float(last_candle[3])
+        # ✅ NECESSARY UPDATE: Get the current range from our live, reconstructed candle.
+        h, l = float(live_candle[2]), float(live_candle[3])
         cur_range = h - l
 
-        # --- FIX ---
-        # If the current candle has no range, it's a dead market or bad data.
-        # Treat this as a non-event, not as compression.
         if cur_range <= 0:
-            report["notes"] = (
-                f"Current candle has zero or negative range ({cur_range:.4f}). Ignoring."
-            )
+            report["notes"] = "Live candle has zero or negative range. Ignoring."
             return report
-        # --- END FIX ---
 
         if avg_range == 0:
-            report["notes"] = (
-                "Avg range is zero. Invalid."
-            )
+            report["notes"] = "Average historical range is zero. Cannot calculate compression."
             return report
 
         is_compressed = (
             cur_range < avg_range * self.range_ratio
         )
-
+        
+        # This logging is preserved and updated with the new live data.
         self.logger.info(json.dumps({
             "level": "DEBUG",
             "avg_range": round(avg_range, 4),
@@ -160,7 +160,7 @@ class CompressionDetector:
                 "compression_score": round(score, 4),
                 "notes": (
                     f"Compression detected. "
-                    f"Cur={cur_range:.4f} "
+                    f"Live Range={cur_range:.4f} "
                     f"vs Avg={avg_range:.4f}"
                 )
             })
@@ -172,9 +172,10 @@ class CompressionDetector:
                 "compression_score": round(score, 4),
                 "cur_range": round(cur_range, 4),
                 "avg_range": round(avg_range, 4),
-                "lookback": self.lookback_period,
-                "ratio": self.range_ratio,
                 "result": True
             }))
+        else:
+            report["notes"] = "No compression detected."
 
         return report
+

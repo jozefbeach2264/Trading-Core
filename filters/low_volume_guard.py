@@ -8,6 +8,7 @@ from config.config import Config
 from data_managers.market_state import MarketState
 
 def setup_low_volume_logger(config: Config) -> logging.Logger:
+    # This function is unchanged.
     log_path = config.low_volume_guard_log_path
     log_dir = os.path.dirname(log_path)
     if log_dir and not os.path.exists(log_dir):
@@ -27,6 +28,7 @@ def setup_low_volume_logger(config: Config) -> logging.Logger:
 
 class LowVolumeGuard:
     def __init__(self, config: Config):
+        # This function is unchanged.
         self.config = config
         self.logger = setup_low_volume_logger(self.config)
         self.lookback = self.config.low_volume_lookback
@@ -34,6 +36,7 @@ class LowVolumeGuard:
         self.allowed_hours = self._parse_trade_windows(config.trade_windows)
 
     def _parse_trade_windows(self, window_str: str) -> Set[int]:
+        # This function is unchanged.
         allowed_hours = set()
         try:
             parts = window_str.split(',')
@@ -49,6 +52,7 @@ class LowVolumeGuard:
         return allowed_hours
 
     def _is_within_trade_window(self) -> bool:
+        # This function is unchanged.
         return datetime.utcnow().hour in self.allowed_hours
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
@@ -60,47 +64,42 @@ class LowVolumeGuard:
         }
         
         if not self.config.autonomous_mode_enabled or not self._is_within_trade_window():
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": "Not in trade window or autonomous mode off"
-            }))
             return report
 
-        klines = list(market_state.klines)
-        if len(klines) < self.lookback + 1:
-            report["notes"] = f"Not enough kline data ({len(klines)}/{self.lookback + 1})."
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": "Insufficient kline data",
-                "klines_available": len(klines),
-                "klines_required": self.lookback + 1
-            }))
+        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
+        klines = market_state.klines
+        live_candle = market_state.live_reconstructed_candle
+
+        # Check for historical data to calculate the average
+        if len(klines) < self.lookback:
+            report["notes"] = f"Not enough kline history to calculate average volume ({len(klines)}/{self.lookback})."
+            return report
+            
+        # Check for the live intra-candle data to get current volume
+        if not live_candle:
+            report["notes"] = "Live candle data not yet available for volume check."
             return report
 
-        lookback_klines = klines[-(self.lookback + 1):-1]
+        # Calculate average volume from the historical klines.
+        lookback_klines = list(klines)[-self.lookback:]
         volumes = [float(k[5]) for k in lookback_klines]
         average_volume = sum(volumes) / len(volumes) if volumes else 0
-        current_volume = float(klines[-1][5])
+
+        # ✅ NECESSARY UPDATE: Get the current volume from the live reconstructed candle.
+        current_volume = float(live_candle[5])
 
         if average_volume == 0:
-            report["notes"] = "Average volume is zero, cannot calculate ratio."
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": "Zero average volume"
-            }))
+            report["notes"] = "Average historical volume is zero, cannot calculate ratio."
             return report
 
         is_low_volume = current_volume < (average_volume * self.volume_ratio)
-        calculated_ratio = current_volume / average_volume
+        calculated_ratio = current_volume / average_volume if average_volume > 0 else 0
 
         if is_low_volume:
             report.update({
                 "low_volume_detected": True,
                 "volume_ratio": round(calculated_ratio, 4),
-                "notes": f"Low volume detected. Current volume {current_volume:.2f} is below threshold of average {average_volume:.2f}."
+                "notes": f"Low volume detected. Current volume {current_volume:.2f} is below threshold."
             })
             self.logger.info(json.dumps({
                 "timestamp": datetime.utcnow().isoformat() + "Z",

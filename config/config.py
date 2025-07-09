@@ -9,7 +9,7 @@ class Config:
         self.asterdex_api_key: str = os.getenv("ASTERDEX_API_KEY")
         self.asterdex_api_secret: str = os.getenv("ASTERDEX_API_SECRET")
         self.ai_provider_url: str = os.getenv("AI_PROVIDER_URL")
-        self.ai_provider_api_key: str = os.getenv("AI_PROVIDER_API_KEY")
+        self.xai_api_key: str = os.getenv("XAI_API_KEY")
 
         # === Inter-Service Communication ===
         self.neurosync_volume_data_url: str = os.getenv("NEUROSYNC_VOLUME_DATA_URL")

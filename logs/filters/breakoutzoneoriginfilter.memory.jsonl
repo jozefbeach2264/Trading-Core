@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.783450Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:02:31.099412Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2182 > threshold."}
-{"timestamp": "2025-07-05T19:03:44.140130Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:04:55.762397Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:06:10.821244Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:07:25.850080Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:08:18.384273Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:09:32.387708Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:10:47.351689Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.4182 > threshold."}
-{"timestamp": "2025-07-05T19:12:01.827790Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.4182 < Pre-breakout avg 0.5333"}
-{"timestamp": "2025-07-05T19:13:16.324613Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:14:27.733474Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:15:42.317084Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:37:55.209449Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:46:39.954438Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:47:40.468488Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T19:48:11.539594Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:51:46.892888Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:52:32.140919Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T19:53:49.726434Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:04:28.017521Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T20:05:29.826515Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.3273 > threshold."}
-{"timestamp": "2025-07-05T20:06:31.964445Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:07:34.988168Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2818 > threshold."}
-{"timestamp": "2025-07-05T20:08:13.609888Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T20:09:15.355981Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:10:17.244374Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:11:20.475067Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:12:22.849488Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:30:36.427007Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T20:31:38.356449Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:32:40.832411Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:33:43.310167Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:34:45.888672Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:35:48.360927Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:36:50.694177Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:37:52.937916Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:38:54.952806Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:39:57.400753Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:40:59.713420Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:42:01.965128Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T20:43:04.526652Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:35:08.585731Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T21:36:10.736481Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:37:04.349093Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T21:38:06.224049Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:39:08.147460Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:40:10.851450Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:41:12.710943Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:42:15.360357Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:43:17.493363Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:44:19.323895Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:45:21.875825Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:46:24.460454Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:47:26.835904Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.1636 < Pre-breakout avg 0.3667"}
-{"timestamp": "2025-07-05T21:48:29.274612Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:49:31.611604Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:50:33.359782Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:51:44.488509Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:52:46.943983Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2091 > threshold."}
-{"timestamp": "2025-07-05T21:53:48.758185Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:54:51.942667Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:55:54.275243Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:56:56.617874Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:57:58.729320Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T21:59:00.667314Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:00:02.371442Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:01:04.218825Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2818 > threshold."}
-{"timestamp": "2025-07-05T22:01:35.995692Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:02:37.812715Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (2/15)."}
-{"timestamp": "2025-07-05T22:03:39.551310Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (3/15)."}
-{"timestamp": "2025-07-05T22:03:51.507094Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:04:53.654976Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (1/15)."}
-{"timestamp": "2025-07-05T22:05:36.069693Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:06:38.149330Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (2/15)."}
-{"timestamp": "2025-07-05T22:07:39.769127Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (3/15)."}
-{"timestamp": "2025-07-05T22:08:50.672944Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:09:52.374226Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (2/15)."}
-{"timestamp": "2025-07-05T22:10:53.937503Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (2/15)."}
-{"timestamp": "2025-07-05T22:11:55.909972Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (3/15)."}
-{"timestamp": "2025-07-05T22:12:57.524352Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (4/15)."}
-{"timestamp": "2025-07-05T22:13:59.522325Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (6/15)."}
-{"timestamp": "2025-07-05T22:15:01.674857Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (6/15)."}
-{"timestamp": "2025-07-05T22:15:21.732851Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:16:23.667404Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:17:27.106881Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:18:29.440371Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:19:31.286660Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:20:33.851930Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:21:35.506316Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:22:37.876973Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:23:40.340604Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:24:42.360751Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:25:44.367527Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:26:46.953358Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:27:49.019758Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:28:51.557077Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:29:53.455616Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:30:55.693818Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:31:58.066767Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:33:00.692708Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:34:02.946618Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.0364 < Pre-breakout avg 0.2333"}
-{"timestamp": "2025-07-05T22:35:05.645262Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:36:00.468528Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:37:02.361145Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:38:05.377227Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:38:45.197794Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:39:46.989227Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:40:49.406178Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:41:51.138578Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:42:53.571115Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:43:55.491701Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.1182 < Pre-breakout avg 0.4000"}
-{"timestamp": "2025-07-05T22:44:57.490937Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:45:59.535138Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:46:27.002649Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:47:28.767713Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:48:30.870798Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:49:33.062152Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:50:35.358123Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:51:37.819395Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:52:39.639856Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:53:41.380280Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:54:43.242456Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:55:45.577392Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.6455 > threshold."}
-{"timestamp": "2025-07-05T22:56:24.506105Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T22:57:26.362815Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:58:28.512493Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T22:59:30.794180Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:00:32.908304Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:01:35.355239Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:02:37.960449Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:03:40.440601Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:04:43.260640Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:05:45.097214Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:06:46.821402Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:07:49.147955Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:08:10.529748Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-05T23:09:12.313191Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:10:14.453268Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:11:16.538518Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:12:18.446757Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:13:21.327359Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:14:23.621992Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:15:25.755093Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:16:28.615934Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:17:30.854636Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:18:33.359031Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:19:35.739175Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:20:38.034344Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:21:40.121717Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:22:42.566111Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:23:44.676459Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:24:47.293756Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:25:59.042027Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:27:01.689900Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:28:03.907262Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:29:06.169433Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:30:08.056922Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:31:11.103848Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:32:13.072967Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:33:15.205265Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:34:17.397343Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:35:19.815253Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:36:21.647074Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:37:23.922166Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:38:26.476991Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:39:28.798604Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:40:30.720300Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:41:34.911799Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:42:37.192788Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:43:39.425527Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:44:41.778226Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:45:44.310360Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:46:46.845593Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:47:49.077313Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:48:51.269065Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:49:52.943908Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:50:55.246910Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:51:57.454963Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:52:59.436191Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.1091 < Pre-breakout avg 0.1000"}
-{"timestamp": "2025-07-05T23:54:02.018073Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.1091 < Pre-breakout avg 0.1000"}
-{"timestamp": "2025-07-05T23:55:04.676842Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:56:07.145707Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:57:09.355262Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:58:11.969384Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-05T23:59:14.316247Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:00:16.551250Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2818 > threshold."}
-{"timestamp": "2025-07-06T00:01:18.958957Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2818 > threshold."}
-{"timestamp": "2025-07-06T00:02:21.528103Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:03:23.712140Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:04:26.109688Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:05:27.987676Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:06:30.033595Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.2182 < Pre-breakout avg 0.6000"}
-{"timestamp": "2025-07-06T00:07:31.988916Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:08:34.212912Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:09:36.420367Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:10:38.235965Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:11:39.974164Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:12:42.047458Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:13:44.272392Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:14:46.956787Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:15:49.182202Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:16:52.090079Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:17:54.012396Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.2545 > threshold."}
-{"timestamp": "2025-07-06T00:18:56.734608Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:19:59.594974Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:21:01.913567Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.0909 < Pre-breakout avg 0.4000"}
-{"timestamp": "2025-07-06T00:22:04.353368Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:23:06.699328Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:24:09.042837Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:25:11.552230Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Invalid origin zone. Origin range 0.3091 > threshold."}
-{"timestamp": "2025-07-06T00:26:13.150324Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T00:27:15.452798Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:28:17.984760Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:29:20.200042Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:30:22.376196Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:31:24.260948Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:32:26.492862Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:33:28.671428Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:34:30.960463Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:35:33.463626Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:36:35.958897Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:37:38.372432Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:38:40.744768Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:39:43.547085Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:40:45.452706Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Valid breakout origin. Origin range 0.0273 < Pre-breakout avg 0.0667"}
-{"timestamp": "2025-07-06T00:41:47.587205Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:42:20.558133Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T00:43:22.530973Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:44:25.202325Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:45:27.675819Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:45:52.233292Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T00:46:54.137374Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:47:56.318388Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:48:58.391580Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:50:00.268094Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:51:03.135694Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:52:05.793308Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:53:08.118191Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:54:10.374919Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:55:12.767619Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:56:15.144724Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:57:17.173900Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:58:19.667679Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T00:59:22.149670Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:00:24.108320Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:01:26.821950Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:02:29.041882Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:03:31.150895Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:04:33.078479Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:05:35.587976Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:06:38.161070Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:07:39.982442Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T01:08:42.291844Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
-{"timestamp": "2025-07-06T17:27:10.475305Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T17:34:02.215614Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T17:49:17.746788Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:39:15.543932Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:40:17.209622Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:41:14.739986Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:42:16.712616Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:43:18.273510Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:44:19.506711Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T18:45:21.027226Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:20:31.073663Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:34:21.114685Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:38:07.258936Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:39:09.268155Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:39:52.270349Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:39:58.983321Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:40:14.592061Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:41:16.777702Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:41:50.571789Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:41:57.428122Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T19:43:49.638730Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:07:25.126855Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:08:26.855948Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:09:28.245038Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:10:22.338444Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:10:44.712563Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:11:46.418819Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:12:47.844850Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:13:49.408288Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:14:50.881985Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:15:52.665883Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:17:00.680712Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:18:02.296384Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:19:03.646509Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:20:05.110736Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:21:06.637444Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:22:08.714318Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:23:10.217407Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:50:12.845199Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T20:54:56.468225Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
-{"timestamp": "2025-07-06T21:19:13.458143Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough kline data (0/15)."}
+{"timestamp": "2025-07-08T23:51:00.663758Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (10/53)."}
+{"timestamp": "2025-07-08T23:52:02.148498Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (11/53)."}
+{"timestamp": "2025-07-08T23:59:00.164311Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (4/53)."}
+{"timestamp": "2025-07-09T00:00:01.536426Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (5/53)."}
+{"timestamp": "2025-07-09T00:01:03.105743Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (6/53)."}
+{"timestamp": "2025-07-09T00:02:04.461101Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (7/53)."}
+{"timestamp": "2025-07-09T00:03:06.758809Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (8/53)."}
+{"timestamp": "2025-07-09T00:04:08.575864Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (9/53)."}
+{"timestamp": "2025-07-09T00:05:10.129540Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (10/53)."}
+{"timestamp": "2025-07-09T00:06:11.313709Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (11/53)."}
+{"timestamp": "2025-07-09T00:07:12.794914Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (12/53)."}
+{"timestamp": "2025-07-09T00:08:14.453894Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (13/53)."}
+{"timestamp": "2025-07-09T00:09:16.244961Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (14/53)."}
+{"timestamp": "2025-07-09T00:10:17.922464Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (15/53)."}
+{"timestamp": "2025-07-09T00:11:19.676216Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (16/53)."}
+{"timestamp": "2025-07-09T00:12:21.374670Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (17/53)."}
+{"timestamp": "2025-07-09T00:13:23.409290Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (18/53)."}
+{"timestamp": "2025-07-09T00:14:24.775800Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (19/53)."}
+{"timestamp": "2025-07-09T00:15:26.176627Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (20/53)."}
+{"timestamp": "2025-07-09T00:16:28.179821Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (21/53)."}
+{"timestamp": "2025-07-09T00:17:30.392837Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (22/53)."}
+{"timestamp": "2025-07-09T00:18:32.437370Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (23/53)."}
+{"timestamp": "2025-07-09T00:30:24.406766Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T00:31:26.076339Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (51/53)."}
+{"timestamp": "2025-07-09T00:32:27.992893Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (52/53)."}
+{"timestamp": "2025-07-09T00:33:30.318443Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T00:35:06.609192Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T00:36:19.357947Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (51/53)."}
+{"timestamp": "2025-07-09T00:37:21.430045Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (52/53)."}
+{"timestamp": "2025-07-09T00:42:28.964484Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:20:22.094858Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:20:37.398523Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:22:45.405686Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:25:19.058016Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:31:11.411001Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:32:13.264897Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (51/53)."}
+{"timestamp": "2025-07-09T02:33:15.377174Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (52/53)."}
+{"timestamp": "2025-07-09T02:34:17.356402Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:35:19.667191Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:36:40.267967Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:37:42.772044Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:38:44.993825Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:39:47.044060Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:40:49.288582Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "No recent high-volatility breakout candle identified."}
+{"timestamp": "2025-07-09T02:53:38.597634Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}
+{"timestamp": "2025-07-09T02:54:21.695137Z", "filter": "BreakoutZoneOriginFilter", "result": false, "denial_reason": "Not enough historical kline data (50/53)."}

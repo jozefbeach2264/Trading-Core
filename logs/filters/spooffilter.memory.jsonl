@@ -1,295 +1,46 @@
-{"timestamp": "2025-07-05T19:01:18.783114Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:02:31.099167Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -10.00% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:03:44.139943Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 3.54% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:04:55.762222Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.85% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:06:10.821057Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.84% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:07:25.849858Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 3.16% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:08:18.379703Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:09:32.387489Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 3.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:10:47.351427Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -8.34% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:12:01.827512Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -8.51% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:13:16.324345Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 3.28% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:14:27.733159Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -5.96% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:15:42.316862Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 4.39% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:37:55.209151Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:46:39.954228Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:47:40.468168Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 4.18% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T19:48:11.539367Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:51:46.891055Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:52:32.140681Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T19:53:49.726173Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:04:28.017251Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T20:05:29.826315Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.86% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:06:31.964183Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.74% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:07:34.988009Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.75% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:08:13.609667Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T20:09:15.355786Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.93% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:10:17.244123Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:11:20.474824Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:12:22.849212Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 18.64% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:30:36.425418Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T20:31:38.356208Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.46% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:32:40.832213Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.61% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:33:43.309973Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.61% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:34:45.888438Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:35:48.360753Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -14.23% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:36:50.693972Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.51% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:37:52.937702Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.90% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:38:54.952534Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.87% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:39:57.400392Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -14.44% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:40:59.713239Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.40% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:42:01.964988Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.38% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T20:43:04.526405Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.89% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:35:08.584180Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T21:36:10.736218Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.38% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:37:04.342768Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T21:38:06.223775Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.85% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:39:08.147156Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.83% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:40:10.851130Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.89% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:41:12.710008Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.89% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:42:15.360154Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.88% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:43:17.493169Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.62% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:44:19.323718Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.89% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:45:21.875623Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 13.51% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:46:24.460195Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.61% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:47:26.835676Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.64% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:48:29.274331Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 13.44% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:49:31.611344Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.42% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:50:33.359424Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.88% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:51:44.488131Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 10.60% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:52:46.943658Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.77% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:53:48.757842Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.78% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:54:51.942470Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.53% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:55:54.274978Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:56:56.617659Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.78% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:57:58.729111Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.66% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T21:59:00.666978Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:00:02.371184Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.60% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:01:04.218602Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.76% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:01:35.994408Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:02:37.812373Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.30% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:03:39.550991Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.02% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:03:51.506896Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:04:53.654727Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:05:36.069317Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:06:38.149138Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.71% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:07:39.768864Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.91% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:08:50.672699Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:09:52.373914Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.63% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:10:53.937170Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.78% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:11:55.909678Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.52% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:12:57.524117Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.54% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:13:59.522077Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 4.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:15:01.674479Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.71% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:15:21.732624Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:16:23.667138Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -33.30% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:17:27.106563Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.85% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:18:29.440117Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:19:31.286398Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.73% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:20:33.850398Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:21:35.506097Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.72% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:22:37.876687Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:23:40.339512Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.53% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:24:42.360442Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:25:44.367239Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.68% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:26:46.953088Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.67% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:27:49.019474Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.67% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:28:51.555424Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.69% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:29:53.455380Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.74% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:30:55.693449Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.69% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:31:58.066437Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.67% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:33:00.692431Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.64% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:34:02.946337Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.72% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:35:05.644997Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.73% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:36:00.468262Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:37:02.360927Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.74% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:38:05.376991Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.68% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:38:45.197602Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:39:46.987823Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:40:49.405900Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.65% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:41:51.138370Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.67% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:42:53.570871Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -20.00% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:43:55.491458Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.49% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:44:57.490741Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.36% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:45:59.534905Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.43% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:46:27.002355Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:47:28.767404Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.63% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:48:30.870484Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.13% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:49:33.061938Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.16% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:50:35.357923Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -12.81% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:51:37.819151Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.96% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:52:39.639496Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.41% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:53:41.380053Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.10% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:54:43.242239Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.28% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:55:45.577185Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.04% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:56:24.505931Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T22:57:26.362621Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.91% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:58:28.512235Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.07% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T22:59:30.793986Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.04% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:00:32.908032Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.41% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:01:35.354967Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.38% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:02:37.960161Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:03:40.439877Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.06% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:04:43.260377Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.11% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:05:45.096986Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.07% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:06:46.821142Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.14% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:07:49.147543Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:08:10.529544Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-05T23:09:12.312902Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.10% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:10:14.453021Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.11% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:11:16.538252Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.06% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:12:18.446519Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:13:21.327193Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:14:23.621830Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.97% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:15:25.754866Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.97% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:16:28.615757Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.66%)"}
-{"timestamp": "2025-07-05T23:17:30.854329Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.36%)"}
-{"timestamp": "2025-07-05T23:18:33.358787Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.98%)"}
-{"timestamp": "2025-07-05T23:19:35.738924Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.04% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:20:38.034119Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:21:40.121267Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:22:42.565419Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.34%)"}
-{"timestamp": "2025-07-05T23:23:44.676241Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:24:47.293460Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.99% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:25:59.041787Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.71%)"}
-{"timestamp": "2025-07-05T23:27:01.689637Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.96% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:28:03.907059Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:29:06.169196Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:30:08.056650Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.15% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:31:11.103659Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.19% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:32:13.072709Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.18% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:33:15.205070Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.18% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:34:17.397171Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.86% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:35:19.815024Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.04% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:36:21.646860Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.09% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:37:23.921892Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.10% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:38:26.476786Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.11% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:39:28.798318Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.99% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:40:30.719938Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.33%)"}
-{"timestamp": "2025-07-05T23:41:34.911490Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.02% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:42:37.192477Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.79%)"}
-{"timestamp": "2025-07-05T23:43:39.425329Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.33%)"}
-{"timestamp": "2025-07-05T23:44:41.777986Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.28%)"}
-{"timestamp": "2025-07-05T23:45:44.310127Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.29%)"}
-{"timestamp": "2025-07-05T23:46:46.845259Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.14% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:47:49.077139Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.08% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:48:51.268801Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.12% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:49:52.943740Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.11% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:50:55.246513Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.15% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:51:57.454757Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.28%)"}
-{"timestamp": "2025-07-05T23:52:59.435898Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.81%)"}
-{"timestamp": "2025-07-05T23:54:02.017841Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.97% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:55:04.676593Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 1.05% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:56:07.145432Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.42%)"}
-{"timestamp": "2025-07-05T23:57:09.354967Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.23% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:58:11.969183Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.93% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-05T23:59:14.316039Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.94% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:00:16.551018Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.58%)"}
-{"timestamp": "2025-07-06T00:01:18.958695Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.97% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:02:21.527863Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.32%)"}
-{"timestamp": "2025-07-06T00:03:23.711853Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.93% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:04:26.109470Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.02% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:05:27.987509Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.21%)"}
-{"timestamp": "2025-07-06T00:06:30.033347Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.61% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:07:31.988485Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.60% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:08:34.212500Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.61% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:09:36.420215Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.79%)"}
-{"timestamp": "2025-07-06T00:10:38.235724Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.59% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:11:39.973976Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.80%)"}
-{"timestamp": "2025-07-06T00:12:42.047243Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.81%)"}
-{"timestamp": "2025-07-06T00:13:44.272197Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.45% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:14:46.956529Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.60% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:15:49.181983Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.84% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:16:52.089907Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.99% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:17:54.012224Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.84% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:18:56.734388Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.78%)"}
-{"timestamp": "2025-07-06T00:19:59.594753Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.57%)"}
-{"timestamp": "2025-07-06T00:21:01.913311Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.38%)"}
-{"timestamp": "2025-07-06T00:22:04.353185Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.01% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:23:06.699071Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.02% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:24:09.042667Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.50%)"}
-{"timestamp": "2025-07-06T00:25:11.552019Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.94% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:26:13.150074Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T00:27:15.452623Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.53%)"}
-{"timestamp": "2025-07-06T00:28:17.984423Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.50%)"}
-{"timestamp": "2025-07-06T00:29:20.199875Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.99% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:30:22.376014Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.83% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:31:24.260693Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -1.02% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:32:26.492520Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance -0.98% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:33:28.671205Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.45%)"}
-{"timestamp": "2025-07-06T00:34:30.960267Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.61%)"}
-{"timestamp": "2025-07-06T00:35:33.463361Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.51%)"}
-{"timestamp": "2025-07-06T00:36:35.958257Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.54%)"}
-{"timestamp": "2025-07-06T00:37:38.372177Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.49%)"}
-{"timestamp": "2025-07-06T00:38:40.744279Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.43%)"}
-{"timestamp": "2025-07-06T00:39:43.546901Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.66%)"}
-{"timestamp": "2025-07-06T00:40:45.452442Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.28%)"}
-{"timestamp": "2025-07-06T00:41:47.586994Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.27%)"}
-{"timestamp": "2025-07-06T00:42:20.557777Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T00:43:22.530781Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.30%)"}
-{"timestamp": "2025-07-06T00:44:25.201190Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.29%)"}
-{"timestamp": "2025-07-06T00:45:27.673470Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.42%)"}
-{"timestamp": "2025-07-06T00:45:52.233034Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T00:46:54.137139Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.75% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:47:56.318137Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.99% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:48:58.391329Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.87% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:50:00.267859Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.44%)"}
-{"timestamp": "2025-07-06T00:51:03.135372Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.83% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:52:05.793043Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.82% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:53:08.117877Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.81% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:54:10.374694Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.83% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:55:12.767290Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.77% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:56:15.143935Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.79% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:57:17.173683Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.71% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:58:19.667407Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.71% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T00:59:22.149378Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.70% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T01:00:24.107988Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.74%)"}
-{"timestamp": "2025-07-06T01:01:26.821731Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.71% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T01:02:29.041659Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.33%)"}
-{"timestamp": "2025-07-06T01:03:31.150669Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-8.23%)"}
-{"timestamp": "2025-07-06T01:04:33.078276Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (1.61%)"}
-{"timestamp": "2025-07-06T01:05:35.587807Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.75% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T01:06:38.160833Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.73% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T01:07:39.982209Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Imbalance 0.75% below threshold; No large distant bid found; No large distant ask found"}
-{"timestamp": "2025-07-06T01:08:42.291671Z", "filter": "SpoofFilter", "result": true, "denial_reason": "High imbalance (-1.65%)"}
-{"timestamp": "2025-07-06T17:27:10.471945Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T17:34:02.214586Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T17:49:17.745376Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:39:15.543695Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:40:17.209396Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:41:14.739788Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:42:16.712396Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:43:18.273180Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:44:19.506414Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T18:45:21.026990Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:20:31.072619Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:34:21.111362Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:38:07.257980Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:39:09.267863Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:39:52.270045Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:39:58.983009Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:40:14.591854Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:41:16.777471Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:41:50.571522Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:41:57.427502Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T19:43:49.638513Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:07:25.124429Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:08:26.855728Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:09:28.244788Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:10:22.338201Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:10:44.712334Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:11:46.418631Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:12:47.844565Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:13:49.407266Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:14:50.881315Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:15:52.665446Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:17:00.679450Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:18:02.295300Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:19:03.646010Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:20:05.110438Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:21:06.637265Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:22:08.714135Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:23:10.217100Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:50:12.840835Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T20:54:56.467786Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
-{"timestamp": "2025-07-06T21:19:13.456807Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-08T23:51:00.663560Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-08T23:52:02.148277Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-08T23:59:00.164095Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:00:01.536192Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:01:03.105353Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:02:04.460808Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:03:06.758579Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:04:08.575591Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:05:10.129326Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:06:11.313399Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:07:12.794634Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:08:14.453625Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:09:16.244716Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:10:17.922256Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:11:19.675770Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:12:21.374448Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:13:23.408898Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:14:24.775541Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:15:26.176408Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:16:28.179527Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:17:30.392576Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:18:32.436795Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:30:24.405579Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:31:26.076135Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:32:27.992619Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:33:30.318240Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:35:06.608921Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:36:19.357724Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:37:21.429838Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T00:42:28.964286Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:20:21.947352Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:20:37.398303Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:22:45.404415Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:25:19.053885Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:31:11.409467Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:32:13.264633Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:33:15.376910Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:34:17.356048Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:35:19.663219Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:36:40.266363Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:37:42.771798Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:38:44.993600Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:39:47.043812Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:40:49.288399Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:53:38.596453Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
+{"timestamp": "2025-07-09T02:54:21.694916Z", "filter": "SpoofFilter", "result": false, "denial_reason": "Not enough order book data (requires at least 2 levels)."}
