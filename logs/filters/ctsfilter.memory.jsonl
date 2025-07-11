@@ -44,3 +44,39 @@
 {"timestamp": "2025-07-09T02:40:49.288234Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
 {"timestamp": "2025-07-09T02:53:38.595827Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
 {"timestamp": "2025-07-09T02:54:21.694755Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T22:59:03.247639Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T22:59:58.124096Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bear_trap). Live range 0.01."}
+{"timestamp": "2025-07-09T23:07:25.232405Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T23:08:27.256929Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-09T23:09:29.383689Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T02:41:07.884088Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T02:43:42.235213Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T02:44:45.605645Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T02:45:47.646977Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T02:46:50.784800Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bear_trap). Live range 0.94."}
+{"timestamp": "2025-07-10T02:47:52.756817Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:12:53.006962Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:13:55.578050Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:14:57.977626Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:15:12.824803Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bear_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:16:15.032936Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:17:17.474559Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:22:25.384792Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:43:48.746456Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:44:09.534030Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:45:14.876464Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:45:28.214314Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:45:41.968903Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:46:44.783432Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:47:46.843078Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:48:36.171557Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:48:45.814655Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bear_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:48:55.155268Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:49:30.378932Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:49:37.709501Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:49:45.273700Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T03:50:00.106164Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:58:03.500414Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.01."}
+{"timestamp": "2025-07-10T03:59:06.329456Z", "filter": "CtsFilter", "result": false, "denial_reason": "Compression trap detected (bull_trap). Live range 0.19."}
+{"timestamp": "2025-07-10T04:00:09.491350Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}
+{"timestamp": "2025-07-10T04:01:13.340388Z", "filter": "CtsFilter", "result": false, "denial_reason": "No compression trap pattern detected."}

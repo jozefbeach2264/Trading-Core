@@ -44,3 +44,39 @@
 {"timestamp": "2025-07-09T02:40:49.288908Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4227.34 is below threshold."}
 {"timestamp": "2025-07-09T02:53:38.601614Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 230.47 is below threshold."}
 {"timestamp": "2025-07-09T02:54:21.695405Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 212.45 is below threshold."}
+{"timestamp": "2025-07-09T22:59:03.254333Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 556.02 is below threshold."}
+{"timestamp": "2025-07-09T22:59:58.124808Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 65.77 is below threshold."}
+{"timestamp": "2025-07-09T23:07:25.232982Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 1659.00 is below threshold."}
+{"timestamp": "2025-07-09T23:08:27.258216Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 6612.32 is below threshold."}
+{"timestamp": "2025-07-09T23:09:29.384908Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4613.02 is below threshold."}
+{"timestamp": "2025-07-10T02:41:07.896354Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 260.67 is below threshold."}
+{"timestamp": "2025-07-10T02:43:42.238244Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 54.97 is below threshold."}
+{"timestamp": "2025-07-10T02:44:45.606274Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 12721.12 is below threshold."}
+{"timestamp": "2025-07-10T02:45:47.647645Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 2.141"}
+{"timestamp": "2025-07-10T02:46:50.786412Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 13030.99 is below threshold."}
+{"timestamp": "2025-07-10T02:47:52.757463Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 15771.85 is below threshold."}
+{"timestamp": "2025-07-10T03:12:53.014991Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 127.34 is below threshold."}
+{"timestamp": "2025-07-10T03:13:55.578658Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 15392.03 is below threshold."}
+{"timestamp": "2025-07-10T03:14:57.979405Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 15242.15 is below threshold."}
+{"timestamp": "2025-07-10T03:15:12.825446Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 102.78 is below threshold."}
+{"timestamp": "2025-07-10T03:16:15.033656Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 4102.13 is below threshold."}
+{"timestamp": "2025-07-10T03:17:17.475138Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2604.96 is below threshold."}
+{"timestamp": "2025-07-10T03:22:25.385690Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 320.00 is below threshold."}
+{"timestamp": "2025-07-10T03:43:48.752109Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 10.46 is below threshold."}
+{"timestamp": "2025-07-10T03:44:09.534656Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.01 is below threshold."}
+{"timestamp": "2025-07-10T03:45:14.877141Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 837.95 is below threshold."}
+{"timestamp": "2025-07-10T03:45:28.214879Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 68.15 is below threshold."}
+{"timestamp": "2025-07-10T03:45:41.969555Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 19.41 is below threshold."}
+{"timestamp": "2025-07-10T03:46:44.783986Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.6402"}
+{"timestamp": "2025-07-10T03:47:46.843843Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Volume acceptable. Ratio 1.17"}
+{"timestamp": "2025-07-10T03:48:36.172456Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 21.09 is below threshold."}
+{"timestamp": "2025-07-10T03:48:45.815422Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 143.14 is below threshold."}
+{"timestamp": "2025-07-10T03:48:55.155993Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 18.41 is below threshold."}
+{"timestamp": "2025-07-10T03:49:30.380514Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 0.73 is below threshold."}
+{"timestamp": "2025-07-10T03:49:37.711069Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 156.41 is below threshold."}
+{"timestamp": "2025-07-10T03:49:45.274424Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 330.26 is below threshold."}
+{"timestamp": "2025-07-10T03:50:00.106903Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 480.83 is below threshold."}
+{"timestamp": "2025-07-10T03:58:03.501086Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 241.89 is below threshold."}
+{"timestamp": "2025-07-10T03:59:06.330605Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 6085.29 is below threshold."}
+{"timestamp": "2025-07-10T04:00:09.494883Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 7726.77 is below threshold."}
+{"timestamp": "2025-07-10T04:01:13.341078Z", "filter": "LowVolumeGuard", "result": false, "denial_reason": "Low volume detected. Current volume 2388.77 is below threshold."}

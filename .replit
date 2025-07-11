@@ -1,20 +1,14 @@
-modules = ["nodejs-20", "python-3.11"]
-# This sets the entire environment to use a recent Python version (3.11+)
-[nix]
-channel = "stable-23_11"
-packages = ["pkg", "mailutils"]
+modules = ["python-3.11"]
 
-# This configures the main "Run" button with the more reliable command
-[deployment]
-run = ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+[nix]
+packages = ["libxcrypt"]
 
 [workflows]
-runButton = "GET MONEY"
 
 [[workflows.workflow]]
 name = "GET MONEY"
 mode = "sequential"
-author = 42692233
+author = 44730905
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -23,8 +17,3 @@ args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 [[ports]]
 localPort = 8000
 externalPort = 80
-
-[[ports]]
-localPort = 8001
-externalPort = 3000
-exposeLocalhost = true

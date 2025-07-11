@@ -1,4 +1,6 @@
 import logging
+logger = logging.getLogger(__name__) 
+
 import os
 import json
 from typing import Dict, Any, Set
@@ -34,8 +36,9 @@ class OrderBookReversalZoneDetector:
         self.depth_percent = self.config.orderbook_reversal_depth_percent
         self.wall_multiplier = self.config.orderbook_reversal_wall_multiplier
         self.allowed_hours = self._parse_trade_windows(config.trade_windows)
-        self.min_levels = 15  # Allow slightly incomplete data
+        self.min_levels = 15
         self.client = httpx.AsyncClient(base_url="https://www.okx.com")
+        self.inst_id = f"{self.config.symbol}-USDT-SWAP"
 
     def _parse_trade_windows(self, window_str: str) -> Set[int]:
         allowed_hours = set()
@@ -56,28 +59,32 @@ class OrderBookReversalZoneDetector:
         return datetime.utcnow().hour in self.allowed_hours
 
     async def _fetch_mark_price(self) -> float:
-        """Fetch mark price via REST API if not available."""
         endpoint = "/api/v5/market/mark-price"
-        params = {"instId": f"{self.config.symbol.replace('USDT', '')}-USDT-SWAP"}
+        params = {"instId": self.inst_id}
         max_retries = 3
         for attempt in range(1, max_retries + 1):
             try:
                 response = await self.client.get(endpoint, params=params)
                 response.raise_for_status()
                 data = response.json()
+                logger.debug(f"Mark price REST response: {data}")
                 if data.get("code") != "0" or not data.get("data"):
-                    self.logger.error(f"Failed to fetch mark price: {data.get('msg', 'Unknown error')}")
+                    self.logger.error(f"Failed to fetch mark price for {self.inst_id}: {data.get('msg', 'Unknown error')}, code: {data.get('code')}")
                     if attempt < max_retries:
                         await asyncio.sleep(2)
                     continue
                 mark_price = float(data["data"][0]["markPx"])
-                self.logger.info(f"Fetched mark price: {mark_price}")
+                self.logger.info(f"Fetched mark price for {self.inst_id}: {mark_price}")
                 return mark_price
-            except Exception as e:
-                self.logger.error(f"Error fetching mark price on attempt {attempt}: {e}", exc_info=True)
+            except httpx.HTTPStatusError as e:
+                self.logger.error(f"HTTP error fetching mark price for {self.inst_id} on attempt {attempt}: {e.response.status_code} - {e.response.text}")
                 if attempt < max_retries:
                     await asyncio.sleep(2)
-        self.logger.error(f"Failed to fetch mark price after {max_retries} attempts")
+            except Exception as e:
+                self.logger.error(f"Unexpected error fetching mark price for {self.inst_id} on attempt {attempt}: {e}", exc_info=True)
+                if attempt < max_retries:
+                    await asyncio.sleep(2)
+        self.logger.error(f"Failed to fetch mark price for {self.inst_id} after {max_retries} attempts")
         return None
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
@@ -100,7 +107,14 @@ class OrderBookReversalZoneDetector:
 
         bids = market_state.depth_20.get("bids", [])
         asks = market_state.depth_20.get("asks", [])
-        mark_price = market_state.mark_price or await self._fetch_mark_price()
+        mark_price = market_state.mark_price
+
+        if not mark_price:
+            mark_price = await self._fetch_mark_price()
+        
+        if not mark_price and market_state.book_ticker.get('lastPrice'):
+            mark_price = float(market_state.book_ticker['lastPrice'])
+            self.logger.warning(f"Using book_ticker lastPrice as mark_price: {mark_price}")
 
         if len(bids) < self.min_levels or len(asks) < self.min_levels or not mark_price:
             report["notes"] = f"Insufficient order book data: {len(bids)} bids, {len(asks)} asks, mark_price={mark_price}"
@@ -110,12 +124,11 @@ class OrderBookReversalZoneDetector:
                 "denial_reason": f"Missing order book data ({len(bids)} bids, {len(asks)} asks, mark_price={mark_price})"
             }))
             return report
+        logger.debug(f"Processing order book: {len(bids)} bids, {len(asks)} asks, mark_price={mark_price}")
 
-        # Ensure 20 levels by padding with zeros if necessary
-        bids = bids[:20] + [(mark_price - (i + 1) * 0.01, 0.0) for i in range(len(bids), 20)]
-        asks = asks[:20] + [(mark_price + (i + 1) * 0.01, 0.0) for i in range(len(asks), 20)]
+        bids = bids[:20] + [(mark_price - (i + 1) * 0.1, 0.0) for i in range(len(bids), 20)]
+        asks = asks[:20] + [(mark_price + (i + 1) * 0.1, 0.0) for i in range(len(asks), 20)]
 
-        # Analyze pressure at each level
         pressure_levels = []
         total_bid_volume = 0.0
         total_ask_volume = 0.0
@@ -123,8 +136,8 @@ class OrderBookReversalZoneDetector:
         reversal_type = "none"
 
         for i in range(20):
-            bid_price, bid_qty = bids[-(i + 1)]  # Start from highest bid
-            ask_price, ask_qty = asks[i]  # Start from lowest ask
+            bid_price, bid_qty = bids[-(i + 1)]
+            ask_price, ask_qty = asks[i]
             bid_qty = float(bid_qty)
             ask_qty = float(ask_qty)
             threshold = max(bid_qty, ask_qty) * self.wall_multiplier
@@ -171,7 +184,7 @@ class OrderBookReversalZoneDetector:
             }))
         else:
             report.update({
-                "notes": "No significant reversal zone detected",
+                "notes": "No significant volume imbalance detected",
                 "pressure_levels": pressure_levels
             })
             self.logger.info(json.dumps({

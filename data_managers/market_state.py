@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 class MarketState:
     def __init__(self, symbol: str, config: Config):
-        # This __init__ is correct and unchanged.
         self.symbol = symbol
         self.config = config
         self.last_update_time: float = time.time()
@@ -32,26 +31,17 @@ class MarketState:
         self.live_reconstructed_candle = candle
 
     async def update_klines(self, klines_data: List[List[Any]]):
-        """
-        ✅ THE FIX: This method is now correctly parsing the response from the
-        /history-candles endpoint. It iterates through each candle list in the
-        'data' field and correctly formats it.
-        """
         if not klines_data or not isinstance(klines_data, list):
             logger.warning("update_klines received empty or invalid data.")
             return
         
         self.klines.clear()
-        # The data from the API is newest first, so we process it in reverse
-        # to add the oldest candles to our deque first.
         for k in reversed(klines_data):
             try:
-                # OKX history-candles format: [ts,o,h,l,c,vol,volCcy,volCcyQuote,confirm]
                 formatted_kline = [
                     int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]),
                     float(k[5]), float(k[6]), float(k[7]), str(k[8])
                 ]
-                # appendleft adds to the front, ensuring newest is at index 0
                 self.klines.appendleft(formatted_kline)
             except (ValueError, TypeError, IndexError) as e:
                 logger.error(f"Error parsing historical kline: {k} - {e}")
@@ -59,16 +49,36 @@ class MarketState:
         logger.info(f"Successfully loaded {len(self.klines)} historical klines.")
         self.last_update_time = time.time()
 
-    # --- All other methods are preserved from the last fully functional version ---
-
     async def update_from_ws_books(self, data: dict):
         try:
             bids_data = data.get('bids', [])
             asks_data = data.get('asks', [])
-            self.depth_20['bids'] = [(float(p), float(q)) for p, q, _, _ in bids_data]
-            self.depth_20['asks'] = [(float(p), float(q)) for p, q, _, _ in asks_data]
-            self.depth_20['asks'].reverse()
+            new_bids = [(float(p), float(q)) for p, q, _, _ in bids_data if float(q) > 0]
+            new_asks = [(float(p), float(q)) for p, q, _, _ in asks_data if float(q) > 0]
+            new_asks.reverse()  # Maintain ascending order
+
+            # Merge with existing depth_20
+            current_bids = {p: q for p, q in self.depth_20['bids']}
+            current_asks = {p: q for p, q in self.depth_20['asks']}
+            for price, qty in new_bids:
+                if qty > 0:
+                    current_bids[price] = qty
+                elif price in current_bids:
+                    del current_bids[price]
+            for price, qty in new_asks:
+                if qty > 0:
+                    current_asks[price] = qty
+                elif price in current_asks:
+                    del current_asks[price]
+
+            # Sort and limit to 20 levels, pad if necessary
+            mark_price = self.mark_price or 0.0
+            self.depth_20['bids'] = sorted([(p, q) for p, q in current_bids.items()], reverse=True)
+            self.depth_20['asks'] = sorted([(p, q) for p, q in current_asks.items()])
+            self.depth_20['bids'] = self.depth_20['bids'][:20] + [(mark_price - (i + 1) * 0.01, 0.0) for i in range(len(self.depth_20['bids']), 20)]
+            self.depth_20['asks'] = self.depth_20['asks'][:20] + [(mark_price + (i + 1) * 0.01, 0.0) for i in range(len(self.depth_20['asks']), 20)]
             self.last_update_time = time.time()
+            logger.debug(f"Merged WebSocket books: {len(self.depth_20['bids'])} bids, {len(self.depth_20['asks'])} asks")
         except (ValueError, TypeError) as e:
             logger.error(f"Error parsing OKX 'books' data: {e}", exc_info=True)
 
@@ -91,6 +101,7 @@ class MarketState:
             }
             self.recent_trades.append(trade)
             self.last_update_time = time.time()
+            logger.debug(f"Appended trade, recent_trades: {len(self.recent_trades)}")
         except (ValueError, TypeError) as e:
             logger.error(f"Error parsing OKX trade data: {e}", exc_info=True)
 
@@ -120,6 +131,7 @@ class MarketState:
             new_price = data.get('markPx')
             if new_price:
                 self.mark_price = float(new_price)
+                logger.debug(f"Updated mark price: {self.mark_price}")
             self.last_update_time = time.time()
         except (ValueError, TypeError) as e:
             logger.error(f"Error parsing OKX markPrice data: {e}", exc_info=True)
@@ -131,7 +143,12 @@ class MarketState:
             self.depth_20['bids'] = [(float(p), float(q)) for p, q, _, _ in bids_data]
             self.depth_20['asks'] = [(float(p), float(q)) for p, q, _, _ in asks_data]
             self.depth_20['asks'].reverse()
+            # Pad to 20 levels
+            mark_price = self.mark_price or 0.0
+            self.depth_20['bids'] = self.depth_20['bids'][:20] + [(mark_price - (i + 1) * 0.01, 0.0) for i in range(len(self.depth_20['bids']), 20)]
+            self.depth_20['asks'] = self.depth_20['asks'][:20] + [(mark_price + (i + 1) * 0.01, 0.0) for i in range(len(self.depth_20['asks']), 20)]
             self.last_update_time = time.time()
+            logger.info(f"Updated depth_20: {len(self.depth_20['bids'])} bids, {len(self.depth_20['asks'])} asks")
     
     async def update_open_interest(self, oi_data: Dict[str, Any]):
         if oi_data and 'oi' in oi_data:

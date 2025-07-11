@@ -44,3 +44,39 @@
 {"timestamp": "2025-07-09T02:40:49.288817Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2604.0 is retesting resistance at 2604.99."}
 {"timestamp": "2025-07-09T02:53:38.600919Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2603.4 is retesting support at 2601.13."}
 {"timestamp": "2025-07-09T02:54:21.695272Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2602.64 is retesting support at 2600.67."}
+{"timestamp": "2025-07-09T22:59:03.253712Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2778.93 is retesting resistance at 2779.99."}
+{"timestamp": "2025-07-09T22:59:58.124696Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2778.61 is retesting resistance at 2779.99."}
+{"timestamp": "2025-07-09T23:07:25.232878Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T23:08:27.257926Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-09T23:09:29.384798Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2775.7 is retesting resistance at 2772.99."}
+{"timestamp": "2025-07-10T02:41:07.895525Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2778.25 is retesting resistance at 2778.98."}
+{"timestamp": "2025-07-10T02:43:42.237711Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2777.2 is retesting resistance at 2780.0."}
+{"timestamp": "2025-07-10T02:44:45.606096Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2778.0 is retesting resistance at 2780.0."}
+{"timestamp": "2025-07-10T02:45:47.647515Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2777.44 is retesting resistance at 2780.0."}
+{"timestamp": "2025-07-10T02:46:50.786086Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2778.79 is retesting resistance at 2780.0."}
+{"timestamp": "2025-07-10T02:47:52.757358Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price high 2780.0 is retesting resistance at 2780.0."}
+{"timestamp": "2025-07-10T03:12:53.013284Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:13:55.578568Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:14:57.979301Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:15:12.825321Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:16:15.033528Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:17:17.475031Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:22:25.385507Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2779.25 is retesting support at 2774.5."}
+{"timestamp": "2025-07-10T03:43:48.750184Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:44:09.534540Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:45:14.877037Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:45:28.214779Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:45:41.969487Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:46:44.783890Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:47:46.843587Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:48:36.172371Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:48:45.815154Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:48:55.155858Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:49:30.380416Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:49:37.710960Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:49:45.274315Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:50:00.106787Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "No retest of significant levels detected."}
+{"timestamp": "2025-07-10T03:58:03.500967Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2774.11 is retesting support at 2778.93."}
+{"timestamp": "2025-07-10T03:59:06.330430Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2774.81 is retesting support at 2778.93."}
+{"timestamp": "2025-07-10T04:00:09.494365Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2773.63 is retesting support at 2778.93."}
+{"timestamp": "2025-07-10T04:01:13.340967Z", "filter": "RetestEntryLogic", "result": false, "denial_reason": "Live price low 2773.51 is retesting support at 2778.93."}

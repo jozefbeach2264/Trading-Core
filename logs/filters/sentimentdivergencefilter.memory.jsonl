@@ -44,3 +44,39 @@
 {"timestamp": "2025-07-09T02:40:49.288990Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
 {"timestamp": "2025-07-09T02:53:38.602392Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
 {"timestamp": "2025-07-09T02:54:21.695507Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-09T22:59:03.254813Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-09T22:59:58.124917Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-09T23:07:25.233104Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-09T23:08:27.258579Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}
+{"timestamp": "2025-07-09T23:09:29.385125Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}
+{"timestamp": "2025-07-10T02:41:07.897132Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T02:43:42.238792Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T02:44:45.606371Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T02:45:47.647760Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T02:46:50.786647Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T02:47:52.757575Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bullish divergence detected."}
+{"timestamp": "2025-07-10T03:12:53.015614Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:13:55.578802Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:14:57.979497Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}
+{"timestamp": "2025-07-10T03:15:12.825575Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:16:15.033764Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:17:17.475606Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}
+{"timestamp": "2025-07-10T03:22:25.385828Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}
+{"timestamp": "2025-07-10T03:43:48.752994Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:44:09.534766Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:45:14.877279Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:45:28.214983Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:45:41.969627Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:46:44.784104Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:47:46.843959Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bullish divergence detected."}
+{"timestamp": "2025-07-10T03:48:36.172540Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:48:45.815540Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:48:55.156115Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:49:30.380605Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:49:37.711191Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:49:45.274525Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T03:50:00.107017Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:58:03.501317Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not enough trade data to evaluate CVD."}
+{"timestamp": "2025-07-10T03:59:06.332647Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T04:00:09.495819Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Not in trade window or not autonomous."}
+{"timestamp": "2025-07-10T04:01:13.341223Z", "filter": "SentimentDivergenceFilter", "result": false, "denial_reason": "Potential bearish divergence detected."}

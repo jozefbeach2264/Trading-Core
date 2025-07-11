@@ -44,3 +44,12 @@
 {"timestamp": "2025-07-09T02:40:49.289175Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "Insufficient order book data: 7 bids, 17 asks, mark_price=None"}
 {"timestamp": "2025-07-09T02:53:38.603026Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "Insufficient order book data: 4 bids, 14 asks, mark_price=None"}
 {"timestamp": "2025-07-09T02:54:21.695604Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "Insufficient order book data: 108 bids, 104 asks, mark_price=None"}
+{"timestamp": "2025-07-10T03:48:55.156244Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:49:30.380689Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:49:37.711321Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:49:45.274658Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:50:00.107218Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:58:03.501453Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T03:59:06.333059Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T04:00:09.497958Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}
+{"timestamp": "2025-07-10T04:01:13.341416Z", "filter": "OrderBookReversalZoneDetector", "result": false, "denial_reason": "No significant volume imbalance detected"}

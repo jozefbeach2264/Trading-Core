@@ -1,19 +1,28 @@
 [tool.poetry]
 name = "trading-core"
-version = "0.1.0"
-description = "Core logic for the trading system."
+version = "1.0.0"
+description = "REALITY_CORE (GENESIS) Trading Engine"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-fastapi = "^0.104.1"
-uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
-httpx = "^0.25.2"
-python-dotenv = "^1.0.0"
-websockets = "^12.0"
-# The missing package for timezone handling
-pytz = "^2023.3.post1"
+python = "^3.11"
+
+# Pinned versions from your requirements file
+fastapi = "0.115.0"
+httpx = "0.27.0"
+websockets = "12.0"
+python-dotenv = "1.0.1"
+
+# Libraries with flexible versions (Poetry will use the latest stable)
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
+requests = "^2.32.3"
+psutil = ">=5.9.0, <6.0.0"
+pydantic = "^2.8.2"
+aiohttp = "^3.9.5"
+
+# The official SDK for Grok, replacing the generic OpenAI library
+xai-sdk = "^1.0.0"
 
 
 [build-system]
