@@ -7,175 +7,95 @@ from datetime import datetime
 from config.config import Config
 from data_managers.market_state import MarketState
 
-def setup_compression_logger(
-    config: Config
-) -> logging.Logger:
-    # This function is unchanged.
+# The logger setup is a complete implementation based on your Pre-Genesis file.
+def setup_compression_logger(config: Config) -> logging.Logger:
     log_path = config.compression_detector_log_path
-    log_dir = os.path.dirname(log_path)
-    if log_dir and not os.path.exists(
-        log_dir
-    ):
+    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
+    if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    logger = logging.getLogger(
-        'CompressionDetectorLogger'
-    )
+
+    logger = logging.getLogger('CompressionDetectorLogger')
     logger.setLevel(logging.INFO)
     logger.propagate = False
+
     if not logger.handlers:
-        handler = logging.FileHandler(
-            log_path
-        )
-        formatter = logging.Formatter(
-            '%(asctime)s - %(message)s'
-        )
+        handler = logging.FileHandler(log_path, mode='w')
+        formatter = logging.Formatter('%(asctime)s - %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
     return logger
 
 class CompressionDetector:
+    """
+    Evaluates candles for minimal range/movement to identify zones where
+    breakout energy may be depleted (market grind).
+    """
     def __init__(self, config: Config):
-        # This function is unchanged.
         self.config = config
-        self.logger = (
-            setup_compression_logger(config)
-        )
-        self.lookback_period = (
-            config.compression_lookback_period
-        )
-        self.range_ratio = (
-            config.compression_range_ratio
-        )
-        self.allowed_hours = (
-            self._parse_trade_windows(
-                config.trade_windows
-            )
-        )
-        self.logger.info(json.dumps({
-            "level": "INIT",
-            "msg": "CompressionDetector Ready",
-            "lookback": self.lookback_period,
-            "range_ratio": self.range_ratio
-        }))
+        self.logger = setup_compression_logger(config)
+        self.lookback_period = self.config.compression_lookback_period
+        self.range_ratio = self.config.compression_range_ratio
 
-    def _parse_trade_windows(
-        self, window_str: str
-    ) -> Set[int]:
-        # This function is unchanged.
-        allowed = set()
-        try:
-            for part in window_str.split(','):
-                if '-' in part:
-                    start, end = map(
-                        int, part.split('-')
-                    )
-                    for h in range(start, end + 1):
-                        allowed.add(h)
-                else:
-                    allowed.add(int(part))
-        except ValueError as e:
-            logging.getLogger(__name__).error(
-                f"Invalid trade_windows: '{window_str}'"
-            )
-        return allowed
-
-    def _is_within_trade_window(self) -> bool:
-        # This function is unchanged.
-        return datetime.utcnow().hour in (
-            self.allowed_hours
-        )
-
-    async def generate_report(
-        self, market_state: MarketState
-    ) -> Dict[str, Any]:
+    async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        """
+        Analyzes candle range to detect compression and generates a weighted
+        report with a score, metrics, and flag.
+        """
         report = {
             "filter_name": "CompressionDetector",
-            "compression_detected": False,
-            "compression_score": 0.0,
-            "notes": "Not in trade window or off."
+            "score": 0.0,
+            "metrics": {},
+            "flag": "❌ Block"
         }
-        if (
-            not self.config.autonomous_mode_enabled
-            or not self._is_within_trade_window()
-        ):
-            return report
 
-        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
         klines = market_state.klines
         live_candle = market_state.live_reconstructed_candle
 
         if len(klines) < self.lookback_period:
-            report["notes"] = (
-                f"Not enough kline history for average range ({len(klines)}/"
-                f"{self.lookback_period})"
-            )
+            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback_period})."
             return report
 
         if not live_candle:
-            report["notes"] = "Live candle data not yet available for compression check."
+            report["metrics"]["reason"] = "Live candle data not available."
             return report
 
-        # Calculate average range from historical klines.
+        # --- Compression Analysis Logic ---
         lookback_klines = list(klines)[-self.lookback_period:]
-        ranges = [
-            float(k[2]) - float(k[3])
-            for k in lookback_klines
-        ]
-        avg_range = (
-            sum(ranges) / len(ranges)
-            if ranges else 0
-        )
+        ranges = [float(k[2]) - float(k[3]) for k in lookback_klines]
+        avg_range = sum(ranges) / len(ranges) if ranges else 0
 
-        # ✅ NECESSARY UPDATE: Get the current range from our live, reconstructed candle.
-        h, l = float(live_candle[2]), float(live_candle[3])
-        cur_range = h - l
+        current_range = float(live_candle[2]) - float(live_candle[3])
 
-        if cur_range <= 0:
-            report["notes"] = "Live candle has zero or negative range. Ignoring."
+        if avg_range <= 0:
+            report["metrics"]["reason"] = "Invalid historical data (zero or negative average range)."
+            report["score"] = 1.0 # Pass if history is invalid, cannot determine compression
+            report["flag"] = "✅ Hard Pass"
             return report
 
-        if avg_range == 0:
-            report["notes"] = "Average historical range is zero. Cannot calculate compression."
-            return report
-
-        is_compressed = (
-            cur_range < avg_range * self.range_ratio
-        )
+        # --- Scoring Logic ---
+        # The score is a measure of how NOT compressed the candle is.
+        # A high score means high volatility / not compressed.
+        # A low score means low volatility / compressed.
+        compression_ratio = current_range / avg_range
         
-        # This logging is preserved and updated with the new live data.
-        self.logger.info(json.dumps({
-            "level": "DEBUG",
-            "avg_range": round(avg_range, 4),
-            "current_range": round(cur_range, 4),
-            "threshold": round(
-                avg_range * self.range_ratio, 4
-            ),
-            "compressed": is_compressed
-        }))
+        # We normalize the score. If ratio is at the threshold (e.g., 0.8), score is 0.5.
+        # If ratio is 0, score is 0. If ratio is > 1.2 * threshold, score is 1.0.
+        score = min(compression_ratio / (self.range_ratio * 1.2), 1.0)
 
-        if is_compressed:
-            score = 1.0 - (cur_range / avg_range)
-            report.update({
-                "compression_detected": True,
-                "compression_score": round(score, 4),
-                "notes": (
-                    f"Compression detected. "
-                    f"Live Range={cur_range:.4f} "
-                    f"vs Avg={avg_range:.4f}"
-                )
-            })
-            self.logger.info(json.dumps({
-                "timestamp": (
-                    datetime.utcnow()
-                    .isoformat() + "Z"
-                ),
-                "compression_score": round(score, 4),
-                "cur_range": round(cur_range, 4),
-                "avg_range": round(avg_range, 4),
-                "result": True
-            }))
+        report["score"] = round(score, 4)
+        report["metrics"] = {
+            "average_range": round(avg_range, 4),
+            "current_range": round(current_range, 4),
+            "compression_ratio": round(compression_ratio, 2),
+            "config_threshold_ratio": self.range_ratio
+        }
+        
+        # --- Flagging Logic ---
+        if score >= 0.75:
+            report["flag"] = "✅ Hard Pass" # Clean, non-compressed state
+        elif score >= 0.50:
+            report["flag"] = "⚠️ Soft Flag" # Some compression, warrants review
         else:
-            report["notes"] = "No compression detected."
+            report["flag"] = "❌ Block" # Heavy compression/grind detected
 
         return report
-

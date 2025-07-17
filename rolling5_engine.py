@@ -1,148 +1,95 @@
 import logging
-import asyncio
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from config.config import Config
 from data_managers.market_state import MarketState
-from validator_stack import ValidatorStack
-from system_managers.trade_executor import TradeExecutor
-from ai_client import AIClient
 
 logger = logging.getLogger(__name__)
 
 class Rolling5Engine:
-    def __init__(
-        self,
-        config: Config,
-        market_state: MarketState,
-        validator_stack: ValidatorStack,
-        trade_executor: TradeExecutor,
-        ai_client: AIClient
-    ):
+    def __init__(self, config: Config):
         self.config = config
-        self.market_state = market_state
-        self.validator_stack = validator_stack
-        self.trade_executor = trade_executor
-        self.ai_client = ai_client
-        self.is_running = False
-        self._task: asyncio.Task = None
+        logger.debug("Rolling5Engine (Forecaster) Initialized.")
 
-        logger.info("Rolling5Engine Initialized.")
-
-    async def start(self):
-        if not self.is_running:
-            self.is_running = True
-            self._task = asyncio.create_task(self.run_autonomous_cycle())
-            logger.info("Rolling5Engine started.")
-
-    async def stop(self):
-        if self.is_running and self._task:
-            self.is_running = False
-            self._task.cancel()
-            try:
-                await self._task
-            except asyncio.CancelledError:
-                logger.info("Cycle task was cancelled.")
-            logger.info("Rolling5Engine stopped.")
-
-    async def _wait_for_initial_data(self):
-        min_klines_needed = 50  # Changed from 4 to 50
-        logger.info("Rolling5Engine is waiting for initial market data to load...")
-
-        while not self.is_running:
-            await asyncio.sleep(1)
-
-        while self.is_running:
-            klines_len = len(self.market_state.klines)
-            has_orderbook = bool(self.market_state.depth_20.get("bids"))
-            has_live_candle = self.market_state.live_reconstructed_candle is not None
-
-            if (klines_len >= min_klines_needed and has_orderbook and has_live_candle):
-                logger.info("--- Initial market data loaded. Starting autonomous analysis. ---")
-                return
-
-            log_msg = f"Waiting for data... Klines: {klines_len}/{min_klines_needed}, " \
-                      f"Orderbook: {'YES' if has_orderbook else 'NO'}, " \
-                      f"Live Candle: {'YES' if has_live_candle else 'NO'}"
-            logger.info(log_msg)
-            await asyncio.sleep(2)
-
-    async def preload_modules_from_historical_klines(self):
-        required = 50  # Changed from 10 to 50
-        historical = list(self.market_state.klines)[-required:]
-
-        if not historical:
-            logger.warning("No historical klines found for preload.")
-            return
-
-        logger.info(f"Preloading {len(historical)} historical candles into ValidatorStack...")
-
-        for candle in historical:
-            await self.validator_stack.process_backfill_candle(candle)
-
-    async def run_autonomous_cycle(self):
-        await self._wait_for_initial_data()
-        await self.preload_modules_from_historical_klines()
-
-        logger.info("--- Starting Autonomous Cycle ---")
-        while self.is_running:
-            try:
-                if not self.config.autonomous_mode_enabled:
-                    logger.info("Autonomous mode is disabled. Engine idle.")
-                    await asyncio.sleep(300)
-                    continue
-
-                report = await self.validator_stack.generate_report(self.market_state)
-
-                if not report or not report.get("filters"):
-                    await asyncio.sleep(10)
-                    continue
-
-                ai_report = self.ai_client.get_ai_verdict(report)
-                trade_direction = ai_report.get("direction", "NONE")
-
-                if ai_report and trade_direction in ["LONG", "SHORT"]:
-                    logger.info("AI returned an actionable report. Passing to executor.")
-                    await self.trade_executor.execute_trade(ai_report)
-                else:
-                    reason = ai_report.get("reasoning", "No actionable trade.")
-                    logger.info(f"AI report not actionable. Reason: {reason}")
-
-                await asyncio.sleep(60)
-
-            except asyncio.CancelledError:
-                logger.info("Autonomous cycle cancelled.")
-                break
-            except Exception as e:
-                logger.error(f"Error in autonomous cycle: {e}", exc_info=True)
-                await asyncio.sleep(60)
-
-    def generate_predictions(self, klines: list) -> Dict[str, Any]:
-        num_klines = len(klines)
-        if num_klines < 10:
-            return {"error": "Not enough data."}
-        recent_klines = klines[-10:]
-        x = list(range(10))
+    def _calculate_trend(self, klines: List[List[Any]]):
+        recent_klines = klines[:10]
+        x = list(range(len(recent_klines)))
         y = [float(k[4]) for k in recent_klines]
-        n = 10
-        sum_x = sum(x)
-        sum_y = sum(y)
-        sum_xy = sum(xi * yi for xi, yi in zip(x, y))
-        sum_x2 = sum(xi**2 for xi in x)
+        n = len(y)
+        if n < 2:
+            logger.debug("Insufficient klines for trend: %d", n)
+            return {"slope": 0, "intercept": y[0] if y else 0}
+        sum_x, sum_y, sum_xy, sum_x2 = sum(x), sum(y), sum(xi * yi for xi, yi in zip(x, y)), sum(xi**2 for xi in x)
         try:
             slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x**2)
             intercept = (sum_y - slope * sum_x) / n
         except ZeroDivisionError:
-            return {"error": "Calc failed."}
-        predictions = {}
-        last_close = y[-1]
-        for i in range(1, 6):
-            pred_price = intercept + slope * (9 + i)
-            direction = "up" if pred_price > last_close else "down"
-            confidence = min(abs(slope) / last_close * 100, 1.0) * 100
-            predictions[f"c{i}"] = {
-                "direction": direction,
-                "confidence": round(confidence, 2)
+            logger.debug("ZeroDivisionError in trend calculation, using last price")
+            return {"slope": 0, "intercept": y[-1]}
+        logger.debug("Trend calculated: slope=%.4f, intercept=%.4f", slope, intercept)
+        return {"slope": slope, "intercept": intercept}
+
+    async def generate_forecast(self, market_state: MarketState) -> Dict[str, Any]:
+        klines = list(market_state.klines)
+        sentiment_report = market_state.filter_audit_report.get("SentimentDivergenceFilter", {})
+        order_book_report = market_state.filter_audit_report.get("OrderBookReversalZoneDetector", {})
+        mark_price = market_state.mark_price or 0.0
+        report = {
+            "forecast_generated": False,
+            "reversal_likelihood_score": 0.0,
+            "forecast": {},
+            "order_book_metrics": {
+                "bid_pressure": market_state.order_book_pressure.get("bid_pressure", 0.0),
+                "ask_pressure": market_state.order_book_pressure.get("ask_pressure", 0.0),
+                "bid_walls": market_state.order_book_walls.get("bid_walls", []),
+                "ask_walls": market_state.order_book_walls.get("ask_walls", [])
             }
-            last_close = pred_price
-        return {"prediction_type": "5_candle_forecast", **predictions}
+        }
+        if len(klines) < 10:
+            logger.debug("Insufficient klines for forecast: %d", len(klines))
+            return report
+
+        trend = self._calculate_trend(klines)
+        slope, intercept = trend["slope"], trend["intercept"]
+        
+        predictions = {}
+        projected_prices = [intercept + slope * (len(klines) - 1 + i) for i in range(1, 7)]
+        for i, pred_price in enumerate(projected_prices, 1):
+            # Adjust predictions with mark_price for accuracy
+            if mark_price > 0:
+                pred_price = (pred_price * 0.5) + (mark_price * 0.5)
+            predictions[f"c{i}"] = {"price": round(pred_price, 2)}
+        
+        peak_price = max(projected_prices)
+        peak_index = projected_prices.index(peak_price)
+        internal_score = (6 - peak_index) / 6.0 
+
+        sentiment_confidence = sentiment_report.get("score", 1.0)
+        sentiment_direction = sentiment_report.get("metrics", {}).get("divergence_type", "none")
+        
+        external_booster = 0.0
+        if sentiment_direction == "bearish" and slope > 0:
+            external_booster = (1.0 - sentiment_confidence) * -1
+        elif sentiment_direction == "bullish" and slope < 0:
+            external_booster = (1.0 - sentiment_confidence) * -1
+
+        bid_pressure = market_state.order_book_pressure.get("bid_pressure", 0.0)
+        ask_pressure = market_state.order_book_pressure.get("ask_pressure", 0.0)
+        total_pressure = bid_pressure + ask_pressure
+        pressure_factor = (bid_pressure - ask_pressure) / total_pressure if total_pressure > 0 else 0.0
+        pressure_adjustment = pressure_factor * 0.2
+
+        # Adjust score with mark_price proximity
+        mark_price_factor = 0.0
+        if mark_price > 0 and peak_price > 0:
+            mark_price_factor = 1 - (abs(mark_price - peak_price) / mark_price) * 0.1
+
+        reversal_score = internal_score + (external_booster * 0.5) + pressure_adjustment + mark_price_factor
+        
+        report.update({
+            "forecast_generated": True,
+            "reversal_likelihood_score": round(max(0, min(reversal_score, 1.0)), 4),
+            "forecast": predictions
+        })
+        logger.debug("Forecast generated: %s", report)
+        return report

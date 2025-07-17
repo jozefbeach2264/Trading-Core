@@ -1,26 +1,24 @@
 import logging
 import os
 import json
-from typing import Dict, Any, Set
+from typing import Dict, Any, Set, Tuple
 from datetime import datetime
 
 from config.config import Config
 from data_managers.market_state import MarketState
 
 def setup_retest_logger(config: Config) -> logging.Logger:
-    # This function is unchanged.
     log_path = config.retest_logic_log_path
-    log_dir = os.path.dirname(log_path)
-    if log_dir and not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
+    os.makedirs(log_dir, exist_ok=True)
 
     logger = logging.getLogger('RetestEntryLogicLogger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
     if not logger.handlers:
-        handler = logging.FileHandler(log_path)
-        formatter = logging.Formatter('%(message)s')
+        handler = logging.FileHandler(log_path, mode='a')
+        formatter = logging.Formatter('%(asctime)s - %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         
@@ -28,101 +26,98 @@ def setup_retest_logger(config: Config) -> logging.Logger:
 
 class RetestEntryLogic:
     def __init__(self, config: Config):
-        # This function is unchanged.
         self.config = config
         self.logger = setup_retest_logger(self.config)
         self.lookback = self.config.retest_lookback
         self.proximity_percent = self.config.retest_proximity_percent
-        self.allowed_hours = self._parse_trade_windows(config.trade_windows)
-
-    def _parse_trade_windows(self, window_str: str) -> Set[int]:
-        # This function is unchanged.
-        allowed_hours = set()
-        try:
-            parts = window_str.split(',')
-            for part in parts:
-                if '-' in part:
-                    start, end = map(int, part.split('-'))
-                    for hour in range(start, end + 1):
-                        allowed_hours.add(hour)
-                else:
-                    allowed_hours.add(int(part))
-        except ValueError as e:
-            logging.getLogger(__name__).error(f"Invalid trade_windows format: '{window_str}'. Error: {e}")
-        return allowed_hours
-
-    def _is_within_trade_window(self) -> bool:
-        # This function is unchanged.
-        return datetime.utcnow().hour in self.allowed_hours
+        self.logger.debug("RetestEntryLogic initialized: lookback=%d, proximity_percent=%.2f",
+                         self.lookback, self.proximity_percent)
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         report = {
             "filter_name": "RetestEntryLogic",
-            "retest_detected": False,
-            "retest_type": "none",
-            "retest_level": 0.0,
-            "notes": "Not in trade window or not autonomous."
+            "score": 1.0,
+            "metrics": {"reason": "No retest scenario detected."},
+            "flag": "✅ Hard Pass"
         }
 
-        if not self.config.autonomous_mode_enabled or not self._is_within_trade_window():
-            return report
-
-        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
         klines = market_state.klines
         live_candle = market_state.live_reconstructed_candle
+        mark_price = market_state.mark_price or 0.0
 
-        # Check for historical data to establish levels
         if len(klines) < self.lookback:
-            report["notes"] = f"Not enough kline history to establish levels ({len(klines)}/{self.lookback})."
+            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback})."
+            report["flag"] = "⚠️ Soft Flag"
+            report["score"] = 0.5
+            self.logger.error(report["metrics"]["reason"])
             return report
             
-        # Check for the live intra-candle data to perform the check
         if not live_candle:
-            report["notes"] = "Live candle data not yet available for retest check."
+            report["metrics"]["reason"] = "Live candle data not available."
+            self.logger.error(report["metrics"]["reason"])
             return report
 
-        # This logic is unchanged: find the significant high/low from history.
+        if mark_price <= 0:
+            report["metrics"]["reason"] = "Invalid mark price."
+            self.logger.error(report["metrics"]["reason"])
+            return report
+
         lookback_klines = list(klines)[-self.lookback:]
         highest_high = max(float(k[2]) for k in lookback_klines)
         lowest_low = min(float(k[3]) for k in lookback_klines)
 
+        live_open, live_high, live_low, live_close = map(float, live_candle[1:5])
+        # Use mark_price to adjust live_high/low for accuracy
+        live_high = max(live_high, mark_price)
+        live_low = min(live_low, mark_price)
+
         proximity_to_high = highest_high * (self.proximity_percent / 100)
         proximity_to_low = lowest_low * (self.proximity_percent / 100)
 
-        # ✅ NECESSARY UPDATE: Use the live candle's high and low for the comparison.
-        live_candle_high = float(live_candle[2])
-        live_candle_low = float(live_candle[3])
-
-        if abs(live_candle_high - highest_high) <= proximity_to_high:
-            report.update({
-                "retest_detected": True,
+        is_near_high = abs(live_high - highest_high) <= proximity_to_high
+        is_near_low = abs(live_low - lowest_low) <= proximity_to_low
+        
+        retest_pct = 0.0
+        
+        if is_near_high:
+            rejection_confirmed = live_close < live_high
+            report["metrics"] = {
                 "retest_type": "resistance",
-                "retest_level": highest_high,
-                "notes": f"Live price high {live_candle_high} is retesting resistance at {highest_high}."
-            })
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "retest_type": "resistance",
-                "retest_level": highest_high,
-                "live_candle_high": live_candle_high,
-                "result": True
-            }))
-        elif abs(live_candle_low - lowest_low) <= proximity_to_low:
-            report.update({
-                "retest_detected": True,
+                "historical_level": highest_high,
+                "live_high": live_high,
+                "rejection_confirmed": rejection_confirmed,
+                "mark_price": round(mark_price, 4)
+            }
+            if rejection_confirmed:
+                retest_pct = (live_high - live_close) / (live_high - live_low) if (live_high - live_low) > 0 else 0
+                report["score"] = round(retest_pct, 4)
+                report["flag"] = "✅ Validated" if retest_pct > 0.5 else "⚠️ Soft Flag"
+                report["metrics"]["retest_strength_pct"] = round(retest_pct * 100, 2)
+            else:
+                report["score"] = 0.0
+                report["flag"] = "fallback_strategy: Scalpel"
+                report["metrics"]["reason"] = "Resistance level broken, not retested."
+        
+        elif is_near_low:
+            bounce_confirmed = live_close > live_low
+            report["metrics"] = {
                 "retest_type": "support",
-                "retest_level": lowest_low,
-                "notes": f"Live price low {live_candle_low} is retesting support at {lowest_low}."
-            })
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "retest_type": "support",
-                "retest_level": lowest_low,
-                "live_candle_low": live_candle_low,
-                "result": True
-            }))
-        else:
-            # This is not an error, just a log that no retest was detected.
-            report["notes"] = "No retest of significant levels detected."
-
+                "historical_level": lowest_low,
+                "live_low": live_low,
+                "bounce_confirmed": bounce_confirmed,
+                "mark_price": round(mark_price, 4)
+            }
+            if bounce_confirmed:
+                retest_pct = (live_close - live_low) / (live_high - live_low) if (live_high - live_low) > 0 else 0
+                report["score"] = round(retest_pct, 4)
+                report["flag"] = "✅ Validated" if retest_pct > 0.5 else "⚠️ Soft Flag"
+                report["metrics"]["retest_strength_pct"] = round(retest_pct * 100, 2)
+            else:
+                report["score"] = 0.0
+                report["flag"] = "fallback_strategy: Scalpel"
+                report["metrics"]["reason"] = "Support level broken, not retested."
+        
+        self.logger.debug("RetestEntryLogic report: score=%.4f, flag=%s, metrics=%s",
+                         report["score"], report["flag"], report["metrics"])
+        await market_state.update_filter_audit_report("RetestEntryLogic", report)
         return report

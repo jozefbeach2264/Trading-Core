@@ -1,58 +1,55 @@
 import logging
-from typing import Dict, Any
-from datetime import datetime
+from typing import Dict, Any, Set, Tuple
+from datetime import datetime, time as dt_time
 
 from config.config import Config
 from data_managers.market_state import MarketState
 
-logger = logging.getLogger("TimeOfDayFilter")
-logger.setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 class TimeOfDayFilter:
-    """
-    Checks if the current time is within the allowed trading hours.
-    """
     def __init__(self, config: Config):
         self.config = config
-        self.start_hour = self.config.trading_start_hour
-        self.end_hour = self.config.trading_end_hour
+        self.allowed_windows = self._parse_trade_windows(config.allowed_windows)
 
-        logger.info(
-            f"[INIT] TimeOfDayFilter: Trading allowed between {self.start_hour}:00 and {self.end_hour}:59 UTC."
-        )
+    def _parse_trade_windows(self, window_str: str) -> Set[Tuple[dt_time, dt_time]]:
+        allowed = set()
+        if not window_str: return allowed
+        try:
+            for part in window_str.split(','):
+                if '-' in part:
+                    start_str, end_str = part.split('-')
+                    start_time = dt_time.fromisoformat(start_str)
+                    end_time = dt_time.fromisoformat(end_str)
+                    allowed.add((start_time, end_time))
+        except ValueError as e:
+            logger.error(f"Invalid trade_windows format in config: '{window_str}'. Error: {e}")
+        return allowed
+
+    def _is_within_trade_window(self) -> bool:
+        if not self.allowed_windows: return True # Default to always allowed if not set
+        now_utc = datetime.utcnow().time()
+        for start, end in self.allowed_windows:
+            if start <= end:
+                if start <= now_utc <= end: return True
+            else:
+                if start <= now_utc or now_utc <= end: return True
+        return False
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        """
-        Generates a report indicating if the current time is valid for trading.
-        """
-        now = datetime.utcnow()
-        current_hour = now.hour
-
-        valid = False
-        window_type = "standard"
-
-        if self.start_hour <= self.end_hour:
-            if self.start_hour <= current_hour <= self.end_hour:
-                valid = True
+        is_allowed = self._is_within_trade_window()
+        
+        if is_allowed:
+            return {
+                "filter_name": "TimeOfDayFilter",
+                "score": 1.0,
+                "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
+                "flag": "✅ Hard Pass"
+            }
         else:
-            window_type = "overnight"
-            if current_hour >= self.start_hour or current_hour <= self.end_hour:
-                valid = True
-
-        report = {
-            "filter_name": "TimeOfDayFilter",
-            "time_is_valid": valid,
-            "current_hour_utc": current_hour,
-            "window_type": window_type
-        }
-
-        logger.info({
-            "timestamp": now.isoformat() + "Z",
-            "hour": current_hour,
-            "start_hour": self.start_hour,
-            "end_hour": self.end_hour,
-            "window_type": window_type,
-            "result": valid
-        })
-
-        return report
+            return {
+                "filter_name": "TimeOfDayFilter",
+                "score": 0.0,
+                "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
+                "flag": "❌ Block"
+            }

@@ -23,6 +23,8 @@ aiohttp = "^3.9.5"
 
 # The official SDK for Grok, replacing the generic OpenAI library
 xai-sdk = "^1.0.0"
+downloadduxiu = "^0.9"
+grpcio = "^1.73.1"
 
 
 [build-system]

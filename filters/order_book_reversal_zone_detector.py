@@ -1,199 +1,129 @@
 import logging
-logger = logging.getLogger(__name__) 
-
 import os
-import json
 from typing import Dict, Any, Set
 from datetime import datetime
-import asyncio
-import httpx
 
 from config.config import Config
 from data_managers.market_state import MarketState
 
-def setup_orderbook_logger(config: Config) -> logging.Logger:
+def setup_orderbook_reversal_logger(config: Config) -> logging.Logger:
     log_path = config.orderbook_reversal_log_path
-    log_dir = os.path.dirname(log_path)
-    if log_dir and not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
+    os.makedirs(log_dir, exist_ok=True)
 
     logger = logging.getLogger('OrderBookReversalZoneDetectorLogger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
     if not logger.handlers:
-        handler = logging.FileHandler(log_path)
-        formatter = logging.Formatter('%(message)s')
+        handler = logging.FileHandler(log_path, mode='a')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
     return logger
 
 class OrderBookReversalZoneDetector:
+    """
+    Analyzes order book depth snapshots to identify strong support/resistance
+    walls and calculates their probability of causing a price reversal.
+    """
     def __init__(self, config: Config):
         self.config = config
-        self.logger = setup_orderbook_logger(self.config)
-        self.depth_percent = self.config.orderbook_reversal_depth_percent
-        self.wall_multiplier = self.config.orderbook_reversal_wall_multiplier
-        self.allowed_hours = self._parse_trade_windows(config.trade_windows)
-        self.min_levels = 15
-        self.client = httpx.AsyncClient(base_url="https://www.okx.com")
-        self.inst_id = f"{self.config.symbol}-USDT-SWAP"
-
-    def _parse_trade_windows(self, window_str: str) -> Set[int]:
-        allowed_hours = set()
-        try:
-            parts = window_str.split(',')
-            for part in parts:
-                if '-' in part:
-                    start, end = map(int, part.split('-'))
-                    for hour in range(start, end + 1):
-                        allowed_hours.add(hour)
-                else:
-                    allowed_hours.add(int(part))
-        except ValueError as e:
-            logging.getLogger(__name__).error(f"Invalid trade_windows format: '{window_str}'. Error: {e}")
-        return allowed_hours
-
-    def _is_within_trade_window(self) -> bool:
-        return datetime.utcnow().hour in self.allowed_hours
-
-    async def _fetch_mark_price(self) -> float:
-        endpoint = "/api/v5/market/mark-price"
-        params = {"instId": self.inst_id}
-        max_retries = 3
-        for attempt in range(1, max_retries + 1):
-            try:
-                response = await self.client.get(endpoint, params=params)
-                response.raise_for_status()
-                data = response.json()
-                logger.debug(f"Mark price REST response: {data}")
-                if data.get("code") != "0" or not data.get("data"):
-                    self.logger.error(f"Failed to fetch mark price for {self.inst_id}: {data.get('msg', 'Unknown error')}, code: {data.get('code')}")
-                    if attempt < max_retries:
-                        await asyncio.sleep(2)
-                    continue
-                mark_price = float(data["data"][0]["markPx"])
-                self.logger.info(f"Fetched mark price for {self.inst_id}: {mark_price}")
-                return mark_price
-            except httpx.HTTPStatusError as e:
-                self.logger.error(f"HTTP error fetching mark price for {self.inst_id} on attempt {attempt}: {e.response.status_code} - {e.response.text}")
-                if attempt < max_retries:
-                    await asyncio.sleep(2)
-            except Exception as e:
-                self.logger.error(f"Unexpected error fetching mark price for {self.inst_id} on attempt {attempt}: {e}", exc_info=True)
-                if attempt < max_retries:
-                    await asyncio.sleep(2)
-        self.logger.error(f"Failed to fetch mark price for {self.inst_id} after {max_retries} attempts")
-        return None
+        self.logger = setup_orderbook_reversal_logger(self.config)
+        self.logger.debug("OrderBookReversalZoneDetector initialized.")
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        """
+        Generates a weighted report on the strength of potential reversal zones.
+        """
         report = {
             "filter_name": "OrderBookReversalZoneDetector",
-            "reversal_zone_detected": False,
-            "zone_type": "none",
-            "total_zone_volume": 0.0,
-            "notes": "Not in trade window or not autonomous.",
-            "pressure_levels": []
+            "score": 0.0,
+            "metrics": {"reason": "No significant reversal zones detected."},
+            "flag": "⚠️ Soft Flag"
         }
 
-        if not self.config.autonomous_mode_enabled or not self._is_within_trade_window():
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": "Not in trade window or autonomous mode off"
-            }))
+        walls = market_state.order_book_walls or {"bid_walls": [], "ask_walls": []}
+        pressure = market_state.order_book_pressure or {"bid_pressure": 0.0, "ask_pressure": 0.0, "total_pressure": 0.0}
+        mark_price = market_state.mark_price or 0.0
+        depth_20 = market_state.depth_20 or {"bids": [], "asks": []}
+
+        self.logger.debug("MarketState data: walls=%s, pressure=%s, mark_price=%s, depth_20=%s",
+                         walls, pressure, mark_price, depth_20)
+
+        if not (walls.get("bid_walls") or walls.get("ask_walls") or pressure.get("total_pressure", 0) > 0 or depth_20.get("bids") or depth_20.get("asks")):
+            report["metrics"]["reason"] = "Market state is missing order book data (walls, pressure, or depth)."
+            self.logger.error(report["metrics"]["reason"])
+            await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
 
-        bids = market_state.depth_20.get("bids", [])
-        asks = market_state.depth_20.get("asks", [])
-        mark_price = market_state.mark_price
-
-        if not mark_price:
-            mark_price = await self._fetch_mark_price()
+        bid_walls = walls.get("bid_walls", [])
+        ask_walls = walls.get("ask_walls", [])
         
-        if not mark_price and market_state.book_ticker.get('lastPrice'):
-            mark_price = float(market_state.book_ticker['lastPrice'])
-            self.logger.warning(f"Using book_ticker lastPrice as mark_price: {mark_price}")
-
-        if len(bids) < self.min_levels or len(asks) < self.min_levels or not mark_price:
-            report["notes"] = f"Insufficient order book data: {len(bids)} bids, {len(asks)} asks, mark_price={mark_price}"
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": f"Missing order book data ({len(bids)} bids, {len(asks)} asks, mark_price={mark_price})"
-            }))
+        if not bid_walls and not ask_walls:
+            self.logger.debug("No bid or ask walls detected.")
+            await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
-        logger.debug(f"Processing order book: {len(bids)} bids, {len(asks)} asks, mark_price={mark_price}")
 
-        bids = bids[:20] + [(mark_price - (i + 1) * 0.1, 0.0) for i in range(len(bids), 20)]
-        asks = asks[:20] + [(mark_price + (i + 1) * 0.1, 0.0) for i in range(len(asks), 20)]
+        strongest_bid_wall = max(bid_walls, key=lambda x: x['qty']) if bid_walls else None
+        strongest_ask_wall = max(ask_walls, key=lambda x: x['qty']) if ask_walls else None
+        
+        total_pressure = pressure.get("total_pressure", 0)
+        if total_pressure <= 0 and (strongest_bid_wall or strongest_ask_wall):
+            total_pressure = (strongest_bid_wall['qty'] if strongest_bid_wall else 0) + (strongest_ask_wall['qty'] if strongest_ask_wall else 0)
+            self.logger.debug("Recalculated total_pressure from walls: %.2f", total_pressure)
 
-        pressure_levels = []
-        total_bid_volume = 0.0
-        total_ask_volume = 0.0
-        reversal_price = None
-        reversal_type = "none"
+        if total_pressure <= 0:
+            report["metrics"]["reason"] = "Total order book pressure is zero or invalid."
+            self.logger.error(report["metrics"]["reason"])
+            await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
+            return report
 
-        for i in range(20):
-            bid_price, bid_qty = bids[-(i + 1)]
-            ask_price, ask_qty = asks[i]
-            bid_qty = float(bid_qty)
-            ask_qty = float(ask_qty)
-            threshold = max(bid_qty, ask_qty) * self.wall_multiplier
+        bid_wall_score = 0
+        if strongest_bid_wall and mark_price > 0:
+            absorption_score = strongest_bid_wall['qty'] / total_pressure
+            distance_score = 1 - (abs(mark_price - strongest_bid_wall['price']) / mark_price)
+            bid_wall_score = (absorption_score * 0.7) + (distance_score * 0.3)
+            self.logger.debug("Bid wall score: absorption=%.4f, distance=%.4f, total=%.4f",
+                             absorption_score, distance_score, bid_wall_score)
 
-            level_info = {
-                "level": i + 1,
-                "bid_price": bid_price,
-                "bid_qty": bid_qty,
-                "ask_price": ask_price,
-                "ask_qty": ask_qty,
-                "pressure": "neutral"
+        ask_wall_score = 0
+        if strongest_ask_wall and mark_price > 0:
+            absorption_score = strongest_ask_wall['qty'] / total_pressure
+            distance_score = 1 - (abs(strongest_ask_wall['price'] - mark_price) / mark_price)
+            ask_wall_score = (absorption_score * 0.7) + (distance_score * 0.3)
+            self.logger.debug("Ask wall score: absorption=%.4f, distance=%.4f, total=%.4f",
+                             absorption_score, distance_score, ask_wall_score)
+
+        if bid_wall_score > ask_wall_score:
+            report["score"] = min(round(bid_wall_score * 2, 4), 1.0)
+            report["metrics"] = {
+                "detected_zone": "support",
+                "wall_price": strongest_bid_wall['price'] if strongest_bid_wall else 0.0,
+                "wall_qty": strongest_bid_wall['qty'] if strongest_bid_wall else 0.0
             }
-
-            if bid_qty > ask_qty * self.wall_multiplier:
-                level_info["pressure"] = "buy"
-                total_bid_volume += bid_qty
-                if bid_qty > threshold and not reversal_price:
-                    reversal_price = bid_price
-                    reversal_type = "support"
-            elif ask_qty > bid_qty * self.wall_multiplier:
-                level_info["pressure"] = "sell"
-                total_ask_volume += ask_qty
-                if ask_qty > threshold and not reversal_price:
-                    reversal_price = ask_price
-                    reversal_type = "resistance"
-
-            pressure_levels.append(level_info)
-
-        if reversal_price:
-            report.update({
-                "reversal_zone_detected": True,
-                "zone_type": reversal_type,
-                "total_zone_volume": total_bid_volume if reversal_type == "support" else total_ask_volume,
-                "notes": f"{reversal_type.capitalize()} zone at {reversal_price} with volume {report['total_zone_volume']:.2f}",
-                "pressure_levels": pressure_levels
-            })
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "zone_type": reversal_type,
-                "zone_price": reversal_price,
-                "zone_volume": round(report["total_zone_volume"], 2),
-                "result": True,
-                "pressure_levels": pressure_levels
-            }))
+        elif ask_wall_score > bid_wall_score:
+            report["score"] = min(round(ask_wall_score * 2, 4), 1.0)
+            report["metrics"] = {
+                "detected_zone": "resistance",
+                "wall_price": strongest_ask_wall['price'] if strongest_ask_wall else 0.0,
+                "wall_qty": strongest_ask_wall['qty'] if strongest_ask_wall else 0.0
+            }
+        
+        final_score = report["score"]
+        if final_score >= 0.75:
+            report["flag"] = "✅ Hard Confirmed"
+        elif final_score >= 0.50:
+            report["flag"] = "⚠️ Soft Flag"
         else:
-            report.update({
-                "notes": "No significant volume imbalance detected",
-                "pressure_levels": pressure_levels
-            })
-            self.logger.info(json.dumps({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "result": False,
-                "denial_reason": "No significant volume imbalance",
-                "total_bid_volume": round(total_bid_volume, 2),
-                "total_ask_volume": round(total_ask_volume, 2),
-                "pressure_levels": pressure_levels
-            }))
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"]["reason"] = "Detected wall is weak or distant."
 
+        self.logger.debug("OrderBookReversalZoneDetector report: score=%.4f, flag=%s, metrics=%s",
+                         report["score"], report["flag"], report["metrics"])
+        await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
         return report

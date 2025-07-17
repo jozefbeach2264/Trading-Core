@@ -6,8 +6,7 @@ logger = logging.getLogger(__name__)
 class CandleReconstructor:
     """
     Reconstructs a 1-minute OHLCV candle in real-time by aggregating
-    live trade data from a WebSocket stream. This simulates the data structure
-    of an official kline/candle feed.
+    live trade data. Now includes hard finalization logic.
     """
     def __init__(self):
         self.current_candle: Optional[List[Any]] = None
@@ -20,75 +19,59 @@ class CandleReconstructor:
         volume = float(trade['sz'])
         timestamp = int(trade['ts'])
         
-        # Calculate the starting timestamp for the current minute (e.g., 17:45:33 -> 17:45:00)
         self.current_minute_timestamp = timestamp - (timestamp % 60000)
 
-        # This structure mimics the official OKX kline format:
-        # [ts, o, h, l, c, vol, volCcy, volCcyQuote, confirm]
+        # Structure: [ts,o,h,l,c,vol,volCcy,volCcyQuote,confirm]
+        # 'confirm' flag (index 8) is "0" for in-progress.
         self.current_candle = [
-            self.current_minute_timestamp, # 0: Timestamp (start of the minute)
-            price,                        # 1: Open
-            price,                        # 2: High
-            price,                        # 3: Low
-            price,                        # 4: Close
-            volume,                       # 5: Volume (in base currency, e.g., ETH)
-            price * volume,               # 6: Volume (in quote currency, e.g., USDT)
-            0.0,                          # 7: volCcyQuote (unused, kept for structure)
-            "0"                           # 8: Confirmation flag (0 = in-progress)
+            self.current_minute_timestamp, price, price, price, price,
+            volume, price * volume, 0.0, "0"
         ]
-        logger.debug(f"Started new 1m candle at {self.current_minute_timestamp} with trade: {trade}")
+        logger.info(f"Started new 1m candle at {self.current_minute_timestamp}")
 
     def process_trade(self, trade: Dict[str, Any]) -> Optional[List[Any]]:
         """
-        Processes a single trade from the WebSocket feed, updating the current candle.
-        
-        Returns:
-            A list representing the completed candle if a minute has just ended, 
-            otherwise returns None.
+        Processes a single trade, updating the current candle.
+        Returns the completed candle only when a minute boundary is crossed.
         """
         try:
             trade_time = int(trade['ts'])
             trade_price = float(trade['px'])
             trade_volume = float(trade['sz'])
+            logger.debug(f"Processing trade: time={trade_time}, price={trade_price}, volume={trade_volume}")
         except (ValueError, TypeError, KeyError) as e:
-            logger.error(f"Could not parse trade data: {trade}. Error: {e}")
+            logger.error(f"Invalid trade data: {trade}. Error: {e}")
             return None
 
         completed_candle = None
 
-        # If this is the very first trade we've seen, start the first candle.
         if self.current_candle is None:
             self._start_new_candle(trade)
+            logger.debug(f"Initial candle state: {self.current_candle}")
             return None
 
         # Check if the trade belongs to a new minute.
         if trade_time >= self.current_minute_timestamp + 60000:
-            # 1. Finalize the old candle by setting its confirmation flag.
-            self.current_candle[8] = "1" 
+            # Finalize the old candle by setting the 'confirm' flag to "1".
+            self.current_candle[8] = "1"
             completed_candle = self.current_candle.copy()
             logger.info(f"Finalized 1m candle: {completed_candle}")
             
-            # 2. Start a new candle with the current trade's data.
+            # Start the next candle with the current trade's data.
             self._start_new_candle(trade)
         else:
-            # This trade is part of the current minute, so update the candle.
-            # High price
-            if trade_price > self.current_candle[2]:
-                self.current_candle[2] = trade_price
-            # Low price
-            if trade_price < self.current_candle[3]:
-                self.current_candle[3] = trade_price
-            # Close price is always the last trade's price
-            self.current_candle[4] = trade_price
-            # Accumulate volume
-            self.current_candle[5] += trade_volume
-            self.current_candle[6] += trade_price * trade_volume
+            # Update current candle metrics.
+            self.current_candle[2] = max(self.current_candle[2], trade_price)  # High
+            self.current_candle[3] = min(self.current_candle[3], trade_price)  # Low
+            self.current_candle[4] = trade_price  # Close
+            self.current_candle[5] += trade_volume  # Volume
+            self.current_candle[6] += trade_price * trade_volume  # Quote Volume
+            logger.debug(f"Updated candle: {self.current_candle}")
 
         return completed_candle
 
     def get_live_candle(self) -> Optional[List[Any]]:
-        """
-        Provides access to the current, in-progress candle for intra-candle analysis.
-        This is the method the filters will call to get the latest data.
-        """
-        return self.current_candle.copy() if self.current_candle else None
+        """Provides access to the current, in-progress candle."""
+        candle = self.current_candle.copy() if self.current_candle else None
+        logger.debug(f"Live candle requested: {candle}")
+        return candle

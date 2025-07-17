@@ -1,6 +1,5 @@
 import logging
 import os
-import json
 from typing import Dict, Any, Set
 from datetime import datetime
 
@@ -8,129 +7,117 @@ from config.config import Config
 from data_managers.market_state import MarketState
 
 def setup_cts_logger(config: Config) -> logging.Logger:
-    # This function is unchanged.
     log_path = config.cts_filter_log_path
-
-    log_dir = os.path.dirname(log_path)
-    if log_dir and not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
+    os.makedirs(log_dir, exist_ok=True)
 
     logger = logging.getLogger('CtsFilterLogger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    if not logger.handlers:
-        handler = logging.FileHandler(log_path)
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    logger.handlers.clear()
+    file_handler = logging.FileHandler(log_path, mode='a')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(file_handler)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(console_handler)
 
     return logger
 
 class CtsFilter:
     def __init__(self, config: Config):
-        # This function is unchanged.
         self.config = config
         self.logger = setup_cts_logger(self.config)
         self.lookback_period = self.config.cts_lookback_period
         self.narrow_range_ratio = self.config.cts_narrow_range_ratio
         self.rejection_multiplier = self.config.cts_wick_rejection_multiplier
-        self.allowed_hours = self._parse_trade_windows(config.trade_windows)
-        self.logger.info(
-            f"CtsFilter Initialized. Lookback: {self.lookback_period}, "
-            f"Narrow Range Ratio: {self.narrow_range_ratio}, "
-            f"Wick Multiplier: {self.rejection_multiplier}"
-        )
-
-    def _parse_trade_windows(self, window_str: str) -> Set[int]:
-        # This function is unchanged.
-        allowed_hours = set()
-        try:
-            parts = window_str.split(',')
-            for part in parts:
-                if '-' in part:
-                    start, end = map(int, part.split('-'))
-                    for hour in range(start, end + 1):
-                        allowed_hours.add(hour)
-                else:
-                    allowed_hours.add(int(part))
-        except ValueError as e:
-            self.logger.error(f"Invalid trade_windows format: '{window_str}'. Error: {e}")
-        return allowed_hours
-
-    def _is_within_trade_window(self) -> bool:
-        # This function is unchanged.
-        return datetime.utcnow().hour in self.allowed_hours
+        self.logger.debug("CtsFilter initialized: lookback=%d, narrow_range_ratio=%.2f, rejection_multiplier=%.2f",
+                         self.lookback_period, self.narrow_range_ratio, self.rejection_multiplier)
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         report = {
             "filter_name": "CtsFilter",
-            "trap_probability": 0.0,
-            "trap_direction": "none",
-            "notes": "Not in trade window or not autonomous."
+            "score": 0.0,
+            "metrics": {},
+            "flag": "❌ Block"
         }
 
-        if not self.config.autonomous_mode_enabled or not self._is_within_trade_window():
-            return report
-
-        report["notes"] = "No pattern detected."
-        
-        # ✅ NECESSARY UPDATE: Get both historical and live candle data.
         klines = market_state.klines
         live_candle = market_state.live_reconstructed_candle
+        mark_price = market_state.mark_price or 0.0
+
+        self.logger.debug("Checking MarketState: klines_length=%d, live_candle=%s, mark_price=%s",
+                         len(klines), live_candle, mark_price)
 
         if len(klines) < self.lookback_period:
-            report["notes"] = f"Not enough historical kline data ({len(klines)}/{self.lookback_period})."
+            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback_period})."
+            self.logger.error(report["metrics"]["reason"])
             return report
 
         if not live_candle:
-            report["notes"] = "Live candle data not yet available for CTS check."
+            report["metrics"]["reason"] = "Live candle data not available."
+            self.logger.error(report["metrics"]["reason"])
             return report
 
-        # This logic is unchanged as it correctly uses historical data.
+        if mark_price <= 0:
+            report["metrics"]["reason"] = "Invalid mark price."
+            self.logger.error(report["metrics"]["reason"])
+            return report
+
         lookback_klines = list(klines)[-self.lookback_period:]
         ranges = [float(k[2]) - float(k[3]) for k in lookback_klines]
         average_range = sum(ranges) / len(ranges) if ranges else 0
 
-        # ✅ NECESSARY UPDATE: The candle to be analyzed is now our live, reconstructed candle.
-        last_candle = live_candle
-        o, h, l, c = map(float, [last_candle[1], last_candle[2], last_candle[3], last_candle[4]])
-
+        o, h, l, c = map(float, [live_candle[1], live_candle[2], live_candle[3], live_candle[4]])
         current_range = h - l
+        # Adjust range with mark_price if candle is stale
+        if mark_price > 0:
+            current_range = max(current_range, abs(mark_price - max(o, c)), abs(mark_price - min(o, c)))
         current_body = abs(c - o)
 
-        is_compressed = current_range < (average_range * self.narrow_range_ratio) if average_range > 0 else False
+        if average_range <= 0 or current_range <= 0:
+            report["metrics"]["reason"] = "Invalid candle data (zero or negative range)."
+            self.logger.error(report["metrics"]["reason"])
+            return report
+
+        is_compressed = current_range < (average_range * self.narrow_range_ratio)
+        grind_ratio = current_range / average_range
 
         upper_wick = h - max(o, c)
         lower_wick = min(o, c) - l
         dynamic_rejection_threshold = current_body * self.rejection_multiplier
 
         wick_signal = "none"
-        if lower_wick > dynamic_rejection_threshold:
-            wick_signal = "bull_trap"
-        elif upper_wick > dynamic_rejection_threshold:
-            wick_signal = "bear_trap"
+        wick_strength = 0.0
+        if lower_wick > dynamic_rejection_threshold and dynamic_rejection_threshold > 0:
+            wick_signal = "bull_trap_rejection"
+            wick_strength = lower_wick / dynamic_rejection_threshold
+        elif upper_wick > dynamic_rejection_threshold and dynamic_rejection_threshold > 0:
+            wick_signal = "bear_trap_rejection"
+            wick_strength = upper_wick / dynamic_rejection_threshold
 
+        report["metrics"] = {
+            "average_range": round(average_range, 4),
+            "current_range": round(current_range, 4),
+            "grind_ratio": round(grind_ratio, 2),
+            "is_compressed": is_compressed,
+            "wick_signal": wick_signal,
+            "wick_strength_ratio": round(wick_strength, 2),
+            "mark_price": round(mark_price, 4)
+        }
+        
+        score = 0.0
         if is_compressed and wick_signal != "none":
-            exceed_ratio = 0
-            if wick_signal == "bull_trap" and dynamic_rejection_threshold > 0:
-                exceed_ratio = lower_wick / dynamic_rejection_threshold
-            elif wick_signal == "bear_trap" and dynamic_rejection_threshold > 0:
-                exceed_ratio = upper_wick / dynamic_rejection_threshold
+            score = 0.6
+            score += min((wick_strength - 1) * 0.2, 0.4)
+        elif not is_compressed:
+            score = 1.0
+        
+        report["score"] = round(score, 4)
+        report["flag"] = "✅ Hard Pass" if score >= 0.75 else "⚠️ Soft Flag" if score >= 0.50 else "❌ Block"
 
-            probability = min(0.70 + (0.05 * (exceed_ratio - 1)), 0.95)
-
-            report.update({
-                "trap_probability": round(probability, 4),
-                "trap_direction": wick_signal,
-                "notes": f"Compression trap detected ({wick_signal}). Live range {current_range:.2f}."
-            })
-            
-            # This logging is preserved and correct.
-            log_payload = report.copy()
-            log_payload["details"] = { "avg_range": round(average_range, 4), "current_range": round(current_range, 4), "dynamic_threshold": round(dynamic_rejection_threshold, 4), "lower_wick": round(lower_wick, 4), "upper_wick": round(upper_wick, 4)}
-            self.logger.info(f"DECISION: {log_payload}")
-        else:
-            report["notes"] = "No compression trap pattern detected."
-
+        self.logger.debug("CtsFilter report: score=%.4f, flag=%s, metrics=%s",
+                         report["score"], report["flag"], report["metrics"])
+        await market_state.update_filter_audit_report("CtsFilter", report)
         return report

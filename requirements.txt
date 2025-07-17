@@ -8,3 +8,4 @@ psutil==5.9.8
 pydantic==2.8.2
 aiohttp==3.9.5
 xai-sdk==0.0.7
+numpy>=1.26.0

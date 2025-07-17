@@ -1,9 +1,10 @@
 modules = ["python-3.11"]
 
 [nix]
-packages = ["libxcrypt"]
+packages = ["c-ares", "grpc", "libxcrypt", "openssl", "pkg-config", "zlib"]
 
 [workflows]
+runButton = "GET MONEY"
 
 [[workflows.workflow]]
 name = "GET MONEY"

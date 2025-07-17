@@ -322,6 +322,17 @@ files = [
 ]
 
 [[package]]
+name = "downloadduxiu"
+version = "0.9"
+description = "download images from duxiu and chaoxing library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "downloadduxiu-0.9.tar.gz", hash = "sha256:1dfa5f9e213c7f16a9ac4c91fe134b2ed40ae3a5c35539e08cba46bc817fbb56"},
+    {file = "downloadduxiu-0.9.zip", hash = "sha256:7774591d414f8c09d06175b16d08e02c12688e64e4e4a4adb4c8d02cfec8d6e0"},
+]
+
+[[package]]
 name = "fastapi"
 version = "0.115.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1639,4 +1650,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7b8655c01baa841688663424c4c23eee5554d8b5b395a24e6d8382a8899cf0e3"
+content-hash = "33a5fc8426fa4c4343d5426008477479c7c174e6588de971965589d19554a12a"
