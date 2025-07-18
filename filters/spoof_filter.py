@@ -22,7 +22,7 @@ class SpoofFilter:
         if not spoof_metrics:
             report["flag"] = "⚠️ Soft Flag"
             report["score"] = 0.5
-            report["metrics"]["reason"] = "Spoof metrics not yet available."
+            report["metrics"]["reason"] = "SPOOF_METRICS_UNAVAILABLE"
             return report
 
         spoof_thin_rate = spoof_metrics.get("spoof_thin_rate", 0.0)
@@ -36,6 +36,8 @@ class SpoofFilter:
         if spoof_thin_rate > 10.0:
             report["score"] = 0.0
             report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = f"Spoofing detected: wall thinning rate {spoof_thin_rate:.2f}% > 10%"
+            report["metrics"]["reason"] = "SPOOFING_DETECTED"
+        else:
+            report["metrics"]["reason"] = "NO_SPOOFING_DETECTED"
 
         return report

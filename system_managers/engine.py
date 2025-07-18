@@ -45,13 +45,18 @@ class Engine:
             try:
                 validator_report = await self.validator_stack.generate_report(self.market_state)
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, validator_report)
+                
                 if final_signal and final_signal.get("ai_verdict", {}).get("action") == "✅ Execute":
                     if self.config.autonomous_mode_enabled:
                         await self.trade_executor.execute_trade(final_signal)
                     else:
                         logging.info(f"AUTONOMOUS MODE DISABLED. Suppressing execution of signal: {final_signal.get('direction')}")
                 else:
-                    log_failed_signal(validator_report, "Signal rejected by AI Strategy or upstream filters.", self.config)
+                    # --- THIS IS THE FIX ---
+                    # Use the specific reason from the final_signal dictionary.
+                    specific_reason = final_signal.get("reason", "UNKNOWN_REJECTION_REASON")
+                    log_failed_signal(validator_report, specific_reason, self.config)
+                    
                 await asyncio.sleep(15)
             except asyncio.CancelledError:
                 logging.info("Autonomous cycle cancelled.")

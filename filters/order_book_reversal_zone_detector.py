@@ -43,8 +43,8 @@ class OrderBookReversalZoneDetector:
         report = {
             "filter_name": "OrderBookReversalZoneDetector",
             "score": 0.0,
-            "metrics": {"reason": "No significant reversal zones detected."},
-            "flag": "⚠️ Soft Flag"
+            "metrics": {},
+            "flag": "⚠️ Soft Flag" 
         }
 
         walls = market_state.order_book_walls or {"bid_walls": [], "ask_walls": []}
@@ -56,7 +56,8 @@ class OrderBookReversalZoneDetector:
                          walls, pressure, mark_price, depth_20)
 
         if not (walls.get("bid_walls") or walls.get("ask_walls") or pressure.get("total_pressure", 0) > 0 or depth_20.get("bids") or depth_20.get("asks")):
-            report["metrics"]["reason"] = "Market state is missing order book data (walls, pressure, or depth)."
+            report["metrics"]["reason"] = "ORDER_BOOK_DATA_MISSING"
+            report["flag"] = "❌ Block"
             self.logger.error(report["metrics"]["reason"])
             await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
@@ -65,6 +66,7 @@ class OrderBookReversalZoneDetector:
         ask_walls = walls.get("ask_walls", [])
         
         if not bid_walls and not ask_walls:
+            report["metrics"]["reason"] = "NO_WALLS_DETECTED"
             self.logger.debug("No bid or ask walls detected.")
             await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
@@ -78,12 +80,13 @@ class OrderBookReversalZoneDetector:
             self.logger.debug("Recalculated total_pressure from walls: %.2f", total_pressure)
 
         if total_pressure <= 0:
-            report["metrics"]["reason"] = "Total order book pressure is zero or invalid."
+            report["metrics"]["reason"] = "INVALID_ORDER_BOOK_PRESSURE"
+            report["flag"] = "❌ Block"
             self.logger.error(report["metrics"]["reason"])
             await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
 
-        bid_wall_score = 0
+        bid_wall_score = 0.0
         if strongest_bid_wall and mark_price > 0:
             absorption_score = strongest_bid_wall['qty'] / total_pressure
             distance_score = 1 - (abs(mark_price - strongest_bid_wall['price']) / mark_price)
@@ -91,7 +94,7 @@ class OrderBookReversalZoneDetector:
             self.logger.debug("Bid wall score: absorption=%.4f, distance=%.4f, total=%.4f",
                              absorption_score, distance_score, bid_wall_score)
 
-        ask_wall_score = 0
+        ask_wall_score = 0.0
         if strongest_ask_wall and mark_price > 0:
             absorption_score = strongest_ask_wall['qty'] / total_pressure
             distance_score = 1 - (abs(strongest_ask_wall['price'] - mark_price) / mark_price)
@@ -117,13 +120,14 @@ class OrderBookReversalZoneDetector:
         final_score = report["score"]
         if final_score >= 0.75:
             report["flag"] = "✅ Hard Confirmed"
-        elif final_score >= 0.50:
-            report["flag"] = "⚠️ Soft Flag"
+            zone_type = report["metrics"].get("detected_zone", "").upper()
+            report["metrics"]["reason"] = f"STRONG_{zone_type}_WALL"
         else:
             report["flag"] = "⚠️ Soft Flag"
-            report["metrics"]["reason"] = "Detected wall is weak or distant."
+            report["metrics"]["reason"] = "WEAK_OR_DISTANT_WALL"
 
         self.logger.debug("OrderBookReversalZoneDetector report: score=%.4f, flag=%s, metrics=%s",
                          report["score"], report["flag"], report["metrics"])
         await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
         return report
+

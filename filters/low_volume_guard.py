@@ -52,25 +52,25 @@ class LowVolumeGuard:
         if not live_candle:
             report["score"] = 0.0
             report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = "Live candle data not available for volume check."
+            report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
             return report
 
-        # OKX kline volume is at index 5
         try:
             current_volume = float(live_candle[5])
         except (IndexError, TypeError):
             report["score"] = 0.0
             report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = "Malformed live candle data."
+            report["metrics"]["reason"] = "MALFORMED_CANDLE_DATA"
             return report
 
         report["metrics"]["candle_volume"] = current_volume
         report["metrics"]["min_threshold"] = self.min_volume_threshold
         
-        # --- GENESIS Hard Gate Logic ---
         if current_volume < self.min_volume_threshold:
             report["score"] = 0.0
             report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = f"Volume {current_volume:.2f} < hard threshold {self.min_volume_threshold}"
+            report["metrics"]["reason"] = "LOW_VOLUME_THRESHOLD_NOT_MET"
+        else:
+            report["metrics"]["reason"] = "VOLUME_OK"
         
         return report

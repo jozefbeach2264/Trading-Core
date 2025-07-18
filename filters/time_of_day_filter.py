@@ -32,24 +32,23 @@ class TimeOfDayFilter:
         for start, end in self.allowed_windows:
             if start <= end:
                 if start <= now_utc <= end: return True
-            else:
+            else: # Handles overnight windows like 22:00-04:00
                 if start <= now_utc or now_utc <= end: return True
         return False
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        is_allowed = self._is_within_trade_window()
+        report = {
+            "filter_name": "TimeOfDayFilter",
+            "score": 1.0,
+            "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
+            "flag": "✅ Hard Pass"
+        }
         
-        if is_allowed:
-            return {
-                "filter_name": "TimeOfDayFilter",
-                "score": 1.0,
-                "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
-                "flag": "✅ Hard Pass"
-            }
+        if self._is_within_trade_window():
+            report["metrics"]["reason"] = "WITHIN_TRADING_WINDOW"
         else:
-            return {
-                "filter_name": "TimeOfDayFilter",
-                "score": 0.0,
-                "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
-                "flag": "❌ Block"
-            }
+            report["score"] = 0.0
+            report["flag"] = "❌ Block"
+            report["metrics"]["reason"] = "OUT_OF_TRADING_WINDOW"
+            
+        return report

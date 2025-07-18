@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     ai_client = AIClient(config)
     trade_executor = TradeExecutor(config, market_state, http_client)
     
-    ai_strategy = AIStrategy(config, strategy_router, r5_forecaster, ai_client, entry_simulator)
+    ai_strategy = AIStrategy(config, strategy_router, r5_forecaster, ai_client, entry_simulator, memory_tracker)
     
     engine = Engine(config=config, market_state=market_state, validator_stack=validator_stack, ai_strategy=ai_strategy, trade_executor=trade_executor)
     app_state.update({"engine": engine, "market_data_manager": okx_data_manager, "http_client": http_client, "memory_tracker": memory_tracker})

@@ -51,17 +51,17 @@ class CtsFilter:
                          len(klines), live_candle, mark_price)
 
         if len(klines) < self.lookback_period:
-            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback_period})."
+            report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback_period})."
             self.logger.error(report["metrics"]["reason"])
             return report
 
         if not live_candle:
-            report["metrics"]["reason"] = "Live candle data not available."
+            report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
             self.logger.error(report["metrics"]["reason"])
             return report
 
         if mark_price <= 0:
-            report["metrics"]["reason"] = "Invalid mark price."
+            report["metrics"]["reason"] = "INVALID_MARK_PRICE"
             self.logger.error(report["metrics"]["reason"])
             return report
 
@@ -71,13 +71,12 @@ class CtsFilter:
 
         o, h, l, c = map(float, [live_candle[1], live_candle[2], live_candle[3], live_candle[4]])
         current_range = h - l
-        # Adjust range with mark_price if candle is stale
         if mark_price > 0:
             current_range = max(current_range, abs(mark_price - max(o, c)), abs(mark_price - min(o, c)))
         current_body = abs(c - o)
 
         if average_range <= 0 or current_range <= 0:
-            report["metrics"]["reason"] = "Invalid candle data (zero or negative range)."
+            report["metrics"]["reason"] = "INVALID_CANDLE_DATA"
             self.logger.error(report["metrics"]["reason"])
             return report
 
@@ -115,7 +114,17 @@ class CtsFilter:
             score = 1.0
         
         report["score"] = round(score, 4)
-        report["flag"] = "✅ Hard Pass" if score >= 0.75 else "⚠️ Soft Flag" if score >= 0.50 else "❌ Block"
+        
+        # --- Flag & Reason Assignment ---
+        if score >= 0.75:
+            report["flag"] = "✅ Hard Pass"
+            report["metrics"]["reason"] = "VALID_CANDLE_STRUCTURE"
+        elif score >= 0.50:
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"]["reason"] = "WEAK_TRAP_SIGNAL"
+        else:
+            report["flag"] = "❌ Block"
+            report["metrics"]["reason"] = "NO_TRAP_SIGNAL"
 
         self.logger.debug("CtsFilter report: score=%.4f, flag=%s, metrics=%s",
                          report["score"], report["flag"], report["metrics"])

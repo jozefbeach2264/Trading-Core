@@ -58,6 +58,8 @@ class ValidatorStack:
                 continue
             
             filter_name = result.get("filter_name", "UnknownFilter")
+            if filter_name == "OrderBookReversalZoneDetector":
+                result["metrics"]["mark_price"] = market_state.mark_price or 0.0
             aggregated_report["filters"][filter_name] = result
             await market_state.update_filter_audit_report(filter_name, result)
             await self.memory_tracker.update_memory(filter_report=result)

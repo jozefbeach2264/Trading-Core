@@ -46,22 +46,21 @@ class BreakoutZoneOriginFilter:
 
         required_klines = self.zone_lookback + 3
         if len(klines) < required_klines:
-            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{required_klines})."
+            report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{required_klines})."
             self.logger.error(report["metrics"]["reason"])
             return report
 
         if not live_candle:
-            report["metrics"]["reason"] = "Live candle data not available."
+            report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
             self.logger.error(report["metrics"]["reason"])
             return report
 
         if mark_price <= 0:
-            report["metrics"]["reason"] = "Invalid mark price."
+            report["metrics"]["reason"] = "INVALID_MARK_PRICE"
             self.logger.error(report["metrics"]["reason"])
             return report
 
         breakout_range = float(live_candle[2]) - float(live_candle[3])
-        # Adjust breakout_range with mark_price
         if mark_price > 0:
             breakout_range = max(breakout_range, abs(mark_price - float(live_candle[2])), abs(mark_price - float(live_candle[3])))
 
@@ -70,7 +69,7 @@ class BreakoutZoneOriginFilter:
         avg_pre_breakout_range = sum(pre_breakout_ranges) / len(pre_breakout_ranges) if pre_breakout_ranges else 0
         
         if avg_pre_breakout_range <= 0:
-            report["metrics"]["reason"] = "Invalid pre-breakout data (zero range)."
+            report["metrics"]["reason"] = "INVALID_PRE_BREAKOUT_DATA"
             report["score"] = 1.0
             report["flag"] = "✅ Hard Pass"
             self.logger.error(report["metrics"]["reason"])
@@ -78,7 +77,7 @@ class BreakoutZoneOriginFilter:
 
         is_breakout_candle = breakout_range > (avg_pre_breakout_range * 2.0)
         if not is_breakout_candle:
-            report["metrics"]["reason"] = "Current candle is not a breakout candle."
+            report["metrics"]["reason"] = "NO BREAKOUT"
             report["score"] = 1.0
             report["flag"] = "✅ Hard Pass"
             self.logger.debug(report["metrics"]["reason"])
@@ -103,12 +102,15 @@ class BreakoutZoneOriginFilter:
             score = 1.0 - (avg_origin_zone_range / (avg_pre_breakout_range * self.volatility_ratio))
             report["score"] = round(max(0, score), 4)
             report["flag"] = "✅ Confirmed"
+            report["metrics"]["reason"] = "VALID BREAKOUT ORIGIN"
         else:
             score = 1.0 - min((avg_origin_zone_range / avg_pre_breakout_range), 1.0)
             report["score"] = round(max(0, score), 4)
             report["flag"] = "⚠️ Soft Flag"
+            report["metrics"]["reason"] = "INVALID BREAKOUT ORIGIN"
 
         self.logger.debug("BreakoutZoneOriginFilter report: score=%.4f, flag=%s, metrics=%s",
                          report["score"], report["flag"], report["metrics"])
         await market_state.update_filter_audit_report("BreakoutZoneOriginFilter", report)
         return report
+

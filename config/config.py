@@ -48,6 +48,7 @@ class Config:
         self.low_volume_ratio: float = float(os.getenv('LOW_VOLUME_RATIO', '0.7'))
         self.low_volume_min_threshold: float = float(os.getenv('LOW_VOLUME_MIN_THRESHOLD', '15000'))
         self.sentiment_divergence_lookback: int = int(os.getenv('SENTIMENT_DIVERGENCE_LOOKBACK', '20'))
+        self.min_cvd_threshold: float = float(os.getenv('MIN_CVD_THRESHOLD', '5000.0')) # <-- Added this line
         self.orderbook_reversal_depth_percent: float = float(os.getenv('ORDERBOOK_REVERSAL_DEPTH_PERCENT', '0.3'))
         self.orderbook_reversal_wall_multiplier: float = float(os.getenv('ORDERBOOK_REVERSAL_WALL_MULTIPLIER', '2.0'))
         
@@ -57,6 +58,8 @@ class Config:
         # Toggles & UI
         self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
         self.success_rate_tracking: bool = os.getenv('SUCCESS_RATE_TRACKING', 'True').lower() == 'true'
+        self.validator_testing_mode: bool = os.getenv('VALIDATOR_TESTING_MODE', 'False').lower() == 'true'
+
         
         # File & Log Paths
         self.log_file_path: str = os.getenv("LOG_FILE_PATH", "./logs/system.log")

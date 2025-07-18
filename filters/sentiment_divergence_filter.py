@@ -33,12 +33,12 @@ class SentimentDivergenceFilter:
         self.config = config
         self.logger = setup_sentiment_logger(self.config)
         self.lookback = self.config.sentiment_divergence_lookback
+        self.min_cvd_threshold = self.config.min_cvd_threshold
 
     def _calculate_cvd(self, trades: List[Dict[str, Any]]) -> float:
         """Calculates Cumulative Volume Delta from a list of trades."""
         cvd = 0.0
         for trade in trades:
-            # OKX 'side' field: 'buy' (taker buys) or 'sell' (taker sells)
             if trade.get('side') == 'buy':
                 cvd += trade.get('qty', 0.0)
             elif trade.get('side') == 'sell':
@@ -57,8 +57,8 @@ class SentimentDivergenceFilter:
         """
         report = {
             "filter_name": "SentimentDivergenceFilter",
-            "score": 1.0, # Default to pass
-            "metrics": {"reason": "No divergence detected."},
+            "score": 1.0,
+            "metrics": {"reason": "NO_DIVERGENCE_DETECTED"},
             "flag": "✅ Hard Pass"
         }
 
@@ -66,53 +66,44 @@ class SentimentDivergenceFilter:
         trades = list(market_state.recent_trades)
 
         if len(klines) < self.lookback:
-            report["metrics"]["reason"] = f"Not enough kline data ({len(klines)}/{self.lookback})."
+            report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback})"
             report["score"] = 0.5
             report["flag"] = "⚠️ Soft Flag"
             return report
         
-        if len(trades) < self.lookback * 5: # Require a reasonable number of trades for CVD
-            report["metrics"]["reason"] = f"Not enough trade data ({len(trades)}) for CVD calculation."
+        if len(trades) < self.lookback * 5:
+            report["metrics"]["reason"] = f"INSUFFICIENT_TRADE_DATA ({len(trades)})"
             report["score"] = 0.5
             report["flag"] = "⚠️ Soft Flag"
             return report
 
         # --- Analysis Logic ---
-        # Analyze the most recent 'lookback' period of klines
         recent_klines = klines[:self.lookback]
-        price_highs = [float(k[2]) for k in recent_klines]
-        price_lows = [float(k[3]) for k in recent_klines]
-
-        # Calculate CVD over the same approximate time period
-        # This is an approximation; for perfect sync, trades would need to be mapped to klines
-        cvd_trades = trades[-len(recent_klines)*10:] # Estimate ~10 trades per kline
+        cvd_trades = trades[-len(recent_klines)*10:]
         cvd_value = self._calculate_cvd(cvd_trades)
         
-        # We need historical CVD values to detect a trend, which this simple model doesn't store.
-        # As a proxy, we check for divergence between recent price action and the net CVD.
-        # A more advanced version would store a CVD history deque in market_state.
-        
-        price_trend_is_up = float(recent_klines[0][4]) > float(recent_klines[-1][4]) # New close > old close
+        price_trend_is_up = float(recent_klines[0][4]) > float(recent_klines[-1][4])
         cvd_trend_is_up = cvd_value > 0
 
         divergence_type = "none"
         if price_trend_is_up and not cvd_trend_is_up:
-            divergence_type = "bearish" # Price making new highs, but net volume is selling
+            divergence_type = "bearish"
         elif not price_trend_is_up and cvd_trend_is_up:
-            divergence_type = "bullish" # Price making new lows, but net volume is buying
+            divergence_type = "bullish"
 
         # --- Scoring & Flagging ---
         if divergence_type != "none":
-            # A simple score based on the presence of any divergence.
-            # A more advanced model could score based on the magnitude of the divergence.
-            score = 0.40 # Divergence is a strong warning
-            report["score"] = score
-            report["flag"] = "⚠️ Soft Flag"
-            report["metrics"] = {
-                "divergence_type": divergence_type,
-                "price_trend_up": price_trend_is_up,
-                "cvd_trend_up": cvd_trend_is_up,
-                "net_cvd": round(cvd_value, 2)
-            }
+            if abs(cvd_value) < self.min_cvd_threshold:
+                report["metrics"]["reason"] = "DIVERGENCE_CVD_NOISE"
+            else:
+                report["score"] = 0.40
+                report["flag"] = "⚠️ Soft Flag"
+                report["metrics"] = {
+                    "divergence_type": divergence_type,
+                    "price_trend_up": price_trend_is_up,
+                    "cvd_trend_up": cvd_trend_is_up,
+                    "net_cvd": round(cvd_value, 2),
+                    "reason": f"{divergence_type.upper()}_DIVERGENCE_DETECTED"
+                }
 
         return report

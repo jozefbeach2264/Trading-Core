@@ -52,11 +52,11 @@ class CompressionDetector:
         live_candle = market_state.live_reconstructed_candle
 
         if len(klines) < self.lookback_period:
-            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback_period})."
+            report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback_period})."
             return report
 
         if not live_candle:
-            report["metrics"]["reason"] = "Live candle data not available."
+            report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
             return report
 
         # --- Compression Analysis Logic ---
@@ -67,19 +67,13 @@ class CompressionDetector:
         current_range = float(live_candle[2]) - float(live_candle[3])
 
         if avg_range <= 0:
-            report["metrics"]["reason"] = "Invalid historical data (zero or negative average range)."
-            report["score"] = 1.0 # Pass if history is invalid, cannot determine compression
+            report["metrics"]["reason"] = "INVALID_HISTORICAL_DATA"
+            report["score"] = 1.0
             report["flag"] = "✅ Hard Pass"
             return report
 
-        # --- Scoring Logic ---
-        # The score is a measure of how NOT compressed the candle is.
-        # A high score means high volatility / not compressed.
-        # A low score means low volatility / compressed.
+        # --- Scoring & Flagging Logic ---
         compression_ratio = current_range / avg_range
-        
-        # We normalize the score. If ratio is at the threshold (e.g., 0.8), score is 0.5.
-        # If ratio is 0, score is 0. If ratio is > 1.2 * threshold, score is 1.0.
         score = min(compression_ratio / (self.range_ratio * 1.2), 1.0)
 
         report["score"] = round(score, 4)
@@ -90,12 +84,14 @@ class CompressionDetector:
             "config_threshold_ratio": self.range_ratio
         }
         
-        # --- Flagging Logic ---
         if score >= 0.75:
-            report["flag"] = "✅ Hard Pass" # Clean, non-compressed state
+            report["flag"] = "✅ Hard Pass"
+            report["metrics"]["reason"] = "PRICE_ACTION_NORMAL"
         elif score >= 0.50:
-            report["flag"] = "⚠️ Soft Flag" # Some compression, warrants review
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"]["reason"] = "MILD_PRICE_COMPRESSION"
         else:
-            report["flag"] = "❌ Block" # Heavy compression/grind detected
+            report["flag"] = "❌ Block"
+            report["metrics"]["reason"] = "HEAVY_PRICE_COMPRESSION"
 
         return report

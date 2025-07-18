@@ -1,6 +1,5 @@
 import logging
 import os
-import json
 from typing import Dict, Any, Set, Tuple
 from datetime import datetime
 
@@ -37,7 +36,7 @@ class RetestEntryLogic:
         report = {
             "filter_name": "RetestEntryLogic",
             "score": 1.0,
-            "metrics": {"reason": "No retest scenario detected."},
+            "metrics": {"reason": "NO_RETEST_SCENARIO"},
             "flag": "✅ Hard Pass"
         }
 
@@ -46,19 +45,23 @@ class RetestEntryLogic:
         mark_price = market_state.mark_price or 0.0
 
         if len(klines) < self.lookback:
-            report["metrics"]["reason"] = f"Not enough historical klines ({len(klines)}/{self.lookback})."
+            report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback})."
             report["flag"] = "⚠️ Soft Flag"
             report["score"] = 0.5
             self.logger.error(report["metrics"]["reason"])
             return report
             
         if not live_candle:
-            report["metrics"]["reason"] = "Live candle data not available."
+            report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
+            report["flag"] = "❌ Block"
+            report["score"] = 0.0
             self.logger.error(report["metrics"]["reason"])
             return report
 
         if mark_price <= 0:
-            report["metrics"]["reason"] = "Invalid mark price."
+            report["metrics"]["reason"] = "INVALID_MARK_PRICE"
+            report["flag"] = "❌ Block"
+            report["score"] = 0.0
             self.logger.error(report["metrics"]["reason"])
             return report
 
@@ -67,7 +70,6 @@ class RetestEntryLogic:
         lowest_low = min(float(k[3]) for k in lookback_klines)
 
         live_open, live_high, live_low, live_close = map(float, live_candle[1:5])
-        # Use mark_price to adjust live_high/low for accuracy
         live_high = max(live_high, mark_price)
         live_low = min(live_low, mark_price)
 
@@ -91,12 +93,17 @@ class RetestEntryLogic:
             if rejection_confirmed:
                 retest_pct = (live_high - live_close) / (live_high - live_low) if (live_high - live_low) > 0 else 0
                 report["score"] = round(retest_pct, 4)
-                report["flag"] = "✅ Validated" if retest_pct > 0.5 else "⚠️ Soft Flag"
                 report["metrics"]["retest_strength_pct"] = round(retest_pct * 100, 2)
+                if retest_pct > 0.5:
+                    report["flag"] = "✅ Validated"
+                    report["metrics"]["reason"] = "VALIDATED_RESISTANCE_REJECTION"
+                else:
+                    report["flag"] = "⚠️ Soft Flag"
+                    report["metrics"]["reason"] = "WEAK_RESISTANCE_REJECTION"
             else:
                 report["score"] = 0.0
                 report["flag"] = "fallback_strategy: Scalpel"
-                report["metrics"]["reason"] = "Resistance level broken, not retested."
+                report["metrics"]["reason"] = "RESISTANCE_BROKEN"
         
         elif is_near_low:
             bounce_confirmed = live_close > live_low
@@ -110,14 +117,20 @@ class RetestEntryLogic:
             if bounce_confirmed:
                 retest_pct = (live_close - live_low) / (live_high - live_low) if (live_high - live_low) > 0 else 0
                 report["score"] = round(retest_pct, 4)
-                report["flag"] = "✅ Validated" if retest_pct > 0.5 else "⚠️ Soft Flag"
                 report["metrics"]["retest_strength_pct"] = round(retest_pct * 100, 2)
+                if retest_pct > 0.5:
+                    report["flag"] = "✅ Validated"
+                    report["metrics"]["reason"] = "VALIDATED_SUPPORT_BOUNCE"
+                else:
+                    report["flag"] = "⚠️ Soft Flag"
+                    report["metrics"]["reason"] = "WEAK_SUPPORT_BOUNCE"
             else:
                 report["score"] = 0.0
                 report["flag"] = "fallback_strategy: Scalpel"
-                report["metrics"]["reason"] = "Support level broken, not retested."
+                report["metrics"]["reason"] = "SUPPORT_BROKEN"
         
         self.logger.debug("RetestEntryLogic report: score=%.4f, flag=%s, metrics=%s",
                          report["score"], report["flag"], report["metrics"])
         await market_state.update_filter_audit_report("RetestEntryLogic", report)
         return report
+
