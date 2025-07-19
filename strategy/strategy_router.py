@@ -1,7 +1,6 @@
 import logging
-import os
+import asyncio
 from typing import Dict, Any, Optional
-
 from config.config import Config
 from data_managers.market_state import MarketState
 from strategy.trade_module_trapx import TradeModuleTrapX
@@ -14,18 +13,40 @@ class StrategyRouter:
         self.config = config
         self.trapx_module = TradeModuleTrapX(config)
         self.scalpel_module = TradeModuleScalpel(config)
-        self.force_module = os.getenv('FORCE_MODULE', 'NONE').upper()
-        self.default_strategy = os.getenv('DEFAULT_STRATEGY', 'TRAPX').upper()
-        logger.info(f"StrategyRouter initialized. Default: {self.default_strategy}, Force: {self.force_module}")
+        logger.info("StrategyRouter initialized for CONSENSUS mode.")
 
     async def route_and_generate_signal(self, market_state: MarketState, validator_report: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        if self.force_module == 'TRAPX': return await self.trapx_module.generate_signal(market_state)
-        if self.force_module == 'SCALPEL': return await self.scalpel_module.generate_signal(market_state)
-        retest_report = validator_report.get("filters", {}).get("RetestEntryLogic", {})
-        if retest_report.get("flag") == "fallback_strategy: Scalpel": return await self.scalpel_module.generate_signal(market_state)
-        cts_report = validator_report.get("filters", {}).get("CtsFilter", {})
-        if cts_report.get("score", 1.0) < 0.75: return await self.trapx_module.generate_signal(market_state)
-        breakout_report = validator_report.get("filters", {}).get("BreakoutZoneOriginFilter", {})
-        if breakout_report.get("score", 0.0) >= 0.75: return await self.scalpel_module.generate_signal(market_state)
-        if self.default_strategy == 'SCALPEL': return await self.scalpel_module.generate_signal(market_state)
-        else: return await self.trapx_module.generate_signal(market_state)
+        """
+        Runs both TrapX and Scalpel modules in parallel and only returns a signal
+        if both modules agree on the trade direction.
+        """
+        logger.debug("Attempting to generate consensus signal from TrapX and Scalpel.")
+        
+        # Run both modules concurrently to get their independent signals
+        trapx_signal_task = self.trapx_module.generate_signal(market_state)
+        scalpel_signal_task = self.scalpel_module.generate_signal(market_state)
+        
+        trapx_signal, scalpel_signal = await asyncio.gather(trapx_signal_task, scalpel_signal_task)
+
+        if not trapx_signal:
+            logger.debug("Consensus failed: TrapX module did not generate a signal.")
+            return None
+        
+        if not scalpel_signal:
+            logger.debug("Consensus failed: Scalpel module did not generate a signal.")
+            return None
+
+        # Check for unanimous agreement on direction
+        trapx_direction = trapx_signal.get("direction")
+        scalpel_direction = scalpel_signal.get("direction")
+
+        if trapx_direction and trapx_direction == scalpel_direction:
+            logger.info(f"CONSENSUS ACHIEVED: Both modules agree on a {trapx_direction} signal.")
+            
+            # Per protocol, TrapX is the primary pattern detector. We return its signal packet.
+            return trapx_signal
+        else:
+            logger.debug(
+                f"Consensus failed: Directional mismatch. TrapX: {trapx_direction}, Scalpel: {scalpel_direction}"
+            )
+            return None

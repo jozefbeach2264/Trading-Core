@@ -1,35 +1,27 @@
 import logging
 import os
 import json
-from typing import Dict, Any, Set
-from datetime import datetime
-
+from typing import Dict, Any
 from config.config import Config
 from data_managers.market_state import MarketState
 
-# The logger setup is a complete implementation based on your Pre-Genesis file.
 def setup_compression_logger(config: Config) -> logging.Logger:
     log_path = config.compression_detector_log_path
-    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    
     logger = logging.getLogger('CompressionDetectorLogger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
     if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='w')
+        handler = logging.FileHandler(log_path, mode='a')
         formatter = logging.Formatter('%(asctime)s - %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        
     return logger
 
 class CompressionDetector:
-    """
-    Evaluates candles for minimal range/movement to identify zones where
-    breakout energy may be depleted (market grind).
-    """
     def __init__(self, config: Config):
         self.config = config
         self.logger = setup_compression_logger(config)
@@ -37,61 +29,44 @@ class CompressionDetector:
         self.range_ratio = self.config.compression_range_ratio
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        """
-        Analyzes candle range to detect compression and generates a weighted
-        report with a score, metrics, and flag.
-        """
-        report = {
-            "filter_name": "CompressionDetector",
-            "score": 0.0,
-            "metrics": {},
-            "flag": "❌ Block"
-        }
-
-        klines = market_state.klines
+        report = {"filter_name": "CompressionDetector", "score": 0.0, "metrics": {}, "flag": "❌ Block"}
+        klines = list(market_state.klines)
         live_candle = market_state.live_reconstructed_candle
-
+        
         if len(klines) < self.lookback_period:
             report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback_period})."
+            self.logger.warning(report["metrics"]["reason"])
             return report
 
         if not live_candle:
             report["metrics"]["reason"] = "LIVE_CANDLE_UNAVAILABLE"
+            self.logger.warning(report["metrics"]["reason"])
             return report
 
-        # --- Compression Analysis Logic ---
-        lookback_klines = list(klines)[-self.lookback_period:]
+        lookback_klines = klines[:self.lookback_period]
         ranges = [float(k[2]) - float(k[3]) for k in lookback_klines]
         avg_range = sum(ranges) / len(ranges) if ranges else 0
-
         current_range = float(live_candle[2]) - float(live_candle[3])
 
         if avg_range <= 0:
-            report["metrics"]["reason"] = "INVALID_HISTORICAL_DATA"
-            report["score"] = 1.0
-            report["flag"] = "✅ Hard Pass"
+            report["metrics"]["reason"] = "INVALID_HISTORICAL_DATA"; report["score"] = 1.0; report["flag"] = "✅ Hard Pass"
             return report
 
-        # --- Scoring & Flagging Logic ---
         compression_ratio = current_range / avg_range
         score = min(compression_ratio / (self.range_ratio * 1.2), 1.0)
-
+        
         report["score"] = round(score, 4)
         report["metrics"] = {
-            "average_range": round(avg_range, 4),
-            "current_range": round(current_range, 4),
-            "compression_ratio": round(compression_ratio, 2),
-            "config_threshold_ratio": self.range_ratio
+            "average_range": round(avg_range, 4), "current_range": round(current_range, 4),
+            "compression_ratio": round(compression_ratio, 2), "config_threshold_ratio": self.range_ratio
         }
-        
-        if score >= 0.75:
-            report["flag"] = "✅ Hard Pass"
-            report["metrics"]["reason"] = "PRICE_ACTION_NORMAL"
-        elif score >= 0.50:
-            report["flag"] = "⚠️ Soft Flag"
-            report["metrics"]["reason"] = "MILD_PRICE_COMPRESSION"
-        else:
-            report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = "HEAVY_PRICE_COMPRESSION"
 
+        if score >= 0.75:
+            report["flag"] = "✅ Hard Pass"; report["metrics"]["reason"] = "PRICE_ACTION_NORMAL"
+        elif score >= 0.50:
+            report["flag"] = "⚠️ Soft Flag"; report["metrics"]["reason"] = "MILD_PRICE_COMPRESSION"
+        else:
+            report["flag"] = "❌ Block"; report["metrics"]["reason"] = "HEAVY_PRICE_COMPRESSION"
+        
+        self.logger.debug(f"CompressionDetector report generated: {json.dumps(report)}")
         return report

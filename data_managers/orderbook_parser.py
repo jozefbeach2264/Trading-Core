@@ -13,10 +13,10 @@ class OrderBookParser:
         self.last_log_time = 0
 
     def _log_bid_ask_counts(self, bids: List, asks: List) -> None:
-        """Logs bid/ask counts every 30 seconds for user-facing output."""
+        """Logs bid/ask counts periodically for user-facing output."""
         current_time = time.time()
         if current_time - self.last_log_time >= 30:
-            logger.info("BIDS: %d/%d :ASKS", len(bids), len(asks))
+            logger.info("Heartbeat: Order book parser is active.", extra={"bids": len(bids), "asks": len(asks)})
             self.last_log_time = current_time
 
     def calculate_pressure_vectors(
@@ -25,29 +25,24 @@ class OrderBookParser:
         """
         Calculates the total volume for bids and asks up to a certain depth.
         """
-        logger.debug("Calculating pressure vectors with depth_20: %s", depth_20)
         bids = depth_20.get('bids', [])[:levels]
         asks = depth_20.get('asks', [])[:levels]
-
         self._log_bid_ask_counts(bids, asks)
 
         if not bids or not asks:
-            logger.debug("Invalid depth_20: bids=%s, asks=%s", bids, asks)
             return {"bid_pressure": 0.0, "ask_pressure": 0.0, "total_pressure": 0.0}
 
         try:
             bid_pressure = sum(float(qty) for _, qty in bids)
             ask_pressure = sum(float(qty) for _, qty in asks)
             total_pressure = bid_pressure + ask_pressure
-            logger.debug("Pressure: bid=%.2f, ask=%.2f, total=%.2f", 
-                        bid_pressure, ask_pressure, total_pressure)
             return {
                 "bid_pressure": bid_pressure,
                 "ask_pressure": ask_pressure,
                 "total_pressure": total_pressure
             }
         except (ValueError, TypeError) as e:
-            logger.debug("Failed to calculate pressure vectors: %s", e)
+            logger.warning("Failed to calculate pressure vectors", extra={"error": str(e)})
             return {"bid_pressure": 0.0, "ask_pressure": 0.0, "total_pressure": 0.0}
 
     def find_wall_clusters(
@@ -56,35 +51,24 @@ class OrderBookParser:
         """
         Identifies significant volume walls in the order book.
         """
-        logger.debug("Finding wall clusters with depth_20: %s, multiplier=%.2f", depth_20, multiplier)
         bids = depth_20.get('bids', [])
         asks = depth_20.get('asks', [])
 
-        self._log_bid_ask_counts(bids, asks)
-
         if not bids or not asks:
-            logger.debug("No bids or asks in depth_20: bids=%s, asks=%s", bids, asks)
             return {"bid_walls": [], "ask_walls": []}
 
         try:
-            top_bid_qty = float(bids[0][1]) if bids else 0.0
-            top_ask_qty = float(asks[0][1]) if asks else 0.0
+            top_bid_qty = float(bids[0][1])
+            top_ask_qty = float(asks[0][1])
             bid_wall_threshold = top_bid_qty * multiplier
             ask_wall_threshold = top_ask_qty * multiplier
 
-            bid_walls = [
-                {"price": float(p), "qty": float(q)} 
-                for p, q in bids if float(q) >= bid_wall_threshold
-            ]
-            ask_walls = [
-                {"price": float(p), "qty": float(q)} 
-                for p, q in asks if float(q) >= ask_wall_threshold
-            ]
-
-            logger.debug("Wall clusters: bid_walls=%s, ask_walls=%s", bid_walls, ask_walls)
+            bid_walls = [{"price": float(p), "qty": float(q)} for p, q in bids if float(q) >= bid_wall_threshold]
+            ask_walls = [{"price": float(p), "qty": float(q)} for p, q in asks if float(q) >= ask_wall_threshold]
+            
             return {"bid_walls": bid_walls, "ask_walls": ask_walls}
-        except (ValueError, TypeError) as e:
-            logger.debug("Failed to find wall clusters: %s", e)
+        except (ValueError, TypeError, IndexError) as e:
+            logger.warning("Failed to find wall clusters", extra={"error": str(e)})
             return {"bid_walls": [], "ask_walls": []}
 
     def analyze_thinning_and_spoofing(
@@ -93,32 +77,28 @@ class OrderBookParser:
         """
         Compares two consecutive order book snapshots to detect wall thinning.
         """
-        logger.debug("Analyzing thinning/spoofing: prev_ob=%s, curr_ob=%s", previous_ob, current_ob)
-        bids = current_ob.get('bids', [])
-        asks = current_ob.get('asks', [])
+        # The following verbose log has been removed to prevent console flooding.
+        # logger.debug("Analyzing thinning/spoofing: prev_ob=%s, curr_ob=%s", previous_ob, current_ob)
         
-        self._log_bid_ask_counts(bids, asks)
-
-        if not previous_ob or not previous_ob.get('bids') or not current_ob or not current_ob.get('bids'):
-            logger.debug("Invalid order book data: prev_ob=%s, curr_ob=%s", previous_ob, current_ob)
+        if not previous_ob.get('bids') or not current_ob.get('bids'):
             return {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0}
-
+            
         try:
             prev_walls = self.find_wall_clusters(previous_ob)
             curr_walls = self.find_wall_clusters(current_ob)
-
+            
             prev_bid_wall_qty = sum(w['qty'] for w in prev_walls['bid_walls'])
             curr_bid_wall_qty = sum(w['qty'] for w in curr_walls['bid_walls'])
-
+            
             wall_delta = curr_bid_wall_qty - prev_bid_wall_qty
             wall_delta_pct = (wall_delta / prev_bid_wall_qty) * 100 if prev_bid_wall_qty > 0 else 0
-
-            logger.debug("Spoofing: wall_delta=%.2f, wall_delta_pct=%.2f", 
-                        wall_delta, wall_delta_pct)
+            
+            logger.debug("Spoofing metrics calculated", extra={"wall_delta_pct": wall_delta_pct})
+            
             return {
                 "spoof_thin_rate": -wall_delta_pct if wall_delta < 0 else 0.0,
                 "wall_delta_pct": wall_delta_pct
             }
         except (ValueError, TypeError) as e:
-            logger.debug("Failed to analyze thinning/spoofing: %s", e)
+            logger.warning("Failed to analyze thinning/spoofing", extra={"error": str(e)})
             return {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0}

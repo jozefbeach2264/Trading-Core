@@ -8,21 +8,26 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 
-# Pinned versions from your requirements file
+# --- Core Application & Web ---
 fastapi = "0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.30.6"}
 httpx = "0.27.0"
 websockets = "12.0"
-python-dotenv = "1.0.1"
-
-# Libraries with flexible versions (Poetry will use the latest stable)
-uvicorn = {extras = ["standard"], version = "^0.30.1"}
-requests = "^2.32.3"
-psutil = ">=5.9.0, <6.0.0"
-pydantic = "^2.8.2"
 aiohttp = "^3.9.5"
 
-# The official SDK for Grok, replacing the generic OpenAI library
+# --- AI, Data & Numerics ---
+pydantic = "^2.11.7"
 xai-sdk = "^1.0.0"
+numpy = "^1.26.0"
+
+# --- Utilities ---
+python-dotenv = "1.0.1"
+python-json-logger = "^2.0.7"
+psutil = "^5.9.8"
+requests = "^2.32.4"
+pyyaml = "^6.0.1"
+
+# --- Legacy & Other Dependencies ---
 downloadduxiu = "^0.9"
 grpcio = "^1.73.1"
 
@@ -30,3 +35,4 @@ grpcio = "^1.73.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

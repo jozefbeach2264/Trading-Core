@@ -1,34 +1,27 @@
 import logging
 import os
 import json
-from typing import Dict, Any, Set, List, Tuple
-from datetime import datetime
-
+from typing import Dict, Any, List, Tuple
 from config.config import Config
 from data_managers.market_state import MarketState
 
 def setup_sentiment_logger(config: Config) -> logging.Logger:
     log_path = config.sentiment_filter_log_path
-    log_dir = os.path.dirname(log_path) if os.path.dirname(log_path) else '.'
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     logger = logging.getLogger('SentimentDivergenceFilterLogger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
     if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='w')
-        formatter = logging.Formatter('%(message)s')
+        handler = logging.FileHandler(log_path, mode='a')
+        formatter = logging.Formatter('%(asctime)s - %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
     return logger
 
 class SentimentDivergenceFilter:
-    """
-    Analyzes divergence between price and Cumulative Volume Delta (CVD)
-    to detect conflicts in market sentiment versus price action.
-    """
     def __init__(self, config: Config):
         self.config = config
         self.logger = setup_sentiment_logger(self.config)
@@ -36,74 +29,60 @@ class SentimentDivergenceFilter:
         self.min_cvd_threshold = self.config.min_cvd_threshold
 
     def _calculate_cvd(self, trades: List[Dict[str, Any]]) -> float:
-        """Calculates Cumulative Volume Delta from a list of trades."""
         cvd = 0.0
         for trade in trades:
-            if trade.get('side') == 'buy':
-                cvd += trade.get('qty', 0.0)
-            elif trade.get('side') == 'sell':
-                cvd -= trade.get('qty', 0.0)
+            qty = trade.get('qty', 0.0)
+            side = trade.get('side', '')
+            if side == 'buy':
+                cvd += qty
+            elif side == 'sell':
+                cvd -= qty
         return cvd
 
-    def _find_extrema(self, data: List[float]) -> Tuple[float, float]:
-        """Finds the min and max values in a list."""
-        if not data:
-            return (0.0, 0.0)
-        return (min(data), max(data))
-
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        """
-        Generates a weighted report based on price/CVD divergence.
-        """
         report = {
-            "filter_name": "SentimentDivergenceFilter",
-            "score": 1.0,
-            "metrics": {"reason": "NO_DIVERGENCE_DETECTED"},
-            "flag": "✅ Hard Pass"
+            "filter_name": "SentimentDivergenceFilter", "score": 1.0,
+            "metrics": {"reason": "NO_DIVERGENCE_DETECTED"}, "flag": "✅ Hard Pass"
         }
-
         klines = list(market_state.klines)
         trades = list(market_state.recent_trades)
-
+        
         if len(klines) < self.lookback:
             report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback})"
-            report["score"] = 0.5
-            report["flag"] = "⚠️ Soft Flag"
-            return report
-        
-        if len(trades) < self.lookback * 5:
-            report["metrics"]["reason"] = f"INSUFFICIENT_TRADE_DATA ({len(trades)})"
-            report["score"] = 0.5
-            report["flag"] = "⚠️ Soft Flag"
+            report["score"] = 0.5; report["flag"] = "⚠️ Soft Flag"
             return report
 
-        # --- Analysis Logic ---
+        if len(trades) < self.lookback * 5:
+            report["metrics"]["reason"] = f"INSUFFICIENT_TRADE_DATA ({len(trades)})"
+            report["score"] = 0.5; report["flag"] = "⚠️ Soft Flag"
+            return report
+
         recent_klines = klines[:self.lookback]
-        cvd_trades = trades[-len(recent_klines)*10:]
-        cvd_value = self._calculate_cvd(cvd_trades)
+        start_time_ms = recent_klines[-1][0]
+        end_time_ms = recent_klines[0][0] + 60000
+        relevant_trades = [t for t in trades if start_time_ms <= t.get('time', 0) < end_time_ms]
+        
+        cvd_value = self._calculate_cvd(relevant_trades)
         
         price_trend_is_up = float(recent_klines[0][4]) > float(recent_klines[-1][4])
         cvd_trend_is_up = cvd_value > 0
-
+        
         divergence_type = "none"
         if price_trend_is_up and not cvd_trend_is_up:
             divergence_type = "bearish"
         elif not price_trend_is_up and cvd_trend_is_up:
             divergence_type = "bullish"
-
-        # --- Scoring & Flagging ---
+            
         if divergence_type != "none":
             if abs(cvd_value) < self.min_cvd_threshold:
                 report["metrics"]["reason"] = "DIVERGENCE_CVD_NOISE"
             else:
-                report["score"] = 0.40
-                report["flag"] = "⚠️ Soft Flag"
+                report["score"] = 0.40; report["flag"] = "⚠️ Soft Flag"
                 report["metrics"] = {
-                    "divergence_type": divergence_type,
-                    "price_trend_up": price_trend_is_up,
-                    "cvd_trend_up": cvd_trend_is_up,
-                    "net_cvd": round(cvd_value, 2),
+                    "divergence_type": divergence_type, "price_trend_up": price_trend_is_up,
+                    "cvd_trend_up": cvd_trend_is_up, "net_cvd": round(cvd_value, 2),
                     "reason": f"{divergence_type.upper()}_DIVERGENCE_DETECTED"
                 }
-
+        
+        self.logger.debug(f"SentimentDivergenceFilter report generated: {json.dumps(report)}")
         return report
