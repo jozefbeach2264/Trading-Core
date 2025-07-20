@@ -23,7 +23,7 @@ class ValidatorStack:
         self.config = config
         self.memory_tracker = MemoryTracker(config)
         
-        # Filters are grouped according to the new protocol
+        # Filters are grouped according to the final protocol
         self.primary_gate_filters = [
             CtsFilter(config),
             TimeOfDayFilter(config)
@@ -67,7 +67,7 @@ class ValidatorStack:
         
         return report
 
-    async def run_pre_filters(self, market_state: MarketState) -> Dict[str, Any]:
+    async def run_primary_gate(self, market_state: MarketState) -> Dict[str, Any]:
         """Runs the initial, primary gate filters."""
         return await self._run_filter_group(market_state, self.primary_gate_filters, "Primary Gate")
 

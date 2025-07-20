@@ -64,7 +64,7 @@ class AIStrategy:
         self.logger.info("--- New AI Strategy Cycle Started ---")
         
         # Stage 1: Primary Gate
-        primary_gate_report = await validator_stack.run_pre_filters(market_state)
+        primary_gate_report = await validator_stack.run_primary_gate(market_state)
         if primary_gate_report.get("hard_blocks", 0) > 0:
             reason = format_rejection_reason(primary_gate_report["filters"], "Primary Gate")
             self.logger.warning(f"REJECTED: {reason}")

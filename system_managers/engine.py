@@ -74,6 +74,7 @@ class Engine:
         await asyncio.sleep(10)
         while self.is_running:
             try:
+                # The AIStrategy module now handles the entire validation and signal generation flow
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, self.validator_stack)
                 
                 if final_signal and final_signal.get("ai_verdict", {}).get("action") == "✅ Execute":
@@ -94,4 +95,3 @@ class Engine:
             except Exception as e:
                 logger.error("Critical error in autonomous cycle", extra={"error": str(e)}, exc_info=True)
                 await asyncio.sleep(60)
-
