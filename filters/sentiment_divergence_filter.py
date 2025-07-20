@@ -1,7 +1,7 @@
 import logging
 import os
 import json
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
 from config.config import Config
 from data_managers.market_state import MarketState
 
@@ -13,56 +13,51 @@ def setup_sentiment_logger(config: Config) -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='a')
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    if logger.handlers:
+        logger.handlers.clear()
+
+    handler = logging.FileHandler(log_path, mode='a')
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     return logger
 
 class SentimentDivergenceFilter:
+    """
+    Analyzes divergence between price and a live, running Cumulative Volume Delta (CVD)
+    to detect conflicts in market sentiment versus price action.
+    """
     def __init__(self, config: Config):
         self.config = config
         self.logger = setup_sentiment_logger(self.config)
         self.lookback = self.config.sentiment_divergence_lookback
         self.min_cvd_threshold = self.config.min_cvd_threshold
 
-    def _calculate_cvd(self, trades: List[Dict[str, Any]]) -> float:
-        cvd = 0.0
-        for trade in trades:
-            qty = trade.get('qty', 0.0)
-            side = trade.get('side', '')
-            if side == 'buy':
-                cvd += qty
-            elif side == 'sell':
-                cvd -= qty
-        return cvd
-
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        """
+        Generates a weighted report based on price/CVD divergence using a high-speed
+        running CVD total from the MarketState.
+        """
         report = {
-            "filter_name": "SentimentDivergenceFilter", "score": 1.0,
-            "metrics": {"reason": "NO_DIVERGENCE_DETECTED"}, "flag": "✅ Hard Pass"
+            "filter_name": "SentimentDivergenceFilter",
+            "score": 1.0,
+            "metrics": {"reason": "NO_DIVERGENCE_DETECTED"},
+            "flag": "✅ Hard Pass"
         }
         klines = list(market_state.klines)
-        trades = list(market_state.recent_trades)
         
         if len(klines) < self.lookback:
             report["metrics"]["reason"] = f"INSUFFICIENT_KLINE_DATA ({len(klines)}/{self.lookback})"
-            report["score"] = 0.5; report["flag"] = "⚠️ Soft Flag"
+            report["score"] = 0.5
+            report["flag"] = "⚠️ Soft Flag"
             return report
 
-        if len(trades) < self.lookback * 5:
-            report["metrics"]["reason"] = f"INSUFFICIENT_TRADE_DATA ({len(trades)})"
-            report["score"] = 0.5; report["flag"] = "⚠️ Soft Flag"
-            return report
-
+        # --- High-Speed Analysis Logic ---
         recent_klines = klines[:self.lookback]
-        start_time_ms = recent_klines[-1][0]
-        end_time_ms = recent_klines[0][0] + 60000
-        relevant_trades = [t for t in trades if start_time_ms <= t.get('time', 0) < end_time_ms]
         
-        cvd_value = self._calculate_cvd(relevant_trades)
+        # Get the live, pre-calculated running CVD directly from market state
+        cvd_value = market_state.running_cvd
         
         price_trend_is_up = float(recent_klines[0][4]) > float(recent_klines[-1][4])
         cvd_trend_is_up = cvd_value > 0
@@ -73,14 +68,18 @@ class SentimentDivergenceFilter:
         elif not price_trend_is_up and cvd_trend_is_up:
             divergence_type = "bullish"
             
+        # --- Scoring & Flagging ---
         if divergence_type != "none":
             if abs(cvd_value) < self.min_cvd_threshold:
                 report["metrics"]["reason"] = "DIVERGENCE_CVD_NOISE"
             else:
-                report["score"] = 0.40; report["flag"] = "⚠️ Soft Flag"
+                report["score"] = 0.40
+                report["flag"] = "⚠️ Soft Flag"
                 report["metrics"] = {
-                    "divergence_type": divergence_type, "price_trend_up": price_trend_is_up,
-                    "cvd_trend_up": cvd_trend_is_up, "net_cvd": round(cvd_value, 2),
+                    "divergence_type": divergence_type,
+                    "price_trend_up": price_trend_is_up,
+                    "cvd_trend_up": cvd_trend_is_up,
+                    "net_cvd": round(cvd_value, 2),
                     "reason": f"{divergence_type.upper()}_DIVERGENCE_DETECTED"
                 }
         

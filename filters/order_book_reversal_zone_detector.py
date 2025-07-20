@@ -13,11 +13,13 @@ def setup_orderbook_reversal_logger(config: Config) -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='a')
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    if logger.handlers:
+        logger.handlers.clear()
+
+    handler = logging.FileHandler(log_path, mode='a')
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
         
     return logger
 
@@ -28,31 +30,34 @@ class OrderBookReversalZoneDetector:
         self.logger.debug("OrderBookReversalZoneDetector initialized.")
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        
+        # --- NEW: Ensure the latest OB metrics are calculated before proceeding ---
+        await market_state.ensure_order_book_metrics_are_current()
+
         report = {
             "filter_name": "OrderBookReversalZoneDetector", "score": 0.0,
             "metrics": {}, "flag": "⚠️ Soft Flag"
         }
         
-        walls = market_state.order_book_walls or {"bid_walls": [], "ask_walls": []}
-        pressure = market_state.order_book_pressure or {"bid_pressure": 0.0, "ask_pressure": 0.0, "total_pressure": 0.0}
+        # Now, read the pre-calculated (cached) metrics from the market state
+        walls = market_state.order_book_walls
+        pressure = market_state.order_book_pressure
         mark_price = market_state.mark_price or 0.0
-        depth_20 = market_state.depth_20 or {"bids": [], "asks": []}
         
         self.logger.debug(
-            f"MarketState data: walls={walls}, pressure={pressure}, mark_price={mark_price}, depth_20_bids={len(depth_20.get('bids', []))}"
+            f"Using cached metrics: walls={'Yes' if walls else 'No'}, pressure={'Yes' if pressure else 'No'}, mark_price={mark_price}"
         )
         
-        has_walls = walls.get("bid_walls") or walls.get("ask_walls")
-        has_pressure = pressure.get("total_pressure", 0) > 0
-        has_depth = depth_20.get("bids") or depth_20.get("asks")
-
-        if not (has_walls or has_pressure or has_depth):
-            report["metrics"]["reason"] = "ORDER_BOOK_DATA_MISSING"; report["flag"] = "❌ Block"
+        if not walls or not pressure:
+            report["metrics"]["reason"] = "ORDER_BOOK_METRICS_UNAVAILABLE"
+            report["flag"] = "❌ Block"
             self.logger.error(report["metrics"]["reason"])
             await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
 
-        bid_walls = walls.get("bid_walls", []); ask_walls = walls.get("ask_walls", [])
+        bid_walls = walls.get("bid_walls", [])
+        ask_walls = walls.get("ask_walls", [])
+        
         if not bid_walls and not ask_walls:
             report["metrics"]["reason"] = "NO_WALLS_DETECTED"
             self.logger.debug(report["metrics"]["reason"])
@@ -64,7 +69,8 @@ class OrderBookReversalZoneDetector:
         total_pressure = pressure.get("total_pressure", 0)
         
         if total_pressure <= 0:
-            report["metrics"]["reason"] = "INVALID_ORDER_BOOK_PRESSURE"; report["flag"] = "❌ Block"
+            report["metrics"]["reason"] = "INVALID_ORDER_BOOK_PRESSURE"
+            report["flag"] = "❌ Block"
             self.logger.error(report["metrics"]["reason"])
             await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
             return report
@@ -98,10 +104,12 @@ class OrderBookReversalZoneDetector:
 
         final_score = report["score"]
         if final_score >= 0.75:
-            report["flag"] = "✅ Hard Confirmed"; zone_type = report["metrics"].get("detected_zone", "").upper()
+            report["flag"] = "✅ Hard Confirmed"
+            zone_type = report["metrics"].get("detected_zone", "").upper()
             report["metrics"]["reason"] = f"STRONG_{zone_type}_WALL"
         else:
-            report["flag"] = "⚠️ Soft Flag"; report["metrics"]["reason"] = "WEAK_OR_DISTANT_WALL"
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"]["reason"] = "WEAK_OR_DISTANT_WALL"
             
         self.logger.debug(f"OrderBookReversalZoneDetector report generated: {json.dumps(report)}")
         await market_state.update_filter_audit_report("OrderBookReversalZoneDetector", report)
