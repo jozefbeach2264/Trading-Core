@@ -10,7 +10,7 @@ class Config:
         self.asterdex_api_secret: str = os.getenv("ASTERDEX_API_SECRET")
         self.xai_api_key: str = os.getenv("XAI_API_KEY")
         self.ai_provider_url: str = os.getenv("AI_PROVIDER_URL", "https://api.x.ai/v1")
-
+        
         # System & Operational Parameters
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
         self.trading_symbol: str = os.getenv("TRADING_SYMBOL", "ETH-USDT-SWAP")
@@ -18,7 +18,8 @@ class Config:
         self.dry_run_mode: bool = os.getenv('DRY_RUN_MODE', 'True').lower() == 'true'
         self.kline_deque_maxlen: int = int(os.getenv('KLINE_DEQUE_MAXLEN', '500'))
         self.ai_client_timeout: int = int(os.getenv('AI_CLIENT_TIMEOUT', '20'))
-        
+        self.engine_cycle_interval: int = int(os.getenv('ENGINE_CYCLE_INTERVAL', '15'))
+
         # Core Trading & Risk Parameters
         self.leverage: int = int(os.getenv('LEVERAGE', '250'))
         self.risk_cap_percent: float = float(os.getenv('RISK_CAP_PERCENT', '0.25'))
@@ -48,18 +49,15 @@ class Config:
         self.low_volume_ratio: float = float(os.getenv('LOW_VOLUME_RATIO', '0.7'))
         self.low_volume_min_threshold: float = float(os.getenv('LOW_VOLUME_MIN_THRESHOLD', '15000'))
         self.sentiment_divergence_lookback: int = int(os.getenv('SENTIMENT_DIVERGENCE_LOOKBACK', '20'))
-        self.min_cvd_threshold: float = float(os.getenv('MIN_CVD_THRESHOLD', '5000.0')) # <-- Added this line
+        self.min_cvd_threshold: float = float(os.getenv('MIN_CVD_THRESHOLD', '5000.0'))
         self.orderbook_reversal_depth_percent: float = float(os.getenv('ORDERBOOK_REVERSAL_DEPTH_PERCENT', '0.3'))
         self.orderbook_reversal_wall_multiplier: float = float(os.getenv('ORDERBOOK_REVERSAL_WALL_MULTIPLIER', '2.0'))
         
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
-
+        
         # Toggles & UI
         self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
-        self.success_rate_tracking: bool = os.getenv('SUCCESS_RATE_TRACKING', 'True').lower() == 'true'
-        self.validator_testing_mode: bool = os.getenv('VALIDATOR_TESTING_MODE', 'False').lower() == 'true'
-
         
         # File & Log Paths
         self.log_file_path: str = os.getenv("LOG_FILE_PATH", "./logs/system.log")
@@ -73,5 +71,6 @@ class Config:
         self.low_volume_guard_log_path: str = os.getenv("LOW_VOLUME_GUARD_LOG_PATH", "./logs/filters/low_volume_guard.log")
         self.sentiment_filter_log_path: str = os.getenv("SENTIMENT_FILTER_LOG_PATH", "./logs/filters/sentiment_filter.log")
         self.orderbook_reversal_log_path: str = os.getenv("ORDERBOOK_REVERSAL_LOG_PATH", "./logs/filters/orderbook_reversal.log")
-
-config = Config()
+        
+        # --- NEW: Dedicated log for AI Strategy ---
+        self.ai_strategy_log_path: str = os.getenv("AI_STRATEGY_LOG_PATH", "./logs/ai_strategy.log")
