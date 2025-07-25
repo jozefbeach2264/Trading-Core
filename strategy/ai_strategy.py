@@ -63,14 +63,12 @@ class AIStrategy:
     async def generate_signal(self, market_state: MarketState, validator_stack: ValidatorStack) -> Dict[str, Any]:
         self.logger.info("--- New AI Strategy Cycle Started ---")
         
-        # Stage 1: Primary Gate
         primary_gate_report = await validator_stack.run_primary_gate(market_state)
         if primary_gate_report.get("hard_blocks", 0) > 0:
             reason = format_rejection_reason(primary_gate_report["filters"], "Primary Gate")
             self.logger.warning(f"REJECTED: {reason}")
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
 
-        # Stage 2: Signal Generation (TrapX OR Scalpel)
         signal_packet = await self.strategy_router.route_and_generate_signal(market_state, primary_gate_report)
         if not signal_packet:
             reason = REJECTION_CODE_MAP['NO_SIGNAL_GENERATED']
@@ -78,7 +76,6 @@ class AIStrategy:
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
         self.logger.info(f"Signal Packet Generated: Type={signal_packet.get('trade_type')}, Direction={signal_packet.get('direction')}")
 
-        # Stage 3: Post-Signal Validation
         post_signal_report = await validator_stack.run_post_signal_validators(market_state)
         final_validator_log = {**primary_gate_report["filters"], **post_signal_report["filters"]}
         if post_signal_report.get("hard_blocks", 0) > 0:
@@ -87,12 +84,28 @@ class AIStrategy:
             return {"reason": reason, "validator_report": final_validator_log}
         self.logger.info("Post-Signal Validators passed. Proceeding to AI Core.")
         
-        # Stage 4: AI Decision Core
         forecast = await self.forecaster.generate_forecast(market_state)
+        
+        # Create flat context_packet for AIClient
+        snapshot = market_state.get_latest_data_snapshot()
+        candle = snapshot.get("live_reconstructed_candle", [0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "0"])
+        if not candle or len(candle) != 9 or all(v == 0.0 for v in candle[1:6]):
+            self.logger.warning(f"Invalid live_reconstructed_candle: {candle}")
+            candle = [0, market_state.mark_price or 3200.0, 0.0, 0.0, market_state.mark_price or 3200.0, 0.0, 0.0, 0.0, "0"]
+        
         context_packet = {
-            "validator_audit_log": final_validator_log, "rolling5_forecast": forecast,
-            "direction": signal_packet.get("direction", "N/A"), "trade_type": signal_packet.get("trade_type", "N/A")
+            "open": candle[1],
+            "close": candle[4],
+            "volume": candle[5],
+            "direction": signal_packet.get("direction", "N/A"),
+            "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
+            "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
+            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
         }
+        
+        # Log context_packet and validator_audit_log
+        self.logger.info(f"Context packet for AI: {json.dumps(context_packet, indent=2)}")
+        self.logger.info(f"Validator audit log: {json.dumps(final_validator_log, indent=2)}")
         
         ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
         confidence = ai_verdict.get("confidence", 0.0)
@@ -101,7 +114,7 @@ class AIStrategy:
         if ai_verdict.get("action") == "⛔ Abort" and "AI request timed out" in log_reason:
             self.logger.error(f"AI VERDICT FAILED: Request Timed Out.")
         elif ai_verdict.get("action") == "⛔ Abort" and "Invalid JSON" in log_reason:
-             self.logger.error(f"AI VERDICT FAILED: Unreadable Response. Reason: {log_reason}")
+            self.logger.error(f"AI VERDICT FAILED: Unreadable Response. Reason: {log_reason}")
         else:
             self.logger.info(f"AI VERDICT: Action={ai_verdict.get('action')}, Confidence={confidence:.2f}, Reasoning='{log_reason}'")
 

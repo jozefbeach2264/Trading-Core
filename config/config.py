@@ -71,6 +71,5 @@ class Config:
         self.low_volume_guard_log_path: str = os.getenv("LOW_VOLUME_GUARD_LOG_PATH", "./logs/filters/low_volume_guard.log")
         self.sentiment_filter_log_path: str = os.getenv("SENTIMENT_FILTER_LOG_PATH", "./logs/filters/sentiment_filter.log")
         self.orderbook_reversal_log_path: str = os.getenv("ORDERBOOK_REVERSAL_LOG_PATH", "./logs/filters/orderbook_reversal.log")
-        
-        # --- NEW: Dedicated log for AI Strategy ---
         self.ai_strategy_log_path: str = os.getenv("AI_STRATEGY_LOG_PATH", "./logs/ai_strategy.log")
+        self.diagnostics_log_path: str = os.getenv("DIAGNOSTICS_LOG_PATH", "./logs/diagnostics.log")
