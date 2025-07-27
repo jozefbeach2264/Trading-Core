@@ -1,9 +1,19 @@
 import logging
 import asyncio
+import sys
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import httpx
 from pythonjsonlogger import jsonlogger
+
+# --- THIS IS THE PERMANENT FIX ---
+# This block of code adds the project's root directory to the Python path.
+# It ensures that all modules can be found using absolute imports (e.g., 'from execution.execution_module').
+# This must be at the very top, before any other project modules are imported.
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from config.config import Config
 from data_managers.market_state import MarketState
@@ -14,7 +24,8 @@ from simulators.entry_range_simulator import EntryRangeSimulator
 from rolling5_engine import Rolling5Engine
 from strategy.strategy_router import StrategyRouter
 from strategy.ai_strategy import AIStrategy
-from system_managers.trade_executor import TradeExecutor
+from execution.execution_module import ExecutionModule
+from execution.simulation_account import SimulationAccount
 from system_managers.engine import Engine
 from memory_tracker import MemoryTracker
 
@@ -41,43 +52,58 @@ app_state = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("--- REALITY_CORE (GENESIS) Bootstrap Initializing ---")
-    
+
     http_client = httpx.AsyncClient()
     market_state = MarketState(config=config, symbol=config.trading_symbol)
     okx_data_manager = MarketDataManager(config=config, market_state=market_state, httpx_client=httpx.AsyncClient(base_url="https://www.okx.com"))
     memory_tracker = MemoryTracker(config)
-    
+
     r5_forecaster = Rolling5Engine(config)
     strategy_router = StrategyRouter(config)
     validator_stack = ValidatorStack(config)
     entry_simulator = EntryRangeSimulator(config)
     ai_client = AIClient(config)
-    trade_executor = TradeExecutor(config, market_state, http_client)
-    
-    ai_strategy = AIStrategy(config, strategy_router, r5_forecaster, ai_client, entry_simulator, memory_tracker)
-    
-    engine = Engine(config=config, market_state=market_state, validator_stack=validator_stack, ai_strategy=ai_strategy, trade_executor=trade_executor)
-    
+
+    # Create the simulation account and the execution module that uses it
+    simulation_account = SimulationAccount(config)
+    execution_module = ExecutionModule(config, simulation_account)
+
+    # The 'execution_module' instance is now correctly passed to the AIStrategy constructor.
+    ai_strategy = AIStrategy(
+        config, 
+        strategy_router, 
+        r5_forecaster, 
+        ai_client, 
+        entry_simulator, 
+        memory_tracker,
+        execution_module  # The missing argument
+    )
+
+    # Pass all required modules to the Engine
+    engine = Engine(
+        config=config, 
+        market_state=market_state, 
+        validator_stack=validator_stack, 
+        ai_strategy=ai_strategy, 
+        trade_executor=execution_module
+    )
+
     app_state.update({
         "engine": engine, "market_data_manager": okx_data_manager,
         "http_client": http_client, "memory_tracker": memory_tracker,
-        "ai_client": ai_client
+        "ai_client": ai_client, "execution_module": execution_module
     })
-    
-    await trade_executor.initialize()
+
     await okx_data_manager.start()
 
-    # --- Efficient Startup Sequence ---
-    # This now waits for the 'initial_data_ready' event from MarketState
-    # instead of using an inefficient busy-wait loop.
     logger.info("Waiting for initial market data from OKX...")
     await market_state.initial_data_ready.wait()
     logger.info("Initial market data received. Proceeding with engine start.")
-    
+
     await engine.start()
-    
+
     logger.info("--- REALITY_CORE Bootstrap Complete. System is LIVE. ---")
-    
+
     try:
         yield
     finally:

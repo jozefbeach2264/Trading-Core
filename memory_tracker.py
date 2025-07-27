@@ -99,7 +99,7 @@ class MemoryTracker:
                     verdict_data.get("direction", "N/A"),
                     verdict_data.get("entry_price", 0.0),
                     verdict_data.get("verdict", "None"),
-                    verdict_data.get("confidence", 0.0),
+                    float(verdict_data.get("confidence", 0.0)),
                     verdict_data.get("reason", "N/A")
                 ))
             conn.commit()

@@ -156,3 +156,6 @@ class MarketState:
             "order_book_walls": self.order_book_walls, "spoof_metrics": self.spoof_metrics,
             "running_cvd": self.running_cvd, "filter_audit_report": self.filter_audit_report
         }
+
+    def is_ready(self, required_candles: int = 100) -> bool:
+        return len(self.klines) >= required_candles
