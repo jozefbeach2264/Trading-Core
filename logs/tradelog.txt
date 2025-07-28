@@ -1,22 +1,12 @@
-2025-07-27 03:55:07,331 - ===============================================
+ERROR:    Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/starlette/routing.py", line 693, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 74, in lifespan
+    trade_executor = TradeExecutor(
+                     ^^^^^^^^^^^^^^
+TypeError: TradeExecutor.__init__() missing 1 required positional argument: 'performance_tracker'
 
-2025-07-27 04:01:06,333 - =============== R5 BUFFER DEBUG ===============
-2025-07-27 04:01:06,334 - Total candles in buffer: 5
-2025-07-27 04:01:06,334 - [0] Open: 3773.64 | Close: 3773.44 | Volume: 128.41
-2025-07-27 04:01:06,334 - [1] Open: 3749.16 | Close: 3751.0 | Volume: 7847.84
-2025-07-27 04:01:06,334 - [2] Open: 3751.0 | Close: 3752.02 | Volume: 5302.16
-2025-07-27 04:01:06,334 - [3] Open: 3752.04 | Close: 3751.23 | Volume: 3397.06
-2025-07-27 04:01:06,334 - [4] Open: 3751.23 | Close: 3752.17 | Volume: 4285.37
-2025-07-27 04:01:06,334 - =============== MEMORY TRACKER DEBUG ===============
-2025-07-27 04:01:06,395 - Total trades tracked: 255
-2025-07-27 04:01:06,395 - Raw TRADE DEBUG [0]: {'timestamp': '2025-07-24T17:32:11.115586Z', 'direction': 'LONG', 'quantity': 0.0006729366416693136, 'entry_price': 3715.06, 'simulated': True, 'failed': False, 'reason': '', 'order_data': {}}
-2025-07-27 04:01:06,395 - Trade [0] → Direction: LONG | Entry: 3715.06 | Verdict: None | Confidence: None | Reason: N/A
-2025-07-27 04:01:06,396 - Raw TRADE DEBUG [1]: {'timestamp': '2025-07-24T20:30:48.958219Z', 'direction': 'LONG', 'quantity': 0.0, 'entry_price': 0.0, 'simulated': False, 'failed': False, 'reason': '', 'order_data': {}}
-2025-07-27 04:01:06,396 - Trade [1] → Direction: LONG | Entry: 0.0 | Verdict: None | Confidence: None | Reason: N/A
-2025-07-27 04:01:06,396 - Raw TRADE DEBUG [2]: {'timestamp': '2025-07-24T20:30:49.055837Z', 'direction': 'LONG', 'quantity': 0.0006688301091263206, 'entry_price': 3737.87, 'simulated': True, 'failed': False, 'reason': '', 'order_data': {}}
-2025-07-27 04:01:06,396 - Trade [2] → Direction: LONG | Entry: 3737.87 | Verdict: None | Confidence: None | Reason: N/A
-2025-07-27 04:01:06,396 - Raw TRADE DEBUG [3]: {'timestamp': '2025-07-27T03:10:07.861514Z', 'direction': 'LONG', 'quantity': 0.0, 'entry_price': 0.0, 'simulated': False, 'failed': False, 'reason': '', 'order_data': {}}
-2025-07-27 04:01:06,396 - Trade [3] → Direction: LONG | Entry: 0.0 | Verdict: None | Confidence: None | Reason: N/A
-2025-07-27 04:01:06,396 - Raw TRADE DEBUG [4]: {'timestamp': '2025-07-27T03:10:07.965286Z', 'direction': 'LONG', 'quantity': 0.0006624183569375074, 'entry_price': 3774.05, 'simulated': True, 'failed': False, 'reason': '', 'order_data': {}}
-2025-07-27 04:01:06,396 - Trade [4] → Direction: LONG | Entry: 3774.05 | Verdict: None | Confidence: None | Reason: N/A
-2025-07-27 04:01:06,396 - ===============================================
+ERROR:    Application startup failed. Exiting.
