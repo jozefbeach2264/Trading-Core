@@ -31,12 +31,15 @@ class EntryRangeSimulator:
             and a reason string.
         """
         forecast = forecast_data.get("forecast", {})
-        
+
+        # ⛏ Debug insertion — log the forecast input and entry price
+        logger.warning(f"[DEBUG] Forecast received: {forecast}")
+        logger.warning(f"[DEBUG] Entry Price: {entry_price:.2f}, Direction: {trade_direction}")
+
         if not forecast or "c1" not in forecast or "c2" not in forecast:
             return False, "Liquidation risk check failed: Missing C1/C2 forecast data."
 
         try:
-            # Correctly parse the high/low values from the new forecast structure
             projected_c1_low = forecast["c1"]["low"]
             projected_c2_low = forecast["c2"]["low"]
             projected_c1_high = forecast["c1"]["high"]
@@ -47,18 +50,15 @@ class EntryRangeSimulator:
         risk_move = 0.0
 
         if trade_direction.upper() == "LONG":
-            # For a LONG trade, the risk is the lowest projected price in the near-term forecast
             projected_pullback_price = min(projected_c1_low, projected_c2_low)
             risk_move = entry_price - projected_pullback_price
         elif trade_direction.upper() == "SHORT":
-            # For a SHORT trade, the risk is the highest projected price in the near-term forecast
             projected_spike_price = max(projected_c1_high, projected_c2_high)
             risk_move = projected_spike_price - entry_price
         else:
             return False, f"Invalid trade direction '{trade_direction}' for risk check."
 
         if risk_move < 0:
-            # A negative risk_move means the forecast is entirely favorable, so there's no projected adverse move.
             risk_move = 0.0
 
         if risk_move >= self.liquidation_risk_threshold:
@@ -75,4 +75,3 @@ class EntryRangeSimulator:
         )
         logger.debug(reason)
         return True, reason
-

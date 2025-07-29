@@ -10,7 +10,7 @@ class Config:
         self.asterdex_api_secret: str = os.getenv("ASTERDEX_API_SECRET")
         self.xai_api_key: str = os.getenv("XAI_API_KEY")
         self.ai_provider_url: str = os.getenv("AI_PROVIDER_URL", "https://api.x.ai/v1")
-        
+
         # System & Operational Parameters
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
         self.trading_symbol: str = os.getenv("TRADING_SYMBOL", "ETH-USDT-SWAP")
@@ -19,6 +19,7 @@ class Config:
         self.kline_deque_maxlen: int = int(os.getenv('KLINE_DEQUE_MAXLEN', '500'))
         self.ai_client_timeout: int = int(os.getenv('AI_CLIENT_TIMEOUT', '20'))
         self.engine_cycle_interval: int = int(os.getenv('ENGINE_CYCLE_INTERVAL', '15'))
+        self.tlm_poll_interval_seconds: int = int(os.getenv("TLM_POLL_INTERVAL_SECONDS", "5"))
 
         # Core Trading & Risk Parameters
         self.leverage: int = int(os.getenv('LEVERAGE', '250'))
@@ -27,11 +28,11 @@ class Config:
         self.exchange_fee_rate_taker: float = float(os.getenv('EXCHANGE_FEE_RATE_TAKER', '0.08'))
         self.max_roi_limit: float = float(os.getenv('MAX_ROI_LIMIT', '0'))
         self.simulation_initial_capital: float = float(os.getenv("SIMULATION_INITIAL_CAPITAL", "10.00"))
-        
+
         # Autonomous Mode & Time Filter
         self.autonomous_mode_enabled: bool = os.getenv('AUTONOMOUS_MODE_ENABLED', 'True').lower() == 'true'
         self.allowed_windows: str = os.getenv('ALLOWED_WINDOWS', '00:00-23:59')
-        
+
         # Filter Parameters
         self.cts_lookback_period: int = int(os.getenv('CTS_LOOKBACK_PERIOD', '15'))
         self.cts_narrow_range_ratio: float = float(os.getenv('CTS_NARROW_RANGE_RATIO', '0.7'))
@@ -52,13 +53,13 @@ class Config:
         self.min_cvd_threshold: float = float(os.getenv('MIN_CVD_THRESHOLD', '5000.0'))
         self.orderbook_reversal_depth_percent: float = float(os.getenv('ORDERBOOK_REVERSAL_DEPTH_PERCENT', '0.3'))
         self.orderbook_reversal_wall_multiplier: float = float(os.getenv('ORDERBOOK_REVERSAL_WALL_MULTIPLIER', '2.0'))
-        
+
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
-        
+
         # Toggles & UI
         self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
-        
+
         # File & Log Paths
         self.log_file_path: str = os.getenv("LOG_FILE_PATH", "./logs/system.log")
         self.simulation_state_file_path: str = os.getenv("SIMULATION_STATE_FILE_PATH", "./logs/simulation_state.json")
