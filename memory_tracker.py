@@ -66,22 +66,24 @@ class MemoryTracker:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
             if filter_report:
+                timestamp = filter_report.get("timestamp", datetime.utcnow().isoformat() + "Z")
                 cursor.execute('''
                     INSERT INTO filters (timestamp, filter_name, score, flag, metrics)
                     VALUES (?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    timestamp,
                     filter_report.get("filter_name", "Unknown"),
                     filter_report.get("score", 0.0),
                     filter_report.get("flag", "N/A"),
                     json.dumps(filter_report.get("metrics", {}))
                 ))
             if trade_data:
+                timestamp = trade_data.get("timestamp", datetime.utcnow().isoformat() + "Z")
                 cursor.execute('''
                     INSERT INTO trades (timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    timestamp,
                     trade_data.get("direction", "N/A"),
                     trade_data.get("quantity", 0.0),
                     trade_data.get("entry_price", 0.0),
@@ -91,11 +93,12 @@ class MemoryTracker:
                     json.dumps(trade_data.get("order_data", {}))
                 ))
             if verdict_data:
+                timestamp = verdict_data.get("timestamp", datetime.utcnow().isoformat() + "Z")
                 cursor.execute('''
                     INSERT INTO verdicts (timestamp, direction, entry_price, verdict, confidence, reason)
                     VALUES (?, ?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    timestamp,
                     verdict_data.get("direction", "N/A"),
                     verdict_data.get("entry_price", 0.0),
                     verdict_data.get("verdict", "None"),
