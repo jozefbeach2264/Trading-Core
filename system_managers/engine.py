@@ -91,12 +91,15 @@ class Engine:
 
                 logger.info(f"New candle detected. Proceeding with R5 verdict cycle @ {current_candle_time}.")
                 self.last_candle_close_time = current_candle_time
+                logger.debug(f"Market state has {len(self.market_state.klines)} klines available.")
 
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, self.validator_stack)
 
+                # Always run diagnostics after signal generation, regardless of signal outcome
                 if self.market_state.klines and len(self.market_state.klines) >= 5:
                     r5_buffer = list(self.market_state.klines)[:5]
                     debug_r5_and_memory_state(r5_buffer, self.ai_strategy.memory_tracker)
+                    logger.debug(f"Diagnostics executed for candle time: {current_candle_time}")
                 else:
                     logger.warning("Diagnostic check skipped: Not enough klines in market state for R5 buffer.")
 
