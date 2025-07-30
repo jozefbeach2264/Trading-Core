@@ -9,7 +9,7 @@ class PerformanceTracker:
     """
     Logs every completed trade to a file and calculates success rate.
     """
-    def __init__(self, log_file: str = "trade_performance.jsonl"):
+    def __init__(self, log_file: str = "logs/trade_performance.jsonl"):
         self.log_file = log_file
         self.trades_logged = 0
         self.successful_trades = 0
