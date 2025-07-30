@@ -114,7 +114,13 @@ class AIStrategy:
 
         if ai_verdict.get("action") == "✅ Execute":
             entry_price_for_risk_check = market_state.mark_price or 0.0
-            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price_for_risk_check, final_signal["direction"], forecast)
+            market_snapshot = market_state.get_latest_data_snapshot()
+            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(
+                entry_price_for_risk_check, 
+                final_signal["direction"], 
+                forecast, 
+                market_snapshot
+            )
 
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"
