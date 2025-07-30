@@ -19,7 +19,6 @@ class TradeExecutor:
     def __init__(self, config: Config, market_state: MarketState, http_client: Any, 
                  trade_lifecycle_manager: TradeLifecycleManager, 
                  memory_tracker: MemoryTracker,
-                 simulation_account: SimulationAccount,
                  # --- FIX: Accept the PerformanceTracker instance ---
                  performance_tracker: PerformanceTracker):
         self.config = config
@@ -36,19 +35,78 @@ class TradeExecutor:
         logger.info("TradeExecutor initialized.")
         pass
 
-    async def execute_trade(self, trade_details: Dict[str, Any]):
+    async def execute_trade(self, trade_details: Dict[str, Any], candle_timestamp: int = None) -> bool:
         """
-        This function is UNCHANGED. It correctly routes new trades to the TLM.
+        Execute a trade order (live or simulated) and log the result.
         """
-        if self.config.dry_run_mode:
-            logger.info(f"Routing new simulated trade {trade_details.get('trade_id')} to TradeLifecycleManager.")
-            await self.trade_lifecycle_manager.start_new_trade(
-                trade_details.get('trade_id'),
-                trade_details
-            )
-        else:
-            logger.info(f"LIVE EXECUTION: Would place new trade {trade_details.get('trade_id')}.")
-        return True
+        try:
+            logger.info(f"Executing trade: {trade_details}")
+
+            # Add timestamp to trade details for memory tracking
+            if candle_timestamp:
+                trade_details["candle_timestamp"] = candle_timestamp
+
+            if self.config.dry_run_mode:
+                # Simulate the trade execution
+                success = await self.sim_account.execute_trade(trade_details)
+                if success:
+                    logger.info(f"✅ Simulated trade executed successfully: {trade_details}")
+                    await self.performance_tracker.log_trade(trade_details, success=True)
+                    # Log successful trade to memory tracker
+                    await self.memory_tracker.update_memory(trade_data={
+                        "direction": trade_details.get("direction"),
+                        "quantity": trade_details.get("size", 0.0),
+                        "entry_price": trade_details.get("entry_price", 0.0),
+                        "simulated": True,
+                        "failed": False,
+                        "reason": "Trade executed successfully",
+                        "order_data": trade_details,
+                        "candle_timestamp": candle_timestamp
+                    })
+                else:
+                    logger.warning(f"❌ Simulated trade failed: {trade_details}")
+                    await self.performance_tracker.log_trade(trade_details, success=False)
+                    # Log failed trade to memory tracker
+                    await self.memory_tracker.update_memory(trade_data={
+                        "direction": trade_details.get("direction"),
+                        "quantity": trade_details.get("size", 0.0),
+                        "entry_price": trade_details.get("entry_price", 0.0),
+                        "simulated": True,
+                        "failed": True,
+                        "reason": "Simulated trade execution failed",
+                        "order_data": trade_details,
+                        "candle_timestamp": candle_timestamp
+                    })
+                return success
+            else:
+                # Execute real trade (placeholder for actual implementation)
+                logger.info(f"🚀 LIVE TRADE would be executed: {trade_details}")
+                await self.performance_tracker.log_trade(trade_details, success=True)
+                await self.memory_tracker.update_memory(trade_data={
+                    "direction": trade_details.get("direction"),
+                    "quantity": trade_details.get("size", 0.0),
+                    "entry_price": trade_details.get("entry_price", 0.0),
+                    "simulated": False,
+                    "failed": False,
+                    "reason": "Live trade executed",
+                    "order_data": trade_details,
+                    "candle_timestamp": candle_timestamp
+                })
+                return True
+        except Exception as e:
+            logger.error(f"Error executing trade: {e}", exc_info=True)
+            await self.performance_tracker.log_trade(trade_details, success=False)
+            await self.memory_tracker.update_memory(trade_data={
+                "direction": trade_details.get("direction"),
+                "quantity": trade_details.get("size", 0.0),
+                "entry_price": trade_details.get("entry_price", 0.0),
+                "simulated": self.config.dry_run_mode,
+                "failed": True,
+                "reason": f"Trade execution error: {str(e)}",
+                "order_data": trade_details,
+                "candle_timestamp": candle_timestamp
+            })
+            return False
 
     async def exit_trade(self, trade_id: str, exit_price: float, exit_reason: str):
         """

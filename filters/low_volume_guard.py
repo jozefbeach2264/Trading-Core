@@ -33,12 +33,12 @@ class LowVolumeGuard:
         )
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        live_candle = market_state.live_reconstructed_candle
         candle_timestamp = market_state.get_current_candle_timestamp()
+
         report = {
-            "filter_name": "LowVolumeGuard", 
-            "score": 1.0, 
-            "metrics": {}, 
-            "flag": "✅ Hard Pass",
+            "filter_name": "LowVolumeGuard", "score": 1.0,
+            "metrics": {}, "flag": "✅ Hard Pass", 
             "candle_timestamp": candle_timestamp
         }
 

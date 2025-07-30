@@ -148,14 +148,16 @@ class AIStrategy:
 
         # Log AI verdict to memory for future reference
         candle_timestamp = market_state.get_current_candle_timestamp()
-        verdict_data = {
-            "direction": final_signal.get("direction"),
-            "entry_price": final_signal.get("price"),
-            "verdict": ai_verdict.get("action", "None"),
-            "confidence": ai_verdict.get("confidence", 0.0),
-            "reason": ai_verdict.get("reasoning", "N/A"),
-            "candle_timestamp": candle_timestamp
-        }
-        await self.memory_tracker.update_memory(verdict_data=verdict_data)
+
+        await self.memory_tracker.update_memory(
+            verdict_data={
+                "direction": final_signal.get("direction"),
+                "entry_price": final_signal.get("price"),
+                "verdict": ai_verdict.get("action", "None"),
+                "confidence": ai_verdict.get("confidence", 0.0),
+                "reason": ai_verdict.get("reasoning", "N/A"),
+                "candle_timestamp": candle_timestamp
+            }
+        )
 
         return final_signal
