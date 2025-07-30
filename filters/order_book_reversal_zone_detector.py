@@ -34,9 +34,11 @@ class OrderBookReversalZoneDetector:
         # --- NEW: Ensure the latest OB metrics are calculated before proceeding ---
         await market_state.ensure_order_book_metrics_are_current()
 
+        candle_timestamp = market_state.get_current_candle_timestamp()
         report = {
             "filter_name": "OrderBookReversalZoneDetector", "score": 0.0,
-            "metrics": {}, "flag": "⚠️ Soft Flag"
+            "metrics": {}, "flag": "⚠️ Soft Flag",
+            "candle_timestamp": candle_timestamp
         }
         
         # Now, read the pre-calculated (cached) metrics from the market state

@@ -33,9 +33,11 @@ class RetestEntryLogic:
         )
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        candle_timestamp = market_state.get_current_candle_timestamp()
         report = {
             "filter_name": "RetestEntryLogic", "score": 1.0,
-            "metrics": {"reason": "NO_RETEST_SCENARIO"}, "flag": "✅ Hard Pass"
+            "metrics": {"reason": "NO_RETEST_SCENARIO"}, "flag": "✅ Hard Pass",
+            "candle_timestamp": candle_timestamp
         }
         klines = list(market_state.klines)
         live_candle = market_state.live_reconstructed_candle

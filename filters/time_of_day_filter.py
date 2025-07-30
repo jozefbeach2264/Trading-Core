@@ -37,11 +37,13 @@ class TimeOfDayFilter:
         return False
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
+        candle_timestamp = market_state.get_current_candle_timestamp()
         report = {
             "filter_name": "TimeOfDayFilter",
             "score": 1.0,
             "metrics": {"current_utc_time": datetime.utcnow().strftime("%H:%M")},
-            "flag": "✅ Hard Pass"
+            "flag": "✅ Hard Pass",
+            "candle_timestamp": candle_timestamp
         }
         
         if self._is_within_trade_window():

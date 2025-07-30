@@ -147,14 +147,24 @@ class MarketState:
     async def update_filter_audit_report(self, filter_name: str, report: Dict[str, Any]):
         self.filter_audit_report[filter_name] = report
 
+    def get_current_candle_timestamp(self) -> Optional[int]:
+        """Get the timestamp of the current/latest candle being processed"""
+        if self.live_reconstructed_candle:
+            return int(self.live_reconstructed_candle[0])  # Live candle timestamp
+        elif self.klines:
+            return int(self.klines[0][0])  # Latest historical candle timestamp
+        return None
+
     def get_latest_data_snapshot(self) -> Dict[str, Any]:
+        current_timestamp = self.get_current_candle_timestamp()
         return {
             "symbol": self.symbol, "mark_price": self.mark_price, "klines": list(self.klines),
             "live_reconstructed_candle": self.live_reconstructed_candle, "depth_20": self.depth_20,
             "book_ticker": self.book_ticker, "recent_trades": list(self.recent_trades),
             "open_interest": self.open_interest, "order_book_pressure": self.order_book_pressure,
             "order_book_walls": self.order_book_walls, "spoof_metrics": self.spoof_metrics,
-            "running_cvd": self.running_cvd, "filter_audit_report": self.filter_audit_report
+            "running_cvd": self.running_cvd, "filter_audit_report": self.filter_audit_report,
+            "current_candle_timestamp": current_timestamp
         }
 
     def is_ready(self, required_candles: int = 100) -> bool:
