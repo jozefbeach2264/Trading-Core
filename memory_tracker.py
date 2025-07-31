@@ -66,38 +66,22 @@ class MemoryTracker:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
             if filter_report:
-                # Use original candle timestamp if available, otherwise use current time with microsecond precision
-                original_timestamp = filter_report.get("candle_timestamp")
-                if original_timestamp:
-                    # Convert candle timestamp (ms) to ISO format
-                    timestamp = datetime.fromtimestamp(original_timestamp / 1000).strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                else:
-                    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                    
                 cursor.execute('''
                     INSERT INTO filters (timestamp, filter_name, score, flag, metrics)
                     VALUES (?, ?, ?, ?, ?)
                 ''', (
-                    timestamp,
+                    datetime.utcnow().isoformat() + "Z",
                     filter_report.get("filter_name", "Unknown"),
                     filter_report.get("score", 0.0),
                     filter_report.get("flag", "N/A"),
                     json.dumps(filter_report.get("metrics", {}))
                 ))
             if trade_data:
-                # Use original candle timestamp if available, otherwise use current time with microsecond precision
-                original_timestamp = trade_data.get("candle_timestamp")
-                if original_timestamp:
-                    # Convert candle timestamp (ms) to ISO format
-                    timestamp = datetime.fromtimestamp(original_timestamp / 1000).strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                else:
-                    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                    
                 cursor.execute('''
                     INSERT INTO trades (timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    timestamp,
+                    datetime.utcnow().isoformat() + "Z",
                     trade_data.get("direction", "N/A"),
                     trade_data.get("quantity", 0.0),
                     trade_data.get("entry_price", 0.0),
@@ -107,19 +91,11 @@ class MemoryTracker:
                     json.dumps(trade_data.get("order_data", {}))
                 ))
             if verdict_data:
-                # Use original candle timestamp if available, otherwise use current time with microsecond precision
-                original_timestamp = verdict_data.get("candle_timestamp")
-                if original_timestamp:
-                    # Convert candle timestamp (ms) to ISO format
-                    timestamp = datetime.fromtimestamp(original_timestamp / 1000).strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                else:
-                    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f') + "Z"
-                    
                 cursor.execute('''
                     INSERT INTO verdicts (timestamp, direction, entry_price, verdict, confidence, reason)
                     VALUES (?, ?, ?, ?, ?, ?)
                 ''', (
-                    timestamp,
+                    datetime.utcnow().isoformat() + "Z",
                     verdict_data.get("direction", "N/A"),
                     verdict_data.get("entry_price", 0.0),
                     verdict_data.get("verdict", "None"),

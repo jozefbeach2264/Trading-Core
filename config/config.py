@@ -47,7 +47,6 @@ class Config:
         self.retest_lookback: int = int(os.getenv('RETEST_LOOKBACK', '15'))
         self.retest_proximity_percent: float = float(os.getenv('RETEST_PROXIMITY_PERCENT', '0.2'))
         self.low_volume_lookback: int = int(os.getenv('LOW_VOLUME_LOOKBACK', '15'))
-        self.low_volume_lookback_period: int = int(os.getenv('LOW_VOLUME_LOOKBACK_PERIOD', '15'))
         self.low_volume_ratio: float = float(os.getenv('LOW_VOLUME_RATIO', '0.7'))
         self.low_volume_min_threshold: float = float(os.getenv('LOW_VOLUME_MIN_THRESHOLD', '15000'))
         self.sentiment_divergence_lookback: int = int(os.getenv('SENTIMENT_DIVERGENCE_LOOKBACK', '20'))

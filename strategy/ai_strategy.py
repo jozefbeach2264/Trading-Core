@@ -114,13 +114,7 @@ class AIStrategy:
 
         if ai_verdict.get("action") == "✅ Execute":
             entry_price_for_risk_check = market_state.mark_price or 0.0
-            market_snapshot = market_state.get_latest_data_snapshot()
-            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(
-                entry_price_for_risk_check, 
-                final_signal["direction"], 
-                forecast, 
-                market_snapshot
-            )
+            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price_for_risk_check, final_signal["direction"], forecast)
 
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"
@@ -146,17 +140,15 @@ class AIStrategy:
                     final_signal["reason"] = "Invalid mark price at execution time."
                     self.logger.error(f"Execution HALTED: {final_signal['reason']}")
 
-        # Log AI verdict to memory for future reference
-        candle_timestamp = market_state.get_current_candle_timestamp()
-
+        # Your original memory tracker logic is preserved, but now it's fed the correct data.
         await self.memory_tracker.update_memory(
             verdict_data={
-                "direction": final_signal.get("direction"),
-                "entry_price": final_signal.get("price"),
+                "direction": final_signal.get("direction", "N/A"),
+                "entry_price": entry_price, # This now uses the calculated price
+                "quantity": quantity, # This now includes the calculated quantity
                 "verdict": ai_verdict.get("action", "None"),
                 "confidence": ai_verdict.get("confidence", 0.0),
-                "reason": ai_verdict.get("reasoning", "N/A"),
-                "candle_timestamp": candle_timestamp
+                "reason": ai_verdict.get("reasoning", "N/A")
             }
         )
 

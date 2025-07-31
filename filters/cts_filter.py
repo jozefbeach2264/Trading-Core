@@ -33,14 +33,7 @@ class CtsFilter:
         )
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
-        candle_timestamp = market_state.get_current_candle_timestamp()
-        report = {
-            "filter_name": "CtsFilter", 
-            "score": 0.0, 
-            "metrics": {}, 
-            "flag": "❌ Block",
-            "candle_timestamp": candle_timestamp
-        }
+        report = {"filter_name": "CtsFilter", "score": 0.0, "metrics": {}, "flag": "❌ Block"}
         klines = list(market_state.klines)
         live_candle = market_state.live_reconstructed_candle
         mark_price = market_state.mark_price or 0.0
