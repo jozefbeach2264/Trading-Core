@@ -74,3 +74,5 @@ class Config:
         self.orderbook_reversal_log_path: str = os.getenv("ORDERBOOK_REVERSAL_LOG_PATH", "./logs/filters/orderbook_reversal.log")
         self.ai_strategy_log_path: str = os.getenv("AI_STRATEGY_LOG_PATH", "./logs/ai_strategy.log")
         self.diagnostics_log_path: str = os.getenv("DIAGNOSTICS_LOG_PATH", "./logs/diagnostics.log")
+        self.ai_interaction_log_path: str = os.getenv("AI_INTERACTION_LOG_PATH", "./logs/ai_interaction.log")
+        self.performance_log_path: str = os.getenv("PERFORMANCE_LOG_PATH", "./logs/trade_performance.jsonl")

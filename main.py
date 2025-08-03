@@ -83,15 +83,18 @@ async def lifespan(app: FastAPI):
         performance_tracker  # <- FIX: added this argument
     )
 
+    # Remove trade_executor from constructor call
     ai_strategy = AIStrategy(
         config, 
         strategy_router, 
         r5_forecaster, 
         ai_client, 
         entry_simulator, 
-        memory_tracker,
-        trade_executor
+        memory_tracker
     )
+
+    # Assign trade_executor afterward
+    ai_strategy.trade_executor = trade_executor
 
     # Now, link the dependencies
     trade_lifecycle_manager.execution_module = trade_executor

@@ -23,7 +23,8 @@ class MemoryTracker:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS filters (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT,
+                    module_timestamp TEXT,
+                    candle_timestamp TEXT,
                     filter_name TEXT,
                     score REAL,
                     flag TEXT,
@@ -33,20 +34,23 @@ class MemoryTracker:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS trades (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT,
+                    module_timestamp TEXT,
+                    candle_timestamp TEXT,
                     direction TEXT,
                     quantity REAL,
                     entry_price REAL,
                     simulated BOOLEAN,
                     failed BOOLEAN,
                     reason TEXT,
-                    order_data TEXT
+                    order_data TEXT,
+                    ai_verdict TEXT
                 )
             ''')
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS verdicts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT,
+                    module_timestamp TEXT,
+                    candle_timestamp TEXT,
                     direction TEXT,
                     entry_price REAL,
                     verdict TEXT,
@@ -54,66 +58,114 @@ class MemoryTracker:
                     reason TEXT
                 )
             ''')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_filters_timestamp ON filters (timestamp);')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_trades_timestamp ON trades (timestamp);')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_verdicts_timestamp ON verdicts (timestamp);')
-            cursor.execute("DELETE FROM filters WHERE timestamp < datetime('now', '-30 days')")
-            cursor.execute("DELETE FROM trades WHERE timestamp < datetime('now', '-30 days')")
-            cursor.execute("DELETE FROM verdicts WHERE timestamp < datetime('now', '-30 days')")
+
+            # Patch: Ensure ai_verdict column exists (backward compatibility)
+            try:
+                cursor.execute("SELECT ai_verdict FROM trades LIMIT 1")
+            except sqlite3.OperationalError:
+                cursor.execute("ALTER TABLE trades ADD COLUMN ai_verdict TEXT")
+
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_filters_module_ts ON filters (module_timestamp);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_filters_candle_ts ON filters (candle_timestamp);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_trades_module_ts ON trades (module_timestamp);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_trades_candle_ts ON trades (candle_timestamp);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_verdicts_module_ts ON verdicts (module_timestamp);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_verdicts_candle_ts ON verdicts (candle_timestamp);')
+
+            cursor.execute("DELETE FROM filters WHERE module_timestamp < datetime('now', '-30 days')")
+            cursor.execute("DELETE FROM trades WHERE module_timestamp < datetime('now', '-30 days')")
+            cursor.execute("DELETE FROM verdicts WHERE module_timestamp < datetime('now', '-30 days')")
             conn.commit()
 
     async def update_memory(self, filter_report: Dict[str, Any] = None, trade_data: Dict[str, Any] = None, verdict_data: Dict[str, Any] = None):
+        module_ts = datetime.utcnow().isoformat() + "Z"
+
+        def resolve_cts(obj: Dict[str, Any]) -> str:
+            raw = obj.get("candle_timestamp")
+            if raw is None:
+                return "N/A"
+            try:
+                return datetime.fromtimestamp(int(raw) / 1000).isoformat() + "Z"
+            except:
+                return str(raw)
+
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
+
             if filter_report:
                 cursor.execute('''
-                    INSERT INTO filters (timestamp, filter_name, score, flag, metrics)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO filters (module_timestamp, candle_timestamp, filter_name, score, flag, metrics)
+                    VALUES (?, ?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    module_ts,
+                    resolve_cts(filter_report),
                     filter_report.get("filter_name", "Unknown"),
                     filter_report.get("score", 0.0),
                     filter_report.get("flag", "N/A"),
                     json.dumps(filter_report.get("metrics", {}))
                 ))
+
             if trade_data:
                 cursor.execute('''
-                    INSERT INTO trades (timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO trades (
+                        module_timestamp, candle_timestamp, direction, quantity,
+                        entry_price, simulated, failed, reason, order_data, ai_verdict
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    module_ts,
+                    resolve_cts(trade_data),
                     trade_data.get("direction", "N/A"),
                     trade_data.get("quantity", 0.0),
                     trade_data.get("entry_price", 0.0),
                     trade_data.get("simulated", False),
                     trade_data.get("failed", False),
                     trade_data.get("reason", ""),
-                    json.dumps(trade_data.get("order_data", {}))
+                    json.dumps(trade_data.get("order_data", {})),
+                    json.dumps(trade_data.get("ai_verdict", {}))
                 ))
+
             if verdict_data:
                 cursor.execute('''
-                    INSERT INTO verdicts (timestamp, direction, entry_price, verdict, confidence, reason)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO verdicts (module_timestamp, candle_timestamp, direction, entry_price, verdict, confidence, reason)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    datetime.utcnow().isoformat() + "Z",
+                    module_ts,
+                    resolve_cts(verdict_data),
                     verdict_data.get("direction", "N/A"),
                     verdict_data.get("entry_price", 0.0),
                     verdict_data.get("verdict", "None"),
                     float(verdict_data.get("confidence", 0.0)),
                     verdict_data.get("reason", "N/A")
                 ))
+
             conn.commit()
         logger.debug("Memory database updated.")
 
     def get_memory(self) -> Dict[str, Any]:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT timestamp, filter_name, score, flag, metrics FROM filters")
-            filters = [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])} for r in cursor.fetchall()]
-            cursor.execute("SELECT timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data FROM trades")
-            trades = [{"timestamp": r[0], "direction": r[1], "quantity": r[2], "entry_price": r[3], "simulated": bool(r[4]), "failed": bool(r[5]), "reason": r[6], "order_data": json.loads(r[7])} for r in cursor.fetchall()]
-            cursor.execute("SELECT timestamp, direction, entry_price, verdict, confidence, reason FROM verdicts")
-            verdicts = [{"timestamp": r[0], "direction": r[1], "entry_price": r[2], "verdict": r[3], "confidence": r[4], "reason": r[5]} for r in cursor.fetchall()]
+            cursor.execute("SELECT module_timestamp, candle_timestamp, filter_name, score, flag, metrics FROM filters")
+            filters = [{
+                "module_timestamp": r[0], "candle_timestamp": r[1],
+                "filter": r[2], "score": r[3], "flag": r[4],
+                "metrics": json.loads(r[5]) if r[5] else {}
+            } for r in cursor.fetchall()]
+
+            cursor.execute("SELECT module_timestamp, candle_timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data, ai_verdict FROM trades")
+            trades = [{
+                "module_timestamp": r[0], "candle_timestamp": r[1], "direction": r[2],
+                "quantity": r[3], "entry_price": r[4], "simulated": bool(r[5]),
+                "failed": bool(r[6]), "reason": r[7],
+                "order_data": json.loads(r[8]) if r[8] else {},
+                "ai_verdict": json.loads(r[9]) if r[9] else {}
+            } for r in cursor.fetchall()]
+
+            cursor.execute("SELECT module_timestamp, candle_timestamp, direction, entry_price, verdict, confidence, reason FROM verdicts")
+            verdicts = [{
+                "module_timestamp": r[0], "candle_timestamp": r[1], "direction": r[2],
+                "entry_price": r[3], "verdict": r[4], "confidence": r[5], "reason": r[6]
+            } for r in cursor.fetchall()]
+
         return {
             "last_updated": datetime.utcnow().isoformat() + "Z",
             "filters": filters,
@@ -125,7 +177,7 @@ class MemoryTracker:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT id, metrics FROM filters")
-            past_scenarios = [{"id": row[0], "metrics": json.loads(row[1])} for row in cursor.fetchall()]
+            past_scenarios = [{"id": row[0], "metrics": json.loads(row[1]) if row[1] else {}} for row in cursor.fetchall()]
 
         current_metrics = current_state.get("validator_audit_log", {}).get("CtsFilter", {}).get("metrics", {})
         current_vector = np.array([
@@ -156,6 +208,9 @@ class MemoryTracker:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.cursor()
             placeholders = ','.join('?' for _ in top_ids)
-            cursor.execute(f"SELECT timestamp, filter_name, score, flag, metrics FROM filters WHERE id IN ({placeholders})", top_ids)
+            cursor.execute(f"SELECT module_timestamp, candle_timestamp, filter_name, score, flag, metrics FROM filters WHERE id IN ({placeholders})", top_ids)
             rows = cursor.fetchall()
-            return [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])} for r in rows]
+            return [{
+                "module_timestamp": r[0], "candle_timestamp": r[1], "filter": r[2],
+                "score": r[3], "flag": r[4], "metrics": json.loads(r[5]) if r[5] else {}
+            } for r in rows]
