@@ -1,7 +1,7 @@
 import logging
 import json
 import os
-import uuid
+import uuid  # Import UUID to generate unique trade IDs
 from typing import Dict, Any, Optional
 
 from config.config import Config
@@ -12,8 +12,11 @@ from rolling5_engine import Rolling5Engine
 from simulators.entry_range_simulator import EntryRangeSimulator
 from ai_client import AIClient
 from memory_tracker import MemoryTracker
-from system_managers.trade_executor import TradeExecutor
+# --- THIS IS THE FIX ---
+# Reverted to an absolute import, which is the standard for project structures.
+from execution.execution_module import ExecutionModule
 
+# Setup functions and constants remain unchanged
 def setup_ai_strategy_logger(config: Config) -> logging.Logger:
     log_path = config.ai_strategy_log_path
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -54,18 +57,21 @@ class AIStrategy:
                  ai_client: AIClient,
                  entry_simulator: EntryRangeSimulator,
                  memory_tracker: MemoryTracker,
-                 trade_executor: TradeExecutor):
+                 # Add ExecutionModule to the constructor
+                 execution_module: ExecutionModule):
         self.config = config
         self.strategy_router = strategy_router
         self.forecaster = forecaster
         self.ai_client = ai_client
         self.entry_simulator = entry_simulator
         self.memory_tracker = memory_tracker
-        self.trade_executor = trade_executor
+        # Store the execution_module instance
+        self.execution_module = execution_module
         self.logger = setup_ai_strategy_logger(config)
-        self.logger.info("AIStrategy initialized and linked with TradeExecutor.")
+        self.logger.info("AIStrategy initialized and linked with ExecutionModule.")
 
     async def generate_signal(self, market_state: MarketState, validator_stack: ValidatorStack) -> Dict[str, Any]:
+        # --- The entire signal generation and validation process remains the same ---
         self.logger.info("--- New AI Strategy Cycle Started ---")
 
         primary_gate_report = await validator_stack.run_primary_gate(market_state)
@@ -106,9 +112,28 @@ class AIStrategy:
             "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
         }
 
+        self.logger.info(f"Context packet for AI: {json.dumps(context_packet, indent=2)}")
+        self.logger.info(f"Validator audit log: {json.dumps(final_validator_log, indent=2)}")
+
         ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
+        confidence = ai_verdict.get("confidence", 0.0)
+
+        log_reason = ai_verdict.get('reasoning', 'No reasoning provided')
+        if ai_verdict.get("action") == "⛔ Abort" and "AI request timed out" in log_reason:
+            self.logger.error(f"AI VERDICT FAILED: Request Timed Out.")
+        elif ai_verdict.get("action") == "⛔ Abort" and "Invalid JSON" in log_reason:
+            self.logger.error(f"AI VERDICT FAILED: Unreadable Response. Reason: {log_reason}")
+        else:
+            self.logger.info(f"AI VERDICT: Action={ai_verdict.get('action')}, Confidence={confidence:.2f}, Reasoning='{log_reason}'")
+
+        if confidence < self.config.ai_confidence_threshold:
+            reason = f"Rejected - {REJECTION_CODE_MAP['AI_CONFIDENCE']} ({confidence:.2f}/{self.config.ai_confidence_threshold})"
+            self.logger.warning(f"REJECTED: {reason}")
+            return {"reason": reason, "ai_verdict": ai_verdict, "validator_report": final_validator_log}
+
         final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
 
+        trade_id = str(uuid.uuid4())
         entry_price = 0.0
         quantity = 0.0
 
@@ -118,37 +143,40 @@ class AIStrategy:
 
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"
-                final_signal["reason"] = f"Rejected - {REJECTION_CODE_MAP['HIGH_LIQUIDATION_RISK']}: {risk_reason}"
-                self.logger.warning(f"REJECTED: {final_signal['reason']}")
+                reason = f"Rejected - {REJECTION_CODE_MAP['HIGH_LIQUIDATION_RISK']}: {risk_reason}"
+                final_signal["reason"] = reason
+                self.logger.warning(f"REJECTED: {reason}")
             else:
-                self.logger.info("Liquidation risk check passed. Delegating to TradeExecutor.")
+                self.logger.info("Liquidation risk check passed. Delegating to ExecutionModule.")
                 entry_price = market_state.mark_price
                 if entry_price and entry_price > 0:
                     quantity = self.config.trade_size_usd / entry_price
 
                     trade_details = {
-                        "trade_id": str(uuid.uuid4()),
+                        "trade_id": trade_id,
                         "symbol": self.config.symbol,
                         "direction": final_signal.get("direction"),
                         "size": quantity,
                         "entry_price": entry_price
                     }
 
-                    await self.trade_executor.execute_trade(trade_details)
+                    await self.execution_module.execute_trade(trade_details)
                 else:
+                    self.logger.error("Execution HALTED: Mark price is invalid, cannot execute trade.")
                     final_signal["ai_verdict"]["action"] = "⛔ Abort"
                     final_signal["reason"] = "Invalid mark price at execution time."
-                    self.logger.error(f"Execution HALTED: {final_signal['reason']}")
 
-        # Your original memory tracker logic is preserved, but now it's fed the correct data.
         await self.memory_tracker.update_memory(
-            verdict_data={
+            trade_data={
+                "trade_id": trade_id,
                 "direction": final_signal.get("direction", "N/A"),
-                "entry_price": entry_price, # This now uses the calculated price
-                "quantity": quantity, # This now includes the calculated quantity
-                "verdict": ai_verdict.get("action", "None"),
-                "confidence": ai_verdict.get("confidence", 0.0),
-                "reason": ai_verdict.get("reasoning", "N/A")
+                "quantity": quantity,
+                "entry_price": entry_price,
+                "simulated": self.config.is_demo_mode,
+                "failed": final_signal.get("ai_verdict", {}).get("action") == "⛔ Abort",
+                "reason": final_signal.get("reason", ""),
+                "ai_verdict": final_signal.get("ai_verdict", {}),
+                "order_data": {}
             }
         )
 

@@ -1,73 +1,56 @@
 import logging
-import os
-from typing import Deque, Dict, Any
-from memory_tracker import MemoryTracker
-from config.config import Config
+from datetime import datetime
+import asyncio
 
-def setup_diagnostics_logger(config: Config) -> logging.Logger:
-    """Sets up a dedicated logger for the diagnostic script."""
-    log_path = config.diagnostics_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+# Get the specific logger for diagnostics
+logger = logging.getLogger(__name__)
 
-    logger = logging.getLogger('DiagnosticsLogger')
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
+def _log_r5_buffer(r5_engine):
+    """Logs the contents of the Rolling5 candle buffer."""
+    buffer = r5_engine.get_buffer()
+    logger.info("=============== R5 BUFFER DEBUG ===============")
+    logger.info(f"Total candles in buffer: {len(buffer)}")
 
-    if logger.handlers:
-        logger.handlers.clear()
+    # Each 'c' is a candle object, which we assume has a 'timestamp' attribute
+    # Bybit/OKX timestamps are often in milliseconds, so we divide by 1000
+    for i, c in enumerate(buffer):
+        # Convert Unix MS timestamp to a readable datetime object
+        ts = datetime.fromtimestamp(c.timestamp / 1000) if hasattr(c, 'timestamp') else "N/A"
+        logger.info(
+            f"[{i}] Timestamp: {ts:%Y-%m-%d %H:%M:%S} | "
+            f"Open: {c.open} | Close: {c.close} | Volume: {c.volume}"
+        )
+    logger.info("=" * 45)
 
-    handler = logging.FileHandler(log_path, mode='a')
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
 
-    return logger
+def _log_memory_tracker(memory_tracker):
+    """Logs the trades stored in the MemoryTracker."""
+    trades = memory_tracker.get_memory().get("trades", [])
+    logger.info("=============== MEMORY TRACKER DEBUG ===============")
+    logger.info(f"Total trades tracked: {len(trades)}")
 
-config = Config()
-diagnostics_logger = setup_diagnostics_logger(config)
+    for i, trade in enumerate(trades):
+        # The trade dictionary already contains a formatted timestamp string
+        trade_ts = trade.get('timestamp', 'N/A')
+        verdict = trade.get('ai_verdict', {})
 
-def debug_r5_and_memory_state(r5_buffer: Deque, memory_tracker: MemoryTracker):
-    """
-    Logs a diagnostic report for the Rolling 5 candle buffer and the MemoryTracker
-    to a dedicated file.
-    """
-    diagnostics_logger.info("="*15 + " R5 BUFFER DEBUG " + "="*15)
-    diagnostics_logger.info(f"Total candles in buffer: {len(r5_buffer)}")
+        logger.info(
+            f"Trade [{i}] @ {trade_ts} → "
+            f"Direction: {trade.get('direction', 'N/A')} | "
+            f"Entry: {trade.get('entry_price', 0.0)} | "
+            f"Verdict: {verdict.get('action', 'N/A')} | "
+            f"Confidence: {verdict.get('confidence', 'N/A')} | "
+            f"Reason: {verdict.get('reasoning', 'N/A')}"
+        )
+    logger.info("=" * 52)
 
-    for i, candle in enumerate(r5_buffer):
+
+async def run_diagnostics(r5_engine, memory_tracker, interval_seconds=15):
+    """Periodically runs all diagnostic logging functions."""
+    while True:
         try:
-            diagnostics_logger.info(f"[{i}] Open: {candle[1]} | Close: {candle[4]} | Volume: {candle[5]}")
-        except (IndexError, TypeError):
-            diagnostics_logger.warning(f"[{i}] Malformed candle data: {candle}")
-
-    if len(r5_buffer) != 5:
-        diagnostics_logger.warning("R5 buffer length is incorrect! Expected 5.")
-
-    diagnostics_logger.info("="*15 + " MEMORY TRACKER DEBUG " + "="*15)
-    memory_state = memory_tracker.get_memory()
-
-    trades = memory_state.get('trades', [])
-    verdicts = memory_state.get('verdicts', [])
-    diagnostics_logger.info(f"Total trades tracked: {len(trades)}")
-
-    for idx, trade in enumerate(trades[-5:]):
-        # --- Log raw trade payload for inspection ---
-        diagnostics_logger.warning(f"Raw TRADE DEBUG [{idx}]: {trade}")
-
-        # --- Match to verdict ---
-        trade_time = trade.get("timestamp", "")
-        matched_verdict = next(
-            (v for v in reversed(verdicts) if v.get("timestamp", "") <= trade_time), None
-        )
-
-        diagnostics_logger.info(
-            f"Trade [{idx}] → Direction: {trade.get('direction')} | "
-            f"Entry: {trade.get('entry_price')} | Verdict: {matched_verdict.get('verdict') if matched_verdict else 'None'} | "
-            f"Confidence: {matched_verdict.get('confidence') if matched_verdict else 'None'} | "
-            f"Reason: {matched_verdict.get('reason') if matched_verdict else 'N/A'}"
-        )
-
-    if not trades:
-        diagnostics_logger.warning("MemoryTracker is empty or not updating.")
-
-    diagnostics_logger.info("="*47 + "\n")
+            _log_r5_buffer(r5_engine)
+            _log_memory_tracker(memory_tracker)
+        except Exception as e:
+            logger.error(f"Error during diagnostics run: {e}", exc_info=True)
+        await asyncio.sleep(interval_seconds)
