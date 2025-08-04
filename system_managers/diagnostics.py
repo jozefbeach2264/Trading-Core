@@ -54,3 +54,15 @@ async def run_diagnostics(r5_engine, memory_tracker, interval_seconds=15):
         except Exception as e:
             logger.error(f"Error during diagnostics run: {e}", exc_info=True)
         await asyncio.sleep(interval_seconds)
+
+
+def debug_r5_and_memory_state(r5_engine, memory_tracker):
+    """
+    Runs a one-time debug log of both the R5 engine buffer and memory tracker state.
+    This is the public function your engine.py should import.
+    """
+    try:
+        _log_r5_buffer(r5_engine)
+        _log_memory_tracker(memory_tracker)
+    except Exception as e:
+        logger.error(f"Error during debug_r5_and_memory_state: {e}", exc_info=True)
