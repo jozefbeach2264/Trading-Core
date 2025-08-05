@@ -11,7 +11,7 @@ from validator_stack import ValidatorStack
 from rolling5_engine import Rolling5Engine
 from simulators.entry_range_simulator import EntryRangeSimulator
 from ai_client import AIClient
-from memory_tracker import MemoryTracker
+from services.memory_tracker import MemoryTracker
 # --- THIS IS THE FIX ---
 # Reverted to an absolute import, which is the standard for project structures.
 from execution.execution_module import ExecutionModule
@@ -20,23 +20,34 @@ from execution.execution_module import ExecutionModule
 def setup_ai_strategy_logger(config: Config) -> logging.Logger:
     log_path = config.ai_strategy_log_path
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
     logger = logging.getLogger('AIStrategyLogger')
     logger.setLevel(logging.INFO)
     logger.propagate = False
+
     if logger.handlers:
         logger.handlers.clear()
+
     handler = logging.FileHandler(log_path, mode='a')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
     return logger
 
 REJECTION_CODE_MAP = {
-    "LowVolumeGuard": "LOW VOL", "TimeOfDayFilter": "OUT OF TIME WINDOW", "SpoofFilter": "SPOOFING",
-    "CtsFilter": "CTS_BLOCK", "CompressionDetector": "COMPRESSION", "BreakoutZoneOriginFilter": "NO BREAKOUT",
-    "RetestEntryLogic": "RETEST WEAK", "SentimentDivergenceFilter": "CVD CONFLICT",
-    "OrderBookReversalZoneDetector": "OB WALL WEAK", "AI_CONFIDENCE": "AI CONFIDENCE LOW",
-    "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel", "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK"
+    "LowVolumeGuard": "LOW VOL",
+    "TimeOfDayFilter": "OUT OF TIME WINDOW",
+    "SpoofFilter": "SPOOFING",
+    "CtsFilter": "CTS_BLOCK",
+    "CompressionDetector": "COMPRESSION",
+    "BreakoutZoneOriginFilter": "NO BREAKOUT",
+    "RetestEntryLogic": "RETEST WEAK",
+    "SentimentDivergenceFilter": "CVD CONFLICT",
+    "OrderBookReversalZoneDetector": "OB WALL WEAK",
+    "AI_CONFIDENCE": "AI CONFIDENCE LOW",
+    "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel",
+    "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK"
 }
 
 def format_rejection_reason(filter_reports: Dict[str, Any], prefix: str) -> Optional[str]:
@@ -98,6 +109,7 @@ class AIStrategy:
         self.logger.info("Post-Signal Validators passed. Proceeding to AI Core.")
 
         forecast = await self.forecaster.generate_forecast(market_state)
+
         snapshot = market_state.get_latest_data_snapshot()
         candle = snapshot.get("live_reconstructed_candle", [0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "0"])
         if not candle or len(candle) != 9 or all(v == 0.0 for v in candle[1:6]):
@@ -105,7 +117,9 @@ class AIStrategy:
             candle = [0, market_state.mark_price or 3200.0, 0.0, 0.0, market_state.mark_price or 3200.0, 0.0, 0.0, 0.0, "0"]
 
         context_packet = {
-            "open": candle[1], "close": candle[4], "volume": candle[5],
+            "open": candle[1],
+            "close": candle[4],
+            "volume": candle[5],
             "direction": signal_packet.get("direction", "N/A"),
             "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
             "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
@@ -138,9 +152,8 @@ class AIStrategy:
         quantity = 0.0
 
         if ai_verdict.get("action") == "✅ Execute":
-            entry_price_for_risk_check = market_state.mark_price or 0.0
-            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price_for_risk_check, final_signal["direction"], forecast)
-
+            entry_price = market_state.mark_price or 0.0
+            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price, final_signal["direction"], forecast)
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"
                 reason = f"Rejected - {REJECTION_CODE_MAP['HIGH_LIQUIDATION_RISK']}: {risk_reason}"

@@ -1,10 +1,11 @@
 import logging
 import json
+import os
 import httpx
 from typing import Dict, Any
 import asyncio
 from config.config import Config
-from memory_tracker import MemoryTracker
+from services.memory_tracker import MemoryTracker
 
 logger = logging.getLogger(__name__)
 ai_strategy_logger = logging.getLogger('AIStrategyLogger')
@@ -51,6 +52,20 @@ class AIClient:
         self.config = config
         self.memory_tracker = MemoryTracker(config)
         self.client = httpx.AsyncClient(timeout=config.ai_client_timeout)
+
+        # --- AI Interaction Logger Setup ---
+        self.ai_interaction_logger = logging.getLogger("AIInteractionLogger")
+        self.ai_interaction_logger.setLevel(logging.INFO)
+        self.ai_interaction_logger.propagate = False
+
+        if not self.ai_interaction_logger.handlers:
+            log_path = self.config.ai_interaction_log_path
+            os.makedirs(os.path.dirname(log_path), exist_ok=True)
+            handler = logging.FileHandler(log_path, mode='a')
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.ai_interaction_logger.addHandler(handler)
+
         logger.debug("AIClient initialized with httpx.")
 
     async def get_ai_verdict(self, context_packet: Dict[str, Any]) -> Dict[str, Any]:
@@ -63,7 +78,7 @@ class AIClient:
         try:
             logger.debug("Requesting one-shot verdict from AI with JSON schema.")
             response = await self.client.post(
-                f"{self.config.ai_provider_url}/chat/completions",
+                getattr(self.config, "ai_provider_url", "https://api.x.ai/v1"),
                 headers={"Authorization": f"Bearer {self.config.xai_api_key}"},
                 json={
                     "model": "grok-3-mini",

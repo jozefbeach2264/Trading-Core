@@ -11,7 +11,7 @@ from typing import Dict, Any, Tuple
 import httpx
 from config.config import Config
 from data_managers.market_state import MarketState
-from memory_tracker import MemoryTracker
+from services.memory_tracker import MemoryTracker
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ class TradeExecutor:
         risk_amount_usd = Decimal(self.market_state.account_balance) * Decimal(self.config.risk_cap_percent)
         position_size_qty = risk_amount_usd / Decimal(entry_price)
         final_qty, _ = self._adjust_to_filters(position_size_qty, Decimal(entry_price))
-            
+
         params = {
             "symbol": self.config.adex_symbol,
             "side": direction.upper(),
@@ -91,7 +91,7 @@ class TradeExecutor:
         params['signature'] = self._get_signature(params)
         headers = {'X-MBX-APIKEY': self.config.asterdex_api_key}
         url = f"{self.base_url}/fapi/v1/order"
-        
+
         try:
             response = await self.client.post(url, headers=headers, params=params)
             response.raise_for_status()

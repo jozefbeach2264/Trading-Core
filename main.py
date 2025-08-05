@@ -27,7 +27,7 @@ from strategy.ai_strategy import AIStrategy
 from execution.execution_module import ExecutionModule
 from execution.simulation_account import SimulationAccount
 from system_managers.engine import Engine
-from memory_tracker import MemoryTracker
+from services.memory_tracker import MemoryTracker
 
 config = Config()
 
@@ -70,21 +70,21 @@ async def lifespan(app: FastAPI):
 
     # The 'execution_module' instance is now correctly passed to the AIStrategy constructor.
     ai_strategy = AIStrategy(
-        config, 
-        strategy_router, 
-        r5_forecaster, 
-        ai_client, 
-        entry_simulator, 
+        config,
+        strategy_router,
+        r5_forecaster,
+        ai_client,
+        entry_simulator,
         memory_tracker,
         execution_module  # The missing argument
     )
 
     # Pass all required modules to the Engine
     engine = Engine(
-        config=config, 
-        market_state=market_state, 
-        validator_stack=validator_stack, 
-        ai_strategy=ai_strategy, 
+        config=config,
+        market_state=market_state,
+        validator_stack=validator_stack,
+        ai_strategy=ai_strategy,
         trade_executor=execution_module
     )
 
