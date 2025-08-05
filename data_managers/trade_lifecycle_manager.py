@@ -1,31 +1,44 @@
 import asyncio
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 
 from config.config import Config
-from managers.market_state import MarketState
-from execution.ExecutionModule import ExecutionModule
-from ai_strategy import AIStrategy
+from data_managers.market_state import MarketState
+# We keep the forward reference for TradeExecutor
+if TYPE_CHECKING:
+    from system_managers.trade_executor import TradeExecutor
+    # --- THIS IS THE FIX ---
+    # We add a forward reference for AIStrategy to break the new circular import.
+    from strategy.ai_strategy import AIStrategy
+from data_managers.orderbook_parser import OrderBookParser
 
 logger = logging.getLogger(__name__)
 
 class ActiveTrade:
-    """A simple data class to hold information about a single active trade."""
-    def __init__(self, trade_id: str, trade_data: Dict[str, Any]):
+    """
+    An upgraded data class to hold detailed information for high-fidelity simulation.
+    """
+    def __init__(self, trade_id: str, trade_data: Dict[str, Any], entry_candle: list, liquidation_price: float):
         self.trade_id: str = trade_id
         self.symbol: str = trade_data.get("symbol")
         self.direction: str = trade_data.get("direction")
         self.entry_price: float = trade_data.get("entry_price")
-        self.current_tp: float = trade_data.get("tp")
-        self.current_sl: float = trade_data.get("sl")
         self.size: float = trade_data.get("size")
+        self.leverage: int = trade_data.get("leverage")
+
+        self.liquidation_price: float = liquidation_price
+        self.entry_candle_ohlcv: list = entry_candle
+        self.status: str = "open"
+        self.pnl: float = 0.0
 
 class TradeLifecycleManager:
     """
-    Monitors all active trades and manages their exit conditions.
-    Dynamically fetches updated TP/SL targets from the AI on each cycle.
+    Upgraded to act as a high-fidelity virtual exchange for simulations,
+    managing the full lifecycle of trades with realistic market conditions.
     """
-    def __init__(self, config: Config, execution_module: ExecutionModule, market_state: MarketState, ai_strategy: AIStrategy):
+    # --- THIS IS THE FIX ---
+    # We use string hints for the types to avoid runtime import issues.
+    def __init__(self, config: Config, execution_module: 'TradeExecutor', market_state: MarketState, ai_strategy: 'AIStrategy'):
         self.config = config
         self.execution_module = execution_module
         self.market_state = market_state
@@ -33,21 +46,44 @@ class TradeLifecycleManager:
         self.active_trades: Dict[str, ActiveTrade] = {}
         self.running = False
         self.task = None
-        logger.info("TradeLifecycleManager initialized for dynamic target management.")
+        self.orderbook_parser = OrderBookParser()
+        logger.info("TradeLifecycleManager upgraded and initialized for high-fidelity simulation.")
 
-    def start_new_trade(self, trade_id: str, trade_data: Dict[str, Any]):
-        """Adds a new trade to the monitoring list."""
+    async def start_new_trade(self, trade_id: str, trade_data: Dict[str, Any]):
+        """
+        Acts as the entry point to the virtual exchange.
+        Calculates realistic entry price, fees, and liquidation price.
+        """
         if trade_id in self.active_trades:
             logger.warning(f"Trade {trade_id} is already being managed.")
             return
+
         try:
-            self.active_trades[trade_id] = ActiveTrade(trade_id, trade_data)
-            logger.info(f"Now managing new trade: {trade_id}")
+            order_book = self.market_state.get_latest_data_snapshot().get('order_book', {'bids': [], 'asks': []})
+
+            simulated_entry_price = self.orderbook_parser.calculate_vwap_for_size(
+                order_book, trade_data['direction'], trade_data['size']
+            )
+            trade_data['entry_price'] = simulated_entry_price
+
+            entry_value = trade_data['size'] * simulated_entry_price
+            margin = entry_value / self.config.leverage
+            if trade_data['direction'] == 'LONG':
+                liquidation_price = simulated_entry_price - (margin / trade_data['size'])
+            else: # SHORT
+                liquidation_price = simulated_entry_price + (margin / trade_data['size'])
+
+            entry_candle = self.market_state.get_latest_data_snapshot().get('live_reconstructed_candle', [])
+
+            trade_data['leverage'] = self.config.leverage
+
+            self.active_trades[trade_id] = ActiveTrade(trade_id, trade_data, entry_candle, liquidation_price)
+            logger.info(f"SIMULATED: New trade {trade_id} started. Entry: ${simulated_entry_price:.2f}, Liq. Price: ${liquidation_price:.2f}")
+
         except Exception as e:
-            logger.error(f"Could not start managing trade {trade_id}: {e}")
+            logger.error(f"Could not start managing trade {trade_id}: {e}", exc_info=True)
 
     async def _run_monitoring_cycle(self):
-        """The main monitoring loop that runs periodically as an asyncio task."""
         while self.running:
             try:
                 if not self.active_trades:
@@ -56,7 +92,7 @@ class TradeLifecycleManager:
 
                 for trade_id in list(self.active_trades.keys()):
                     await self._check_trade(trade_id)
-                
+
                 await asyncio.sleep(self.config.tlm_poll_interval_seconds)
             except asyncio.CancelledError:
                 break
@@ -65,49 +101,50 @@ class TradeLifecycleManager:
                 await asyncio.sleep(5)
 
     async def _check_trade(self, trade_id: str):
-        """Checks a single trade for exit conditions using dynamically updated targets."""
+        """
+        Upgraded monitoring logic for an open trade.
+        1. Checks for liquidation first.
+        2. If not liquidated, consults the AI for a dynamic exit decision.
+        """
         trade = self.active_trades.get(trade_id)
         if not trade: return
-        
-        # This is the placeholder for the dynamic target logic we discussed.
-        # A full implementation requires a new 'get_dynamic_targets' method in AIStrategy.
-        # For now, we will use the existing TP/SL to ensure the system runs.
-        # dynamic_targets = await self.ai_strategy.get_dynamic_targets(self.market_state.get_latest_data_snapshot())
-        
+
         current_price = self.market_state.mark_price
         if not current_price: return
 
         exit_reason = None
-        # Check against TP/SL
-        if trade.direction == "LONG":
-            if current_price >= trade.current_tp: exit_reason = "TP_HIT"
-            elif current_price <= trade.current_sl: exit_reason = "SL_HIT"
-        elif trade.direction == "SHORT":
-            if current_price <= trade.current_tp: exit_reason = "TP_HIT"
-            elif current_price >= trade.current_sl: exit_reason = "SL_HIT"
-        
-        # Use MAX_ROI_LIMIT from the final, restored config
-        if self.config.max_roi_limit > 0 and not exit_reason:
-            pnl_ratio = (current_price - trade.entry_price) / trade.entry_price if trade.direction == "LONG" else (trade.entry_price - current_price) / trade.entry_price
-            current_roi = pnl_ratio * self.config.leverage
-            if current_roi >= self.config.max_roi_limit:
-                exit_reason = "MAX_ROI_HIT"
+        exit_price = current_price
+
+        if trade.direction == "LONG" and current_price <= trade.liquidation_price:
+            exit_reason = "LIQUIDATED"
+            exit_price = trade.liquidation_price
+        elif trade.direction == "SHORT" and current_price >= trade.liquidation_price:
+            exit_reason = "LIQUIDATED"
+            exit_price = trade.liquidation_price
+
+        if not exit_reason:
+            exit_verdict = await self.ai_strategy.get_dynamic_exit_verdict(trade, self.market_state)
+            action = exit_verdict.get("action")
+            if action == "EXIT_PROFIT":
+                exit_reason = "AI_TAKE_PROFIT"
+            elif action == "EXIT_LOSS":
+                exit_reason = "AI_STOP_LOSS"
 
         if exit_reason:
-            logger.info(f"Exit condition '{exit_reason}' met for trade {trade.trade_id} at price {current_price}")
-            # Pass the exit reason to the execution module for logging
-            await self.execution_module.exit_trade(trade.trade_id, current_price, exit_reason)
-            del self.active_trades[trade_id]
+            logger.info(f"Exit condition '{exit_reason}' met for trade {trade.trade_id} at price {exit_price}")
+
+            await self.execution_module.exit_trade(trade.trade_id, exit_price, exit_reason)
+            # Remove the trade from active monitoring
+            if trade_id in self.active_trades:
+                del self.active_trades[trade_id]
 
     def start(self):
-        """Starts the TLM background monitoring task."""
         if not self.running:
             self.running = True
             self.task = asyncio.create_task(self._run_monitoring_cycle())
             logger.info("TradeLifecycleManager monitoring has started.")
-    
+
     async def stop(self):
-        """Stops the TLM background task gracefully."""
         if self.running and self.task:
             self.running = False
             self.task.cancel()
