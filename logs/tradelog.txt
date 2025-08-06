@@ -1,12 +1,93 @@
-ERROR:    Traceback (most recent call last):
-  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/starlette/routing.py", line 693, in lifespan
-    async with self.lifespan_context(app) as maybe_state:
-  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/contextlib.py", line 210, in __aenter__
-    return await anext(self.gen)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/workspace/main.py", line 74, in lifespan
-    trade_executor = TradeExecutor(
-                     ^^^^^^^^^^^^^^
-TypeError: TradeExecutor.__init__() missing 1 required positional argument: 'performance_tracker'
+=== Memory Tracker DB Inspection ===
+✅ filters rows: 1204
 
-ERROR:    Application startup failed. Exiting.
+📌 Last 3 rows from filters:
+----------------------------------------
+(1204,
+ '2025-08-05T03:27:02.115534Z',
+ 'TimeOfDayFilter',
+ 1.0,
+ '✅ Hard Pass',
+ '{"current_utc_time": "03:27", "reason": "WITHIN_TRADING_WINDOW"}')
+----------------------------------------
+(1203,
+ '2025-08-05T03:27:02.067357Z',
+ 'CtsFilter',
+ 0.0,
+ '❌ Block',
+ '{"average_range": 4.768, "current_range": 0.2, "grind_ratio": 0.04, '
+ '"is_compressed": true, "wick_signal": "none", "wick_strength_ratio": 0.0, '
+ '"mark_price": 3656.09, "reason": "NO_TRAP_SIGNAL"}')
+----------------------------------------
+(1202,
+ '2025-08-05T03:26:02.042015Z',
+ 'TimeOfDayFilter',
+ 1.0,
+ '✅ Hard Pass',
+ '{"current_utc_time": "03:26", "reason": "WITHIN_TRADING_WINDOW"}')
+✅ trades rows: 16
+
+📌 Last 3 rows from trades:
+----------------------------------------
+(16,
+ '2025-07-28T02:11:12.464626Z',
+ 'LONG',
+ 0.0006490219239605915,
+ 3851.95,
+ 1,
+ 0,
+ '',
+ '{}')
+----------------------------------------
+(15, '2025-07-28T02:11:12.312722Z', 'LONG', 0.0, 0.0, 0, 0, '', '{}')
+----------------------------------------
+(14,
+ '2025-07-28T01:59:15.749264Z',
+ 'LONG',
+ 0.0006494299304070886,
+ 3849.53,
+ 1,
+ 0,
+ '',
+ '{}')
+✅ verdicts rows: 10
+
+📌 Last 3 rows from verdicts:
+----------------------------------------
+(10,
+ '2025-08-05T03:20:11.286248Z',
+ 'SHORT',
+ 0.0,
+ '⛔ Abort',
+ 1.0,
+ "The live market data shows a direction of 'SHORT' with maximum scores across "
+ 'all indicators: reversal_likelihood_score at 1.0, cts_score at 1.0, and '
+ 'orderbook_score at 1.0. These high scores indicate strong signals for a new '
+ 'trade entry in the short direction, as per the rules that emphasize high '
+ 'CtsFilter and OrderBookReversalZoneDetector scores. The slight decrease from '
+ 'open (3660.36) to close (3660.05) with significant volume (32831.84) further '
+ 'supports potential downward movement, making this an optimal opportunity for '
+ 'execution.')
+----------------------------------------
+(9,
+ '2025-08-05T03:17:14.585431Z',
+ 'SHORT',
+ 0.0,
+ '⛔ Abort',
+ 1.0,
+ 'The current live data shows maximum scores across all key indicators: '
+ 'reversal_likelihood_score at 1.0, cts_score at 1.0, and orderbook_score at '
+ '1.0, which are strong signals for a SHORT trade entry. The price has a '
+ 'slight increase from open to close (3662.25 to 3662.83) with significant '
+ 'volume (5739.47), supporting the potential for a profitable short position '
+ 'based on the rules provided.')
+----------------------------------------
+(8,
+ '2025-07-28T02:11:12.412563Z',
+ 'LONG',
+ 0.0,
+ 'Execute',
+ 1.0,
+ 'All filter scores are at maximum strength and align with the bullish candle '
+ 'direction, confirming a strong long signal.')
+~/workspace$ 

@@ -100,15 +100,29 @@ class Engine:
                 else:
                     logger.warning("Diagnostic check skipped: Not enough klines in market state for R5 buffer.")
 
-                if final_signal and final_signal.get("ai_verdict", {}).get("action") == "Execute":
-                    if self.config.autonomous_mode_enabled:
-                        await self.trade_executor.execute_trade(final_signal)
+                if final_signal:
+                    verdict = final_signal.get("ai_verdict", {}).get("action", "")
+                    
+                    if verdict == "✅ Execute":
+                        if self.config.autonomous_mode_enabled:
+                            await self.trade_executor.execute_trade(final_signal)
+                        else:
+                            logger.info("AUTONOMOUS MODE DISABLED. Suppressing execution.", extra={"signal": final_signal})
+                    
+                    elif verdict == "⛔ Exit":
+                        exit_price = self.market_state.mark_price or 0.0
+                        trade_id = final_signal.get("trade_id", "UNKNOWN_ID")
+                        reason = final_signal.get("ai_verdict", {}).get("reasoning", "No reason given.")
+                        await self.trade_executor.exit_trade(trade_id, exit_price, exit_reason=reason)
+                        logger.info(f"EXIT SIGNAL: Closed trade {trade_id} at price {exit_price} due to: {reason}")
+
+                    elif verdict == "HOLD":
+                        logger.info("AI Verdict: HOLD. Continuing without action.")
+                    
                     else:
-                        logger.info("AUTONOMOUS MODE DISABLED. Suppressing execution.", extra={"signal": final_signal})
-                else:
-                    reason = final_signal.get("reason", "UNKNOWN_REJECTION_REASON")
-                    report = final_signal.get("validator_report", {})
-                    log_failed_signal(report, reason, self.config)
+                        reason = final_signal.get("reason", "UNKNOWN_REJECTION_REASON")
+                        report = final_signal.get("validator_report", {})
+                        log_failed_signal(report, reason, self.config)
 
                 await asyncio.sleep(self.config.engine_cycle_interval)
 

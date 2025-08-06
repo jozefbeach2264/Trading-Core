@@ -102,13 +102,13 @@ class MarketDataManager:
         for event_data in event_data_list:
             if channel not in self._subscribed_channels:
                 continue
-            
+
             if channel == "trades":
                 try:
                     completed_candle = self.candle_reconstructor.process_trade(event_data)
                     if completed_candle:
                         await self.market_state.update_from_ws_kline(completed_candle)
-                    
+
                     live_candle = self.candle_reconstructor.get_live_candle()
                     if live_candle:
                         await self.market_state.update_live_reconstructed_candle(live_candle)
@@ -134,7 +134,7 @@ class MarketDataManager:
                         await self.market_state.update_from_ws_mark_price({"markPx": float(mark_px)})
                 except Exception as e:
                     logger.error("Error processing ticker data", extra={"error": str(e)}, exc_info=True)
-            
+
             elif channel == "mark-price":
                 try:
                     mark_px = event_data.get("markPx")
@@ -143,14 +143,23 @@ class MarketDataManager:
                 except Exception as e:
                     logger.error("Error processing mark-price data", extra={"error": str(e)}, exc_info=True)
 
+            # --- FIX: Added handler for open-interest channel ---
+            elif channel == "open-interest":
+                try:
+                    await self.market_state.update_open_interest(event_data)
+                except Exception as e:
+                    logger.error("Error processing open-interest data", extra={"error": str(e)}, exc_info=True)
+
     async def _websocket_handler(self):
+        # --- FIX: Added open-interest to the subscription payload ---
         ws_payload = {
             "op": "subscribe",
             "args": [
                 {"channel": "trades", "instId": self.inst_id},
                 {"channel": "books", "instId": self.inst_id},
                 {"channel": "tickers", "instId": self.inst_id},
-                {"channel": "mark-price", "instId": self.inst_id}
+                {"channel": "mark-price", "instId": self.inst_id},
+                {"channel": "open-interest", "instId": self.inst_id}
             ]
         }
         while self.is_running:
@@ -163,9 +172,9 @@ class MarketDataManager:
                             message = await asyncio.wait_for(ws.recv(), timeout=30)
                             if message == 'pong':
                                 continue
-                            
+
                             data = json.loads(message)
-                            
+
                             if data.get("event") == "subscribe":
                                 self._subscribed_channels = {arg["channel"] for arg in ws_payload["args"]}
                                 logger.info("Subscribed to WebSocket channels", extra={"channels": list(self._subscribed_channels)})
