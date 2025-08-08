@@ -29,13 +29,13 @@ class SimulationAccount:
                 with open(self.state_file_path, 'r') as f:
                     state = json.load(f)
                     self.balance = float(state.get("balance", self.config.simulation_initial_capital))
-                
+
                 # As per your requirement, replenish if balance is zero or less.
                 if self.balance <= 0:
                     logger.warning("Simulation balance was at or below zero. Replenishing to $10.")
                     self.balance = self.config.simulation_initial_capital
                     self._save_state()
-                
+
                 logger.info(f"SimulationAccount state loaded. Current Balance: ${self.balance:.2f}")
 
             except (json.JSONDecodeError, TypeError) as e:
@@ -48,11 +48,13 @@ class SimulationAccount:
     def _save_state(self):
         """Saves the current account balance to the state file."""
         try:
+            # FIX: Ensure the directory exists before writing to the file.
+            os.makedirs(os.path.dirname(self.state_file_path), exist_ok=True)
             with open(self.state_file_path, 'w') as f:
                 json.dump({"balance": self.balance}, f, indent=4)
         except IOError as e:
             logger.error(f"Could not save simulation state to file: {e}")
-    
+
     def get_balance(self) -> float:
         return self.balance
 
@@ -71,7 +73,7 @@ class SimulationAccount:
 
         total_pnl = pnl_per_unit * position['size'] * leverage
         self.balance += total_pnl
-        
+
         logger.info(f"SIMULATED: Closed trade {trade_id} at ${exit_price:.2f} with {leverage}x leverage. PnL: ${total_pnl:.2f}. New Balance: ${self.balance:.2f}")
         self._save_state() # Save progress after every trade
         return total_pnl

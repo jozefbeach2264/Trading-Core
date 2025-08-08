@@ -18,6 +18,8 @@ class Config:
         self.dry_run_mode: bool = os.getenv('DRY_RUN_MODE', 'True').lower() == 'true'
         self.kline_deque_maxlen: int = int(os.getenv('KLINE_DEQUE_MAXLEN', '500'))
         self.ai_client_timeout: int = int(os.getenv('AI_CLIENT_TIMEOUT', '20'))
+        self.console_display_interval: float = float(os.getenv('CONSOLE_DISPLAY_INTERVAL', '1.0'))
+        self.system_monitor_interval: float = float(os.getenv('SYSTEM_MONITOR_INTERVAL', '0.5'))
         self.engine_cycle_interval: int = int(os.getenv('ENGINE_CYCLE_INTERVAL', '15'))
         self.tlm_poll_interval_seconds: int = int(os.getenv("TLM_POLL_INTERVAL_SECONDS", "5"))
 

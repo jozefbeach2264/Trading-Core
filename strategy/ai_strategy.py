@@ -14,6 +14,7 @@ from ai_client import AIClient
 from memory_tracker import MemoryTracker
 from system_managers.trade_executor import TradeExecutor
 
+
 def setup_ai_strategy_logger(config: Config) -> logging.Logger:
     log_path = config.ai_strategy_log_path
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -28,13 +29,22 @@ def setup_ai_strategy_logger(config: Config) -> logging.Logger:
     logger.addHandler(handler)
     return logger
 
+
 REJECTION_CODE_MAP = {
-    "LowVolumeGuard": "LOW VOL", "TimeOfDayFilter": "OUT OF TIME WINDOW", "SpoofFilter": "SPOOFING",
-    "CtsFilter": "CTS_BLOCK", "CompressionDetector": "COMPRESSION", "BreakoutZoneOriginFilter": "NO BREAKOUT",
-    "RetestEntryLogic": "RETEST WEAK", "SentimentDivergenceFilter": "CVD CONFLICT",
-    "OrderBookReversalZoneDetector": "OB WALL WEAK", "AI_CONFIDENCE": "AI CONFIDENCE LOW",
-    "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel", "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK"
+    "LowVolumeGuard": "LOW VOL",
+    "TimeOfDayFilter": "OUT OF TIME WINDOW",
+    "SpoofFilter": "SPOOFING",
+    "CtsFilter": "CTS_BLOCK",
+    "CompressionDetector": "COMPRESSION",
+    "BreakoutZoneOriginFilter": "NO BREAKOUT",
+    "RetestEntryLogic": "RETEST WEAK",
+    "SentimentDivergenceFilter": "CVD CONFLICT",
+    "OrderBookReversalZoneDetector": "OB WALL WEAK",
+    "AI_CONFIDENCE": "AI CONFIDENCE LOW",
+    "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel",
+    "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK"
 }
+
 
 def format_rejection_reason(filter_reports: Dict[str, Any], prefix: str) -> Optional[str]:
     rejection_codes = []
@@ -45,6 +55,7 @@ def format_rejection_reason(filter_reports: Dict[str, Any], prefix: str) -> Opti
     if rejection_codes:
         return f"Rejected - {prefix}: {', '.join(rejection_codes)}"
     return None
+
 
 class AIStrategy:
     def __init__(self,
@@ -68,12 +79,14 @@ class AIStrategy:
     async def generate_signal(self, market_state: MarketState, validator_stack: ValidatorStack) -> Dict[str, Any]:
         self.logger.info("--- New AI Strategy Cycle Started ---")
 
+        # Primary Gate
         primary_gate_report = await validator_stack.run_primary_gate(market_state)
         if primary_gate_report.get("hard_blocks", 0) > 0:
             reason = format_rejection_reason(primary_gate_report["filters"], "Primary Gate")
             self.logger.warning(f"REJECTED: {reason}")
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
 
+        # Signal Generation
         signal_packet = await self.strategy_router.route_and_generate_signal(market_state, primary_gate_report)
         if not signal_packet:
             reason = REJECTION_CODE_MAP['NO_SIGNAL_GENERATED']
@@ -82,6 +95,7 @@ class AIStrategy:
 
         self.logger.info(f"Signal Packet Generated: Type={signal_packet.get('trade_type')}, Direction={signal_packet.get('direction')}")
 
+        # Post-Signal Validators
         post_signal_report = await validator_stack.run_post_signal_validators(market_state)
         final_validator_log = {**primary_gate_report["filters"], **post_signal_report["filters"]}
         if post_signal_report.get("hard_blocks", 0) > 0:
@@ -91,30 +105,51 @@ class AIStrategy:
 
         self.logger.info("Post-Signal Validators passed. Proceeding to AI Core.")
 
+        # Forecast
         forecast = await self.forecaster.generate_forecast(market_state)
+
+        # Market Snapshot
         snapshot = market_state.get_latest_data_snapshot()
         candle = snapshot.get("live_reconstructed_candle", [0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "0"])
         if not candle or len(candle) != 9 or all(v == 0.0 for v in candle[1:6]):
             self.logger.warning(f"Invalid live_reconstructed_candle: {candle}")
-            candle = [0, market_state.mark_price or 3200.0, 0.0, 0.0, market_state.mark_price or 3200.0, 0.0, 0.0, 0.0, "0"]
+            candle = [
+                0,
+                market_state.mark_price or 3200.0,
+                0.0, 0.0,
+                market_state.mark_price or 3200.0,
+                0.0, 0.0, 0.0, "0"
+            ]
 
+        # AI Context Packet
         context_packet = {
-            "open": candle[1], "close": candle[4], "volume": candle[5],
+            "open": candle[1],
+            "close": candle[4],
+            "volume": candle[5],
             "direction": signal_packet.get("direction", "N/A"),
             "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
             "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
-            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
+            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0),
+            "running_cvd": market_state.running_cvd,
+            "open_interest": market_state.open_interest
         }
 
+        # AI Verdict
         ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
         final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
 
         entry_price = 0.0
         quantity = 0.0
+        trade_id = str(uuid.uuid4())
 
+        # Execute if AI says so
         if ai_verdict.get("action") == "✅ Execute":
             entry_price_for_risk_check = market_state.mark_price or 0.0
-            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price_for_risk_check, final_signal["direction"], forecast)
+            is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(
+                entry_price_for_risk_check,
+                final_signal["direction"],
+                forecast
+            )
 
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"
@@ -125,30 +160,31 @@ class AIStrategy:
                 entry_price = market_state.mark_price
                 if entry_price and entry_price > 0:
                     quantity = self.config.trade_size_usd / entry_price
-
                     trade_details = {
-                        "trade_id": str(uuid.uuid4()),
+                        "trade_id": trade_id,
                         "symbol": self.config.symbol,
                         "direction": final_signal.get("direction"),
                         "size": quantity,
                         "entry_price": entry_price
                     }
-
                     await self.trade_executor.execute_trade(trade_details)
                 else:
                     final_signal["ai_verdict"]["action"] = "⛔ Abort"
                     final_signal["reason"] = "Invalid mark price at execution time."
                     self.logger.error(f"Execution HALTED: {final_signal['reason']}")
 
-        # Your original memory tracker logic is preserved, but now it's fed the correct data.
+        # Memory Tracker Update
         await self.memory_tracker.update_memory(
-            verdict_data={
+            trade_data={
+                "trade_id": trade_id,
                 "direction": final_signal.get("direction", "N/A"),
-                "entry_price": entry_price, # This now uses the calculated price
-                "quantity": quantity, # This now includes the calculated quantity
-                "verdict": ai_verdict.get("action", "None"),
-                "confidence": ai_verdict.get("confidence", 0.0),
-                "reason": ai_verdict.get("reasoning", "N/A")
+                "quantity": quantity,
+                "entry_price": entry_price,
+                "simulated": self.config.is_demo_mode,
+                "failed": final_signal.get("ai_verdict", {}).get("action") == "⛔ Abort",
+                "reason": final_signal.get("reason", ""),
+                "ai_verdict": final_signal.get("ai_verdict", {}),
+                "order_data": {}
             }
         )
 

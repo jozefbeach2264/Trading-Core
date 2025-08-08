@@ -35,12 +35,12 @@ config = Config()
 # Your logging setup is UNCHANGED.
 logger = logging.getLogger()
 logger.setLevel(getattr(logging, config.log_level.upper(), logging.INFO))
+
 if logger.hasHandlers():
     logger.handlers.clear()
+
 formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-logHandler = logging.StreamHandler()
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
+
 fileHandler = logging.FileHandler(config.log_file_path, mode='a')
 fileHandler.setFormatter(formatter)
 logger.addHandler(fileHandler)

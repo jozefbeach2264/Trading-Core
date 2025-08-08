@@ -1,7 +1,9 @@
 import logging
 import json
+import os
 from datetime import datetime
 from typing import Dict, Any
+from config.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -9,14 +11,17 @@ class PerformanceTracker:
     """
     Logs every completed trade to a file and calculates success rate.
     """
-    def __init__(self, log_file: str = "trade_performance.jsonl"):
-        self.log_file = log_file
+    def __init__(self, config: Config):
+        # FIX: The tracker now correctly uses the path from the config object.
+        self.log_file = config.performance_log_path
         self.trades_logged = 0
         self.successful_trades = 0
         self._load_history()
 
     def _load_history(self):
         try:
+            # Ensure the directory exists before trying to read the file
+            os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
             with open(self.log_file, 'r') as f:
                 for line in f:
                     self.trades_logged += 1
@@ -40,15 +45,15 @@ class PerformanceTracker:
             "roi_percent": trade_result.get("roi_percent"),
             "exit_reason": trade_result.get("exit_reason"),
         }
-        
+
         try:
             with open(self.log_file, 'a') as f:
-                f.write(json.dumps(log_entry) + '\\n')
-            
+                f.write(json.dumps(log_entry) + '\n')
+
             self.trades_logged += 1
-            if log_entry['pnl'] > 0:
+            if log_entry.get('pnl', 0) > 0:
                 self.successful_trades += 1
-                
+
         except Exception as e:
             logger.error(f"Failed to log trade performance: {e}")
 
