@@ -11,7 +11,7 @@ from validator_stack import ValidatorStack
 from strategy.ai_strategy import AIStrategy
 from .trade_executor import TradeExecutor
 from console_display import format_market_state_for_console
-from .diagnostics import debug_r5_and_memory_state
+# from .diagnostics import debug_r5_and_memory_state  # Commented out to fix ImportError
 
 logger = logging.getLogger(__name__)
 
@@ -143,14 +143,16 @@ class Engine:
 
                 if self.market_state.klines and len(self.market_state.klines) >= 5:
                     r5_buffer = list(self.market_state.klines)[:5]
-                    debug_r5_and_memory_state(r5_buffer, self.ai_strategy.memory_tracker)
+                    # debug_r5_and_memory_state(r5_buffer, self.ai_strategy.memory_tracker)  # Commented out to fix ImportError and NameError
                 else:
                     logger.warning("Diagnostic check skipped: Not enough klines in market state for R5 buffer.")
 
                 if final_signal:
-                    verdict = final_signal.get("ai_verdict", {}).get("action", "")
+                    # === NORMALIZE VERDICT TOKENS (handles emojis, case, whitespace) ===
+                    action_raw = (final_signal.get("ai_verdict", {}).get("action", "") or "")
+                    verdict = action_raw.replace("✅", "").replace("⛔", "").strip().lower()
 
-                    if verdict == "Execute":
+                    if verdict == "execute":
                         if self.config.autonomous_mode_enabled:
                             await self.trade_executor.execute_trade(final_signal)
                         else:
@@ -159,15 +161,15 @@ class Engine:
                                 extra={"signal": final_signal}
                             )
 
-                    elif verdict == "Abort":
+                    elif verdict == "abort":
                         exit_price = self.market_state.mark_price or 0.0
                         trade_id = final_signal.get("trade_id", "UNKNOWN_ID")
                         reason = final_signal.get("ai_verdict", {}).get("reasoning", "No reason given.")
                         await self.trade_executor.exit_trade(trade_id, exit_price, exit_reason=reason)
                         logger.info(f"EXIT SIGNAL: Closed trade {trade_id} at price {exit_price} due to: {reason}")
 
-                    elif verdict == "Reanalyze" or verdict == "HOLD":
-                        logger.info(f"AI Verdict: {verdict}. Continuing without action.")
+                    elif verdict in ("reanalyze", "hold"):
+                        logger.info(f"AI Verdict: {action_raw}. Continuing without action.")
 
                     else:
                         reason = final_signal.get("reason", "UNKNOWN_REJECTION_REASON")

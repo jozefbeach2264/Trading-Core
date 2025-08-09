@@ -75,7 +75,7 @@ class MarketState:
             trade_qty = float(data['sz'])
             trade_side = data['side']
 
-            # --- FINAL FIX: Use the 'side' field to determine the maker/taker ---
+            # Use the 'side' field to determine maker/taker
             trade = {
                 'time': trade_time,
                 'price': float(data['px']),
@@ -153,14 +153,26 @@ class MarketState:
         self.filter_audit_report[filter_name] = report
 
     def get_latest_data_snapshot(self) -> Dict[str, Any]:
+        # Added 'order_book' alias built from depth_20 so downstream consumers (TLM) can use it.
         return {
-            "symbol": self.symbol, "mark_price": self.mark_price, "klines": list(self.klines),
-            "live_reconstructed_candle": self.live_reconstructed_candle, "depth_20": self.depth_20,
-            "book_ticker": self.book_ticker, "recent_trades": list(self.recent_trades),
-            "open_interest": self.open_interest, "oi_history": list(self.oi_history),
+            "symbol": self.symbol,
+            "mark_price": self.mark_price,
+            "klines": list(self.klines),
+            "live_reconstructed_candle": self.live_reconstructed_candle,
+            "depth_20": self.depth_20,
+            "order_book": {  # NEW alias
+                "bids": list(self.depth_20.get("bids", [])),
+                "asks": list(self.depth_20.get("asks", [])),
+            },
+            "book_ticker": self.book_ticker,
+            "recent_trades": list(self.recent_trades),
+            "open_interest": self.open_interest,
+            "oi_history": list(self.oi_history),
             "order_book_pressure": self.order_book_pressure,
-            "order_book_walls": self.order_book_walls, "spoof_metrics": self.spoof_metrics,
-            "running_cvd": self.running_cvd, "filter_audit_report": self.filter_audit_report,
+            "order_book_walls": self.order_book_walls,
+            "spoof_metrics": self.spoof_metrics,
+            "running_cvd": self.running_cvd,
+            "filter_audit_report": self.filter_audit_report,
             "system_stats": self.system_stats
         }
 

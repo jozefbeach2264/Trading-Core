@@ -70,6 +70,7 @@ class AIStrategy:
         self.memory_tracker = memory_tracker
         self.trade_executor = trade_executor
         self.logger = setup_ai_strategy_logger(config)
+        self.verdict_cache = {}  # Cache for AI verdicts
         self.logger.info("AIStrategy initialized and linked with TradeExecutor.")
 
     async def generate_signal(self, market_state: MarketState, validator_stack: ValidatorStack) -> Dict[str, Any]:
@@ -105,19 +106,28 @@ class AIStrategy:
             self.logger.warning(f"Invalid live_reconstructed_candle: {candle}")
             candle = [0, market_state.mark_price or 3200.0, 0.0, 0.0, market_state.mark_price or 3200.0, 0.0, 0.0, 0.0, "0"]
 
+        # Optimize context_packet: include only essential fields
         context_packet = {
+            "symbol": signal_packet.get("symbol", "ETHUSDT"),
             "open": candle[1],
             "close": candle[4],
             "volume": candle[5],
             "direction": signal_packet.get("direction", "N/A"),
             "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
             "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
-            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0),
-            "running_cvd": market_state.running_cvd,
-            "open_interest": market_state.open_interest
+            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
         }
+        # Create cache key for verdict
+        context_key = f"entry:{json.dumps(context_packet, sort_keys=True)}"
+        if context_key in self.verdict_cache:
+            self.logger.debug("Returning cached verdict for %s", context_key)
+            ai_verdict = self.verdict_cache[context_key]
+        else:
+            ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
+            if ai_verdict.get("action") in ["✅ Execute", "⛔ Abort"]:
+                self.verdict_cache[context_key] = ai_verdict
+                await self.memory_tracker.update_memory({"context": context_packet, "verdict": ai_verdict})
 
-        ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
         final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
 
         entry_price = 0.0
@@ -138,7 +148,6 @@ class AIStrategy:
                 self.logger.info("Liquidation risk check passed. Delegating to TradeExecutor.")
                 entry_price = market_state.mark_price
                 if entry_price and entry_price > 0:
-                    # Basic USD sizing -> qty
                     usd_size = getattr(self.config, "trade_size_usd", 0.0)
                     quantity = (usd_size / entry_price) if usd_size else 0.0
                     trade_details = {
@@ -154,7 +163,6 @@ class AIStrategy:
                     final_signal["reason"] = "Invalid mark price at execution time."
                     self.logger.error(f"Execution HALTED: {final_signal['reason']}")
 
-        # Persist verdict/trade snapshot for diagnostics + audit
         await self.memory_tracker.update_memory(
             verdict_data={
                 "direction": final_signal.get("direction", "N/A"),
@@ -171,7 +179,6 @@ class AIStrategy:
                 "direction": final_signal.get("direction", "N/A"),
                 "quantity": quantity,
                 "entry_price": entry_price,
-                # FIX: use dry_run_mode instead of non-existent is_demo_mode
                 "simulated": bool(getattr(self.config, "dry_run_mode", True)),
                 "failed": final_signal.get("ai_verdict", {}).get("action") == "⛔ Abort",
                 "reason": final_signal.get("reason", ""),
@@ -181,3 +188,26 @@ class AIStrategy:
         )
 
         return final_signal
+
+    async def get_dynamic_exit_verdict(self, trade: Dict[str, Any], market_state: MarketState) -> Dict[str, Any]:
+        context_key = f"exit:{trade.get('trade_id', 'unknown')}"
+        if context_key in self.verdict_cache:
+            self.logger.debug("Returning cached exit verdict for %s", context_key)
+            return self.verdict_cache[context_key]
+
+        # Optimize context: include only essential fields
+        context = {
+            "trade_id": trade.get("trade_id", "unknown"),
+            "symbol": trade.get("symbol", "ETHUSDT"),
+            "entry_price": trade.get("entry_price", 0.0),
+            "current_price": market_state.mark_price or 0.0,
+            "direction": trade.get("direction", "N/A")
+        }
+        verdict = await self.ai_client.get_dynamic_exit_verdict(context)
+        if verdict.get("action") in ["EXIT_PROFIT", "EXIT_LOSS", "HOLD"]:
+            self.verdict_cache[context_key] = verdict
+            await self.memory_tracker.update_memory({"context": context, "exit_verdict": verdict})
+        else:
+            self.logger.error("Invalid exit verdict action: %s", verdict.get("action", "Unknown"))
+            verdict = {"action": "HOLD", "reasoning": "Invalid exit verdict"}
+        return verdict

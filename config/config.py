@@ -1,3 +1,5 @@
+# config/config.py
+
 import os
 from dotenv import load_dotenv
 
@@ -78,3 +80,8 @@ class Config:
         self.diagnostics_log_path: str = os.getenv("DIAGNOSTICS_LOG_PATH", "./logs/system/diagnostics.log")
         self.ai_interaction_log_path: str = os.getenv("AI_INTERACTION_LOG_PATH", "./logs/system/ai_interaction.log")
         self.performance_log_path: str = os.getenv("PERFORMANCE_LOG_PATH", "./logs/system/trade_performance.jsonl")
+
+        # PostgreSQL (added for MemoryTracker PG backend)
+        self.postgres_dsn: str = os.getenv("POSTGRES_DSN", "")
+        self.pg_pool_min: int = int(os.getenv("PG_POOL_MIN", "1"))
+        self.pg_pool_max: int = int(os.getenv("PG_POOL_MAX", "5"))
