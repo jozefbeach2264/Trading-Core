@@ -61,9 +61,26 @@ class TradeLifecycleManager:
         try:
             order_book = self.market_state.get_latest_data_snapshot().get('order_book', {'bids': [], 'asks': []})
 
-            simulated_entry_price = self.orderbook_parser.calculate_vwap_for_size(
-                order_book, trade_data['direction'], trade_data['size']
-            )
+            # Hardened: compute VWAP with graceful fallback to best price if depth is insufficient
+            try:
+                simulated_entry_price = self.orderbook_parser.calculate_vwap_for_size(
+                    order_book, trade_data['direction'], trade_data['size']
+                )
+            except ValueError as e:
+                logger.warning(f"VWAP calc failed: {e}; falling back to best price")
+                if str(trade_data['direction']).lower() in ('long', 'buy'):
+                    asks = order_book.get('asks') or []
+                    if not asks:
+                        raise
+                    first = asks[0]
+                    simulated_entry_price = float(first.get('price', first.get('p'))) if isinstance(first, dict) else float(first[0])
+                else:
+                    bids = order_book.get('bids') or []
+                    if not bids:
+                        raise
+                    first = bids[0]
+                    simulated_entry_price = float(first.get('price', first.get('p'))) if isinstance(first, dict) else float(first[0])
+
             trade_data['entry_price'] = simulated_entry_price
 
             entry_value = trade_data['size'] * simulated_entry_price

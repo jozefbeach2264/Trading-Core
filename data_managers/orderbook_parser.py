@@ -1,6 +1,10 @@
 import logging
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, TYPE_CHECKING
 import time
+
+# Type-only import to avoid circular at runtime (optional)
+if TYPE_CHECKING:
+    from data_managers.market_state import MarketState  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
@@ -77,9 +81,6 @@ class OrderBookParser:
         """
         Compares two consecutive order book snapshots to detect wall thinning.
         """
-        # The following verbose log has been removed to prevent console flooding.
-        # logger.debug("Analyzing thinning/spoofing: prev_ob=%s, curr_ob=%s", previous_ob, current_ob)
-        
         if not previous_ob.get('bids') or not current_ob.get('bids'):
             return {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0}
             
@@ -102,3 +103,57 @@ class OrderBookParser:
         except (ValueError, TypeError) as e:
             logger.warning("Failed to analyze thinning/spoofing", extra={"error": str(e)})
             return {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0}
+
+    # === Required by TradeLifecycleManager ===
+    def calculate_vwap_for_size(self, order_book: Dict[str, Any], direction: str, size: float, max_levels: int | None = None) -> float:
+        """
+        Calculate the Volume-Weighted Average Price (VWAP) needed to execute `size`
+        units on the given `direction` using the provided order book depth.
+        """
+        if size <= 0:
+            raise ValueError("size must be > 0")
+        d = str(direction).lower()
+        if d not in ("long", "short", "buy", "sell"):
+            raise ValueError("direction must be one of: LONG/SHORT/buy/sell")
+
+        bids = (order_book or {}).get('bids') or []
+        asks = (order_book or {}).get('asks') or []
+
+        def _normalize(level):
+            if isinstance(level, dict):
+                p = level.get("price", level.get("p"))
+                q = level.get("size", level.get("qty", level.get("q")))
+            else:
+                p = level[0]; q = level[1]
+            return float(p), float(q)
+
+        if d in ("long", "buy"):
+            levels = [_normalize(l) for l in asks]
+            levels.sort(key=lambda x: x[0])  # asks ascending
+        else:
+            levels = [_normalize(l) for l in bids]
+            levels.sort(key=lambda x: x[0], reverse=True)  # bids descending
+
+        if max_levels is not None:
+            levels = levels[:max_levels]
+
+        remaining = float(size)
+        notional = 0.0
+        filled = 0.0
+
+        for price, qty in levels:
+            if remaining <= 0:
+                break
+            if qty <= 0:
+                continue
+            take = qty if qty <= remaining else remaining
+            notional += take * price
+            filled += take
+            remaining -= take
+
+        if filled <= 0:
+            raise ValueError("No liquidity available on the requested side to compute VWAP.")
+        if remaining > 1e-12:
+            raise ValueError(f"Insufficient liquidity: requested {size}, available {filled}.")
+
+        return notional / filled
