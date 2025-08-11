@@ -31,7 +31,7 @@ class OrderBookReversalZoneDetector:
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         
-        # --- NEW: Ensure the latest OB metrics are calculated before proceeding ---
+        # --- Ensure the latest OB metrics are calculated before proceeding ---
         await market_state.ensure_order_book_metrics_are_current()
 
         report = {
@@ -89,24 +89,35 @@ class OrderBookReversalZoneDetector:
             ask_wall_score = (absorption_score * 0.7) + (distance_score * 0.3)
             self.logger.debug(f"Ask wall score: absorption={absorption_score:.4f}, distance={distance_score:.4f}, total={ask_wall_score:.4f}")
 
+        # Determine dominant zone and keep the original scoring/metrics
         if bid_wall_score > ask_wall_score:
             report["score"] = min(round(bid_wall_score * 2, 4), 1.0)
             report["metrics"] = {
-                "detected_zone": "support", "wall_price": strongest_bid_wall['price'] if strongest_bid_wall else 0.0,
+                "detected_zone": "support",
+                "wall_price": strongest_bid_wall['price'] if strongest_bid_wall else 0.0,
                 "wall_qty": strongest_bid_wall['qty'] if strongest_bid_wall else 0.0
             }
+            # ADD-ONLY: direction + human-readable message
+            report["metrics"]["direction_hint"] = "long"
+            report["metrics"]["human_reason"] = f"score: {report['score']} - Reversal at support likely"
+
         elif ask_wall_score > bid_wall_score:
             report["score"] = min(round(ask_wall_score * 2, 4), 1.0)
             report["metrics"] = {
-                "detected_zone": "resistance", "wall_price": strongest_ask_wall['price'] if strongest_ask_wall else 0.0,
+                "detected_zone": "resistance",
+                "wall_price": strongest_ask_wall['price'] if strongest_ask_wall else 0.0,
                 "wall_qty": strongest_ask_wall['qty'] if strongest_ask_wall else 0.0
             }
+            # ADD-ONLY: direction + human-readable message
+            report["metrics"]["direction_hint"] = "short"
+            report["metrics"]["human_reason"] = f"score: {report['score']} - Reversal at resistance likely"
 
+        # If tie or no dominant wall, leave metrics as-is (backward-compatible)
         final_score = report["score"]
         if final_score >= 0.75:
             report["flag"] = "✅ Hard Confirmed"
             zone_type = report["metrics"].get("detected_zone", "").upper()
-            report["metrics"]["reason"] = f"STRONG_{zone_type}_WALL"
+            report["metrics"]["reason"] = f"STRONG_{zone_type}_WALL" if zone_type else "STRONG_WALL"
         else:
             report["flag"] = "⚠️ Soft Flag"
             report["metrics"]["reason"] = "WEAK_OR_DISTANT_WALL"

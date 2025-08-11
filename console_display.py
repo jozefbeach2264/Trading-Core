@@ -3,7 +3,7 @@ import shutil
 import logging
 from collections import deque
 from data_managers.market_state import MarketState
-from typing import List, Tuple, Optional, Dict, Deque
+from typing import List, Tuple, Optional, Dict, Deque, Any  # <- added Any
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +62,60 @@ def format_market_state_for_console(market_state: MarketState) -> str:
         total_vol_5s = vol_data['5sec']
         imbalance_pct = (buy_vol_5s / total_vol_5s * 100) if total_vol_5s > 0 else 50.0
 
-        # 4. Walls
-        ask_wall_price, ask_wall_qty = max(depth_20.get('asks', []), key=lambda x: float(x[1]), default=(0.0, 0.0))
-        bid_wall_price, bid_wall_qty = max(depth_20.get('bids', []), key=lambda x: float(x[1]), default=(0.0, 0.0))
+        # 4. Walls  (modified)
+        # Select top 3 by qty from the first 20 levels, then display:
+        # Bid 3, Bid 2, Bid 1 (where Bid 1 is closest to mark), Mark, Ask 1, Ask 2, Ask 3.
+        def _top3_levels(levels):
+            # take first 20, coerce to floats, pick 3 largest by qty
+            lvls = []
+            for x in (levels[:20] if levels else []):
+                try:
+                    p, q = float(x[0]), float(x[1])
+                    lvls.append((p, q))
+                except Exception:
+                    continue
+            return sorted(lvls, key=lambda t: t[1], reverse=True)[:3]
+
+        mark = float(mark_price or 0.0)
+        bids20 = depth_20.get('bids', [])
+        asks20 = depth_20.get('asks', [])
+
+        top_bids = _top3_levels(bids20)
+        top_asks = _top3_levels(asks20)
+
+        # Order for display:
+        # - Bids: closest to mark should be Bid 1 (highest price), so show Bid3 (farthest), Bid2, Bid1 (closest).
+        # - Asks: closest to mark should be Ask 1 (lowest price), then Ask 2, Ask 3.
+        # Determine closeness by price distance to mark.
+        if mark > 0.0:
+            # bids: closer = higher price (assuming bids <= mark)
+            top_bids_sorted_closest_first = sorted(top_bids, key=lambda x: (abs(mark - x[0]), -x[0]))
+            # asks: closer = lower price (assuming asks >= mark)
+            top_asks_sorted_closest_first = sorted(top_asks, key=lambda x: (abs(x[0] - mark), x[0]))
+        else:
+            # fallback: just sort by price appropriately if mark missing
+            top_bids_sorted_closest_first = sorted(top_bids, key=lambda x: -x[0])
+            top_asks_sorted_closest_first = sorted(top_asks, key=lambda x: x[0])
+
+        # Ensure we have exactly 3 slots (pad with empties if fewer levels available)
+        def _pad3(arr): 
+            arr = list(arr)
+            while len(arr) < 3:
+                arr.append((0.0, 0.0))
+            return arr
+
+        top_bids_sorted_closest_first = _pad3(top_bids_sorted_closest_first)
+        top_asks_sorted_closest_first = _pad3(top_asks_sorted_closest_first)
+
+        # For bids: show Bid 3 (farthest), Bid 2, Bid 1 (closest)
+        bid1 = top_bids_sorted_closest_first[0]
+        bid2 = top_bids_sorted_closest_first[1]
+        bid3 = top_bids_sorted_closest_first[2]
+
+        # For asks: show Ask 1 (closest), Ask 2, Ask 3 (farthest)
+        ask1 = top_asks_sorted_closest_first[0]
+        ask2 = top_asks_sorted_closest_first[1]
+        ask3 = top_asks_sorted_closest_first[2]
         
         # 5. Trend
         change_1m = 0.0
@@ -109,8 +160,14 @@ def format_market_state_for_console(market_state: MarketState) -> str:
             f"{indent}VOL (1min) : {vol_data['1min']:.3f} ETH",
             f"{indent}DELTA(1min): {delta_data['1min']:+.3f} ETH",
             f"{indent}DELTA(5sec): {delta_data['5sec']:+.3f} ETH {trend_emoji}",
-            f"{indent}WALL (BID) : {float(bid_wall_price):.3f} ({float(bid_wall_qty):.3f} ETH)",
-            f"{indent}WALL (ASK) : {float(ask_wall_price):.3f} ({float(ask_wall_qty):.3f} ETH)",
+            # --- replaced wall display below ---
+            f"{indent}Bid 3: {bid3[0]:.3f} ({bid3[1]:.3f} ETH)",
+            f"{indent}Bid 2: {bid2[0]:.3f} ({bid2[1]:.3f} ETH)",
+            f"{indent}Bid 1: {bid1[0]:.3f} ({bid1[1]:.3f} ETH)",
+            f"{indent}Mark: {formatted_mark_price}",
+            f"{indent}Ask 1: {ask1[0]:.3f} ({ask1[1]:.3f} ETH)",
+            f"{indent}Ask 2: {ask2[0]:.3f} ({ask2[1]:.3f} ETH)",
+            f"{indent}Ask 3: {ask3[0]:.3f} ({ask3[1]:.3f} ETH)",
             f"{separator_line}",
             f"{indent}CPU : {cpu_percent:03.0f}%          RAM : {ram_percent:03.0f}%",
             f"{separator_line}"
@@ -122,4 +179,3 @@ def format_market_state_for_console(market_state: MarketState) -> str:
     except Exception as e:
         logger.error(f"Error in format_market_state_for_console: {e}", exc_info=True)
         return "Error generating display. Check logs."
-

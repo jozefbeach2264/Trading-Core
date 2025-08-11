@@ -1,0 +1,1 @@
+python sim_runner.py --csv ./ETHUSDT0802.csv --symbol ETHUSDT --speed 0.05

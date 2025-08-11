@@ -60,6 +60,7 @@ class Config:
 
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
+        self.exit_reversal_threshold: float = max(0.0, min(1.0, float(os.getenv("EXIT_REVERSAL_THRESHOLD", "0.80"))))
 
         # Toggles & UI
         self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
