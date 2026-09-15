@@ -2,3 +2,14 @@ __pycache__/
 *.pyc
 .env
 r5_statistics.json
+# runtime artifacts (logs, sqlite memory db, simulation state)
+logs/*.log
+logs/*.json
+logs/*.db
+logs/filters/*.log
+# local tooling / accidents
+.venv/
+.local/
+stuff
+=*
+.pytest_cache/

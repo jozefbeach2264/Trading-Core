@@ -47,7 +47,6 @@ class ValidatorStack:
 
         report = {"filters": {}, "hard_blocks": 0}
         
-        logger.info(f"--- Validator {group_name} Report ---")
         for result in filter_results:
             if isinstance(result, Exception):
                 logger.error(f"A {group_name} filter failed", extra={"error": str(result)}, exc_info=True)
@@ -56,7 +55,7 @@ class ValidatorStack:
             filter_name = result.get("filter_name", "UnknownFilter")
             flag = result.get("flag", "N/A")
             score = result.get("score", 0.0)
-            logger.info(f"{filter_name:<35} | Flag: {flag:<18} | Score: {score:.4f}")
+            logger.debug(f"{group_name} | {filter_name:<35} | Flag: {flag:<18} | Score: {score:.4f}")
             
             report["filters"][filter_name] = result
             await market_state.update_filter_audit_report(filter_name, result)
@@ -64,6 +63,15 @@ class ValidatorStack:
 
             if "❌ Block" in flag:
                 report["hard_blocks"] += 1
+
+        logger.info(
+            "Validator %s summary",
+            group_name,
+            extra={
+                "filters_run": len(report["filters"]),
+                "hard_blocks": report["hard_blocks"]
+            }
+        )
         
         return report
 

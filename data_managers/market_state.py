@@ -29,6 +29,7 @@ class MarketState:
         self.open_interest: float = 0.0
         self.positions: Dict[str, Dict] = {}
         self.account_balance: Optional[float] = None
+        self.oi_history: deque = deque(maxlen=600)  # store recent OI snapshots (ts, oi)
         
         # --- Live Calculated & Cached Metrics ---
         self.running_cvd: float = 0.0
@@ -49,9 +50,17 @@ class MarketState:
             self.previous_depth_20 = self.depth_20.copy()
             bids_data = data.get('bids', [])
             asks_data = data.get('asks', [])
-            self.depth_20['bids'] = [(float(p), float(q)) for p, q, _, _ in bids_data]
-            self.depth_20['asks'] = [(float(p), float(q)) for p, q, _, _ in asks_data]
-            self.depth_20['asks'].reverse()
+            # Accept variable tuple lengths from different book feeds
+            def _parse_side(side):
+                parsed = []
+                for entry in side:
+                    if len(entry) >= 2:
+                        price, qty = entry[0], entry[1]
+                        parsed.append((float(price), float(qty)))
+                return parsed
+            self.depth_20['bids'] = _parse_side(bids_data)
+            self.depth_20['asks'] = _parse_side(asks_data)
+            self.depth_20['asks'].reverse()  # ascending for asks
             
             # Mark the cache as dirty; calculations will be done on-demand.
             self._is_ob_metrics_dirty = True
@@ -140,7 +149,14 @@ class MarketState:
 
     async def update_open_interest(self, oi_data: Dict[str, Any]):
         if oi_data and 'oi' in oi_data:
-            self.open_interest = float(oi_data['oi'])
+            try:
+                oi_value = float(oi_data['oi'])
+                ts = int(oi_data.get('ts', time.time() * 1000))
+            except (ValueError, TypeError):
+                oi_value = self.open_interest
+                ts = int(time.time() * 1000)
+            self.open_interest = oi_value
+            self.oi_history.append({"ts": ts, "oi": oi_value})
         else:
             logger.warning("Invalid open interest data received", extra={"data": oi_data})
 

@@ -33,6 +33,7 @@ class Engine:
         self.is_running = False
         self._main_task: asyncio.Task = None
         self._display_task: asyncio.Task = None
+        self.event_queue = asyncio.Queue(maxsize=self.config.event_queue_max_size)
         
         logger.info("System Engine (Kernel) Initialized.")
 
@@ -68,16 +69,39 @@ class Engine:
                 self._display_task.cancel()
                 try: await self._display_task
                 except asyncio.CancelledError: pass
+            # Stop Rolling5 lifecycle if active
+            self.ai_strategy.forecaster.stop_lifecycle()
             logger.info("System Engine stopped.")
 
     async def run_autonomous_cycle(self):
         await asyncio.sleep(10)
         while self.is_running:
             try:
+                # Wait for either an explicit event or the periodic cycle interval
+                # This allows for event-driven decisions during candle formation
+                event_task = asyncio.create_task(self.event_queue.get())
+                sleep_task = asyncio.create_task(asyncio.sleep(self.config.engine_cycle_interval))
+                done, pending = await asyncio.wait(
+                    [event_task, sleep_task],
+                    return_when=asyncio.FIRST_COMPLETED
+                )
+
+                # If an event was received, process it. Otherwise, it was a periodic wake-up.
+                for task in done:
+                    if task is event_task:
+                        event = task.result()
+                        logger.info(f"Processing event from queue: {event}")
+                    # No else needed, if it wasn't event_task, it was sleep_task
+                for task in pending:
+                    task.cancel()
+
                 # The AIStrategy module now handles the entire validation and signal generation flow
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, self.validator_stack)
                 
-                if final_signal and final_signal.get("ai_verdict", {}).get("action") == "✅ Execute":
+                action = final_signal.get("ai_verdict", {}).get("action")
+                if final_signal and action in ("✅ Execute", "Execute"):
+                    # Start Rolling5 lifecycle tracking when a trade is authorized for execution
+                    self.ai_strategy.forecaster.start_lifecycle(self.market_state)
                     if self.config.autonomous_mode_enabled:
                         await self.trade_executor.execute_trade(final_signal)
                     else:
@@ -86,8 +110,6 @@ class Engine:
                     reason = final_signal.get("reason", "UNKNOWN_REJECTION_REASON")
                     report = final_signal.get("validator_report", {})
                     log_failed_signal(report, reason, self.config)
-
-                await asyncio.sleep(self.config.engine_cycle_interval)
 
             except asyncio.CancelledError:
                 logger.info("Autonomous cycle cancelled.")

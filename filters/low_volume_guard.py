@@ -48,15 +48,28 @@ class LowVolumeGuard:
             report["metrics"]["reason"] = "MALFORMED_CANDLE_DATA"
             self.logger.error(report["metrics"]["reason"])
             return report
-            
-        report["metrics"]["candle_volume"] = current_volume
-        report["metrics"]["min_threshold"] = self.min_volume_threshold
 
-        if current_volume < self.min_volume_threshold:
-            report["score"] = 0.0; report["flag"] = "❌ Block"
-            report["metrics"]["reason"] = "LOW_VOLUME_THRESHOLD_NOT_MET"
+        mark_price = market_state.mark_price or 0.0
+        volume_notional = current_volume * mark_price if mark_price > 0 else None
+
+        # Prefer notional (quote currency) threshold when mark price is available
+        if volume_notional is not None:
+            report["metrics"]["candle_volume_notional"] = round(volume_notional, 4)
+            report["metrics"]["min_notional_threshold"] = self.config.low_volume_min_notional
+            threshold_met = volume_notional >= self.config.low_volume_min_notional
+            threshold_reason = "VOLUME_OK" if threshold_met else "LOW_NOTIONAL_THRESHOLD_NOT_MET"
         else:
-            report["metrics"]["reason"] = "VOLUME_OK"
+            # Fallback to base asset volume threshold
+            report["metrics"]["candle_volume"] = current_volume
+            report["metrics"]["min_threshold"] = self.min_volume_threshold
+            threshold_met = current_volume >= self.min_volume_threshold
+            threshold_reason = "VOLUME_OK" if threshold_met else "LOW_VOLUME_THRESHOLD_NOT_MET"
+
+        if not threshold_met:
+            report["score"] = 0.0; report["flag"] = "❌ Block"
+            report["metrics"]["reason"] = threshold_reason
+        else:
+            report["metrics"]["reason"] = threshold_reason
 
         self.logger.debug(f"LowVolumeGuard report generated: {json.dumps(report)}")
         return report

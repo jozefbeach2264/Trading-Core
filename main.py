@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
     
     http_client = httpx.AsyncClient()
     market_state = MarketState(config=config, symbol=config.trading_symbol)
-    okx_data_manager = MarketDataManager(config=config, market_state=market_state, httpx_client=httpx.AsyncClient(base_url="https://www.okx.com"))
+    okx_data_manager = MarketDataManager(config=config, market_state=market_state, httpx_client=httpx.AsyncClient(base_url=config.okx_base_url))
     memory_tracker = MemoryTracker(config)
     
     r5_forecaster = Rolling5Engine(config)
@@ -65,6 +65,8 @@ async def lifespan(app: FastAPI):
     })
     
     await trade_executor.initialize()
+    # Link event queue for intra-candle triggers
+    okx_data_manager.set_event_queue(engine.event_queue)
     await okx_data_manager.start()
 
     # --- Efficient Startup Sequence ---

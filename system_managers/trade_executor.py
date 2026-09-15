@@ -20,15 +20,18 @@ class TradeExecutor:
         self.config = config
         self.market_state = market_state
         self.client = httpx_client
-        self.base_url = "https://fapi.asterdex.com"
+        self.base_url = self.config.asterdex_base_url
         self.exchange_info: Dict[str, Any] = {}
         self.memory_tracker = MemoryTracker(config)
         logger.debug("TradeExecutor initialized for Asterdex.")
 
     async def initialize(self):
+        if self.config.dry_run_mode:
+            logger.info("Dry run mode enabled. Skipping Asterdex exchange info initialization.")
+            return
         try:
             url = f"{self.base_url}/fapi/v1/exchangeInfo"
-            response = await self.client.get(url)
+            response = await self.client.get(url, timeout=15.0)
             response.raise_for_status()
             data = response.json()
             for symbol_data in data.get('symbols', []):
