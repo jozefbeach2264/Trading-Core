@@ -1,28 +1,13 @@
 import logging
-import os
 import json
 from typing import Dict, Any
 from config.config import Config
+from log_utils import file_logger
 from data_managers.market_state import MarketState
 import collections
 
 def setup_spoof_logger(config: Config) -> logging.Logger:
-    log_path = config.spoof_filter_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    
-    logger = logging.getLogger('SpoofFilterLogger')
-    logger.setLevel(logging.DEBUG)
-    logger.propagate = False
-
-    if logger.handlers:
-        logger.handlers.clear()
-
-    handler = logging.FileHandler(log_path, mode='a')
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-        
-    return logger
+    return file_logger("SpoofFilterLogger", config.spoof_filter_log_path)
 
 class SpoofFilter:
     def __init__(self, config: Config):

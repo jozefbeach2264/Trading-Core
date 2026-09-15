@@ -1,10 +1,10 @@
 import logging
 import json
-import os
 from typing import Dict, Any, Optional
 from typing import Protocol
 from strategy.ai_strategy_protocol import AIStrategyProtocol
 from config.config import Config
+from log_utils import file_logger
 from data_managers.market_state import MarketState
 from strategy.strategy_router import StrategyRouter
 from validator_stack import ValidatorStack
@@ -16,22 +16,8 @@ from memory_tracker import MemoryTracker
 main_logger = logging.getLogger(__name__)
 
 def setup_ai_strategy_logger(config: Config) -> logging.Logger:
-    log_path = config.ai_strategy_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    
-    logger = logging.getLogger('AIStrategyLogger')
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-
-    if logger.handlers:
-        logger.handlers.clear()
-
-    handler = logging.FileHandler(log_path, mode='a')
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-        
-    return logger
+    return file_logger("AIStrategyLogger", config.ai_strategy_log_path,
+                       fmt="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 REJECTION_CODE_MAP = {
     "LowVolumeGuard": "LOW VOL", "TimeOfDayFilter": "OUT OF TIME WINDOW",

@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import httpx
@@ -17,6 +18,7 @@ from strategy.ai_strategy import AIStrategy
 from system_managers.trade_executor import TradeExecutor
 from system_managers.engine import Engine
 from memory_tracker import MemoryTracker
+import log_utils
 
 config = Config()
 
@@ -30,11 +32,12 @@ formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(messa
 
 logHandler = logging.StreamHandler()
 logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
 
+os.makedirs(os.path.dirname(os.path.abspath(config.log_file_path)), exist_ok=True)
 fileHandler = logging.FileHandler(config.log_file_path, mode='a')
 fileHandler.setFormatter(formatter)
-logger.addHandler(fileHandler)
+# Both handlers sit behind one queue so the event loop never blocks on stdout/disk.
+log_utils.make_async(logger, [logHandler, fileHandler])
 
 app_state = {}
 
@@ -42,7 +45,11 @@ app_state = {}
 async def lifespan(app: FastAPI):
     logger.info("--- REALITY_CORE (GENESIS) Bootstrap Initializing ---")
     
-    http_client = httpx.AsyncClient()
+    # Shared exchange client: long keep-alive so a live order does not pay a fresh TLS handshake.
+    http_client = httpx.AsyncClient(
+        timeout=httpx.Timeout(10.0, connect=3.0),
+        limits=httpx.Limits(max_keepalive_connections=10, keepalive_expiry=90.0),
+    )
     market_state = MarketState(config=config, symbol=config.trading_symbol)
     okx_data_manager = MarketDataManager(config=config, market_state=market_state, httpx_client=httpx.AsyncClient(base_url=config.okx_base_url))
     memory_tracker = MemoryTracker(config)
@@ -86,6 +93,7 @@ async def lifespan(app: FastAPI):
         logger.info("--- REALITY_CORE Shutting Down ---")
         if app_state.get("engine"):
             await app_state["engine"].stop()
+        await trade_executor.close()
         if app_state.get("market_data_manager"):
             await app_state["market_data_manager"].stop()
         if app_state.get("ai_client"):
@@ -93,6 +101,7 @@ async def lifespan(app: FastAPI):
         if app_state.get("http_client"):
             await app_state["http_client"].aclose()
         logger.info("--- REALITY_CORE Shutdown Complete ---")
+        log_utils.flush_all()
 
 app = FastAPI(lifespan=lifespan)
 

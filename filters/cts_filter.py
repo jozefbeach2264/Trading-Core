@@ -1,25 +1,13 @@
 import logging
-import os
 import json
 import time
 from typing import Dict, Any
 from config.config import Config
+from log_utils import file_logger
 from data_managers.market_state import MarketState
 
 def setup_cts_logger(config: Config) -> logging.Logger:
-    log_path = config.cts_filter_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    
-    logger = logging.getLogger('CtsFilterLogger')
-    logger.setLevel(logging.DEBUG)
-    logger.propagate = False
-
-    if not logger.handlers:
-        file_handler = logging.FileHandler(log_path, mode='a')
-        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-        logger.addHandler(file_handler)
-        
-    return logger
+    return file_logger("CtsFilterLogger", config.cts_filter_log_path)
 
 class CtsFilter:
     def __init__(self, config: Config):

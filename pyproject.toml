@@ -36,3 +36,8 @@ grpcio = "^1.73.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q -p no:cacheprovider"

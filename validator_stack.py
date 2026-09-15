@@ -46,7 +46,8 @@ class ValidatorStack:
         filter_results = await asyncio.gather(*tasks, return_exceptions=True)
 
         report = {"filters": {}, "hard_blocks": 0}
-        
+        valid_results = []
+
         for result in filter_results:
             if isinstance(result, Exception):
                 logger.error(f"A {group_name} filter failed", extra={"error": str(result)}, exc_info=True)
@@ -56,13 +57,16 @@ class ValidatorStack:
             flag = result.get("flag", "N/A")
             score = result.get("score", 0.0)
             logger.debug(f"{group_name} | {filter_name:<35} | Flag: {flag:<18} | Score: {score:.4f}")
-            
+
             report["filters"][filter_name] = result
+            valid_results.append(result)
             await market_state.update_filter_audit_report(filter_name, result)
-            await self.memory_tracker.update_memory(filter_report=result)
 
             if "❌ Block" in flag:
                 report["hard_blocks"] += 1
+
+        # One batched, off-loop write per group instead of one fsync'd commit per filter (perf, 2026-09-15).
+        await self.memory_tracker.update_filter_reports(valid_results)
 
         logger.info(
             "Validator %s summary",

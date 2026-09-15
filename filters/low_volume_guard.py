@@ -1,25 +1,12 @@
 import logging
-import os
 import json
 from typing import Dict, Any
 from config.config import Config
+from log_utils import file_logger
 from data_managers.market_state import MarketState
 
 def setup_low_volume_logger(config: Config) -> logging.Logger:
-    log_path = config.low_volume_guard_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    
-    logger = logging.getLogger('LowVolumeGuardLogger')
-    logger.setLevel(logging.DEBUG)
-    logger.propagate = False
-
-    if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='a')
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        
-    return logger
+    return file_logger("LowVolumeGuardLogger", config.low_volume_guard_log_path)
 
 class LowVolumeGuard:
     def __init__(self, config: Config):

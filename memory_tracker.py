@@ -1,28 +1,40 @@
-import os
+import asyncio
 import json
 import logging
+import os
 import sqlite3
-from datetime import datetime
-from typing import Dict, Any, List
+import threading
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 from config.config import Config
 
 logger = logging.getLogger(__name__)
 
-class MemoryTracker:
-    def __init__(self, config: Config):
-        self.config = config
-        self.db_file = os.path.join("logs", "memory_tracker.db")
-        os.makedirs(os.path.dirname(self.db_file), exist_ok=True)
-        self._init_db()
-        logger.debug("MemoryTracker initialized with DB: %s", self.db_file)
+RETENTION_DAYS = 30
+SQLITE_BUSY_TIMEOUT_S = 5.0
 
-    def _init_db(self):
-        """Initializes the SQLite database and tables."""
-        with sqlite3.connect(self.db_file) as conn:
-            cursor = conn.cursor()
-            # Create tables if they don't exist
-            cursor.execute('''
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class _SqliteStore:
+    """One connection + lock per database file, shared by every MemoryTracker instance
+    (the bot creates four). WAL + synchronous=NORMAL so a commit no longer fsyncs twice."""
+
+    def __init__(self, path: str):
+        self.path = path
+        self.lock = threading.Lock()
+        self.conn = sqlite3.connect(path, timeout=SQLITE_BUSY_TIMEOUT_S, check_same_thread=False)
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA synchronous=NORMAL")
+        self._init_schema()
+
+    def _init_schema(self) -> None:
+        with self.lock, self.conn:
+            self.conn.execute('''
                 CREATE TABLE IF NOT EXISTS filters (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT,
@@ -32,7 +44,7 @@ class MemoryTracker:
                     metrics TEXT
                 )
             ''')
-            cursor.execute('''
+            self.conn.execute('''
                 CREATE TABLE IF NOT EXISTS trades (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT,
@@ -45,101 +57,123 @@ class MemoryTracker:
                     order_data TEXT
                 )
             ''')
-            # Create indexes to speed up queries, especially for deleting old data
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_filters_timestamp ON filters (timestamp);')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_trades_timestamp ON trades (timestamp);')
-            
-            # Prune old data on initialization
-            cursor.execute("DELETE FROM filters WHERE timestamp < datetime('now', '-30 days')")
-            cursor.execute("DELETE FROM trades WHERE timestamp < datetime('now', '-30 days')")
-            conn.commit()
+            self.conn.execute('CREATE INDEX IF NOT EXISTS idx_filters_timestamp ON filters (timestamp);')
+            self.conn.execute('CREATE INDEX IF NOT EXISTS idx_trades_timestamp ON trades (timestamp);')
+            self.conn.execute(f"DELETE FROM filters WHERE timestamp < datetime('now', '-{RETENTION_DAYS} days')")
+            self.conn.execute(f"DELETE FROM trades WHERE timestamp < datetime('now', '-{RETENTION_DAYS} days')")
 
-    async def update_memory(self, filter_report: Dict[str, Any] = None, trade_data: Dict[str, Any] = None):
-        """Updates the database with real-time filter or trade data."""
-        with sqlite3.connect(self.db_file) as conn:
-            cursor = conn.cursor()
-            if filter_report:
-                cursor.execute('''
-                    INSERT INTO filters (timestamp, filter_name, score, flag, metrics)
-                    VALUES (?, ?, ?, ?, ?)
-                ''', (
-                    datetime.utcnow().isoformat() + "Z",
-                    filter_report.get("filter_name", "Unknown"),
-                    filter_report.get("score", 0.0),
-                    filter_report.get("flag", "N/A"),
-                    json.dumps(filter_report.get("metrics", {}))
-                ))
-            if trade_data:
-                cursor.execute('''
-                    INSERT INTO trades (timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    datetime.utcnow().isoformat() + "Z",
-                    trade_data.get("direction", "N/A"),
-                    trade_data.get("quantity", 0.0),
-                    trade_data.get("entry_price", 0.0),
-                    trade_data.get("simulated", False),
-                    trade_data.get("failed", False),
-                    trade_data.get("reason", ""),
-                    json.dumps(trade_data.get("order_data", {}))
-                ))
-            conn.commit()
+    def write(self, filter_rows: List[tuple], trade_rows: List[tuple]) -> None:
+        """One transaction for everything passed in. Runs on a worker thread."""
+        if not filter_rows and not trade_rows:
+            return
+        with self.lock, self.conn:
+            if filter_rows:
+                self.conn.executemany(
+                    "INSERT INTO filters (timestamp, filter_name, score, flag, metrics) VALUES (?, ?, ?, ?, ?)",
+                    filter_rows)
+            if trade_rows:
+                self.conn.executemany(
+                    "INSERT INTO trades (timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", trade_rows)
+
+    def query(self, sql: str, params: tuple = ()) -> List[tuple]:
+        with self.lock:
+            return self.conn.execute(sql, params).fetchall()
+
+
+_stores: Dict[str, _SqliteStore] = {}
+_stores_lock = threading.Lock()
+
+
+def _store_for(path: str) -> _SqliteStore:
+    abs_path = os.path.abspath(path)
+    with _stores_lock:
+        store = _stores.get(abs_path)
+        if store is None:
+            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+            store = _SqliteStore(abs_path)
+            _stores[abs_path] = store
+        return store
+
+
+def _filter_row(report: Dict[str, Any]) -> tuple:
+    return (_utc_now_iso(), report.get("filter_name", "Unknown"), report.get("score", 0.0),
+            report.get("flag", "N/A"), json.dumps(report.get("metrics", {})))
+
+
+def _trade_row(trade: Dict[str, Any]) -> tuple:
+    return (_utc_now_iso(), trade.get("direction", "N/A"), trade.get("quantity", 0.0), trade.get("entry_price", 0.0),
+            trade.get("simulated", False), trade.get("failed", False), trade.get("reason", ""),
+            json.dumps(trade.get("order_data", {})))
+
+
+class MemoryTracker:
+    """Persists filter reports and trade records to SQLite without blocking the event loop.
+
+    Filter-report history is OFF unless MEMORY_FILTER_HISTORY=true: at a 0.2 s cycle it is
+    ~45 rows/s of write-only data (nothing in the bot reads it back), and each row used to be
+    its own fsync'd commit on the event loop."""
+
+    def __init__(self, config: Config):
+        self.config = config
+        self.db_file = config.memory_db_path
+        self._store = _store_for(self.db_file)
+        logger.debug("MemoryTracker initialized with DB: %s", self.db_file)
+
+    @property
+    def filter_history_enabled(self) -> bool:
+        return bool(getattr(self.config, "memory_filter_history", False))
+
+    async def update_filter_reports(self, reports: List[Dict[str, Any]]) -> None:
+        """Persist a whole cycle's filter reports in ONE transaction, off-loop."""
+        if not self.filter_history_enabled or not reports:
+            return
+        rows = [_filter_row(r) for r in reports if isinstance(r, dict)]
+        await asyncio.to_thread(self._store.write, rows, [])
+
+    async def update_memory(self, filter_report: Optional[Dict[str, Any]] = None,
+                            trade_data: Optional[Dict[str, Any]] = None) -> None:
+        """Updates the database with real-time filter or trade data (off-loop)."""
+        filter_rows = [_filter_row(filter_report)] if filter_report and self.filter_history_enabled else []
+        trade_rows = [_trade_row(trade_data)] if trade_data else []
+        if not filter_rows and not trade_rows:
+            return
+        await asyncio.to_thread(self._store.write, filter_rows, trade_rows)
         logger.debug("Memory database updated.")
 
     def get_memory(self) -> Dict[str, Any]:
         """Retrieves all filter and trade history from the database."""
-        with sqlite3.connect(self.db_file) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT timestamp, filter_name, score, flag, metrics FROM filters")
-            filters = [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])} for r in cursor.fetchall()]
-            
-            cursor.execute("SELECT timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data FROM trades")
-            trades = [{"timestamp": r[0], "direction": r[1], "quantity": r[2], "entry_price": r[3], "simulated": bool(r[4]), "failed": bool(r[5]), "reason": r[6], "order_data": json.loads(r[7])} for r in cursor.fetchall()]
-
-        return {"last_updated": datetime.utcnow().isoformat() + "Z", "filters": filters, "trades": trades}
+        filters = [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])}
+                   for r in self._store.query("SELECT timestamp, filter_name, score, flag, metrics FROM filters")]
+        trades = [{"timestamp": r[0], "direction": r[1], "quantity": r[2], "entry_price": r[3], "simulated": bool(r[4]),
+                   "failed": bool(r[5]), "reason": r[6], "order_data": json.loads(r[7])}
+                  for r in self._store.query(
+                      "SELECT timestamp, direction, quantity, entry_price, simulated, failed, reason, order_data FROM trades")]
+        return {"last_updated": _utc_now_iso(), "filters": filters, "trades": trades}
 
     def get_similar_scenarios(self, current_state: Dict[str, Any], top_n: int = 5) -> List[Dict[str, Any]]:
         """Finds scenarios in memory that are similar to the current market state using vector similarity."""
-        with sqlite3.connect(self.db_file) as conn:
-            cursor = conn.cursor()
-            # Fetch all past scenarios to compare against
-            cursor.execute("SELECT id, metrics FROM filters")
-            past_scenarios = [{"id": row[0], "metrics": json.loads(row[1])} for row in cursor.fetchall()]
+        past_scenarios = [{"id": row[0], "metrics": json.loads(row[1])}
+                          for row in self._store.query("SELECT id, metrics FROM filters")]
 
         current_metrics = current_state.get("validator_audit_log", {}).get("CtsFilter", {}).get("metrics", {})
-        current_vector = np.array([
-            current_metrics.get("grind_ratio", 0.0),
-            current_metrics.get("wick_strength_ratio", 0.0)
-        ])
-        
+        current_vector = np.array([current_metrics.get("grind_ratio", 0.0), current_metrics.get("wick_strength_ratio", 0.0)])
         if np.linalg.norm(current_vector) == 0:
             return []
 
         similarities = []
         for scenario in past_scenarios:
             past_metrics = scenario.get("metrics", {})
-            past_vector = np.array([
-                past_metrics.get("grind_ratio", 0.0),
-                past_metrics.get("wick_strength_ratio", 0.0)
-            ])
-            
-            # Calculate cosine similarity
+            past_vector = np.array([past_metrics.get("grind_ratio", 0.0), past_metrics.get("wick_strength_ratio", 0.0)])
             if np.linalg.norm(past_vector) > 0:
                 similarity = np.dot(current_vector, past_vector) / (np.linalg.norm(current_vector) * np.linalg.norm(past_vector))
                 similarities.append((scenario["id"], similarity))
 
-        # Sort by similarity and get the top N
         similarities.sort(key=lambda x: x[1], reverse=True)
-        top_ids = [id for id, _ in similarities[:top_n]]
-
+        top_ids = [scenario_id for scenario_id, _ in similarities[:top_n]]
         if not top_ids:
             return []
-            
-        # Retrieve the full data for the most similar scenarios
-        with sqlite3.connect(self.db_file) as conn:
-            cursor = conn.cursor()
-            placeholders = ','.join('?' for _ in top_ids)
-            cursor.execute(f"SELECT timestamp, filter_name, score, flag, metrics FROM filters WHERE id IN ({placeholders})", top_ids)
-            rows = cursor.fetchall()
-            return [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])} for r in rows]
-
+        placeholders = ",".join("?" for _ in top_ids)
+        rows = self._store.query(
+            f"SELECT timestamp, filter_name, score, flag, metrics FROM filters WHERE id IN ({placeholders})", tuple(top_ids))
+        return [{"timestamp": r[0], "filter": r[1], "score": r[2], "flag": r[3], "metrics": json.loads(r[4])} for r in rows]

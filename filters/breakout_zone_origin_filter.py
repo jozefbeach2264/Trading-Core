@@ -1,25 +1,12 @@
 import logging
-import os
 import json
 from typing import Dict, Any
 from config.config import Config
+from log_utils import file_logger
 from data_managers.market_state import MarketState
 
 def setup_breakout_logger(config: Config) -> logging.Logger:
-    log_path = config.breakout_filter_log_path
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    
-    logger = logging.getLogger('BreakoutZoneOriginFilterLogger')
-    logger.setLevel(logging.DEBUG)
-    logger.propagate = False # This is the key to stopping logs from appearing in the console
-
-    if not logger.handlers:
-        handler = logging.FileHandler(log_path, mode='a')
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        
-    return logger
+    return file_logger("BreakoutZoneOriginFilterLogger", config.breakout_filter_log_path)
 
 class BreakoutZoneOriginFilter:
     def __init__(self, config: Config):

@@ -1,30 +1,17 @@
+import json
 import logging
 import os
-import json
-from typing import Dict, Any
+from typing import Any, Dict
+
 from config.config import Config
+from log_utils import file_logger
 
 
 def get_ai_model_logger(config: Config) -> logging.Logger:
-    """
-    Returns a dedicated logger for AI model decisions (structured NDJSON).
-    Path defaults to logs/ai_model.log unless AI_MODEL_LOG_PATH is set.
-    """
+    """Dedicated NDJSON logger for AI model decisions (queue-backed, never blocks the loop).
+    Path defaults to <ai_strategy_log dir>/ai_model.log unless AI_MODEL_LOG_PATH is set."""
     log_path = os.getenv("AI_MODEL_LOG_PATH", os.path.join(os.path.dirname(config.ai_strategy_log_path), "ai_model.log"))
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-
-    logger = logging.getLogger("AIModelLogger")
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-
-    if logger.handlers:
-        return logger
-
-    handler = logging.FileHandler(log_path, mode='a')
-    formatter = logging.Formatter('%(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
+    return file_logger("AIModelLogger", log_path, fmt="%(message)s", level=logging.INFO)
 
 
 def log_ai_decision(logger: logging.Logger, decision: Dict[str, Any]):

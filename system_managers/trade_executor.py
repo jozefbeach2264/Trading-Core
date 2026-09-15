@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import json
 import os
@@ -23,12 +24,38 @@ class TradeExecutor:
         self.base_url = self.config.asterdex_base_url
         self.exchange_info: Dict[str, Any] = {}
         self.memory_tracker = MemoryTracker(config)
+        self._keepalive_task = None
         logger.debug("TradeExecutor initialized for Asterdex.")
 
     async def initialize(self):
         if self.config.dry_run_mode:
             logger.info("Dry run mode enabled. Skipping Asterdex exchange info initialization.")
             return
+        await self._fetch_exchange_info()
+        self._keepalive_task = asyncio.create_task(self._keepalive_loop())
+
+    async def _keepalive_loop(self):
+        """Keep the exchange TLS session warm so a live order reuses the pooled connection
+        instead of paying connect + handshake (~100-300 ms) at the moment it matters."""
+        url = f"{self.base_url}/fapi/v1/ping"
+        while True:
+            await asyncio.sleep(self.config.exchange_keepalive_seconds)
+            try:
+                await self.client.get(url, timeout=5.0)
+            except Exception as e:
+                logger.debug("Exchange keep-alive ping failed: %r", e)
+
+    async def close(self):
+        task = getattr(self, "_keepalive_task", None)
+        if task:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+            self._keepalive_task = None
+
+    async def _fetch_exchange_info(self):
         try:
             url = f"{self.base_url}/fapi/v1/exchangeInfo"
             response = await self.client.get(url, timeout=15.0)

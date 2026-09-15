@@ -69,6 +69,13 @@ class Config:
         
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
+
+        # Memory tracker (SQLite). Filter history is write-only data at ~45 rows/s — off by default.
+        self.memory_db_path: str = os.getenv("MEMORY_DB_PATH", "./logs/memory_tracker.db")
+        self.memory_filter_history: bool = os.getenv('MEMORY_FILTER_HISTORY', 'False').lower() == 'true'
+
+        # Exchange HTTP keep-alive (live mode): ping so the TLS session is warm when an order fires.
+        self.exchange_keepalive_seconds: float = float(os.getenv('EXCHANGE_KEEPALIVE_SECONDS', '20'))
         
         # Toggles & UI
         self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
