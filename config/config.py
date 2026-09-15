@@ -77,6 +77,8 @@ class Config:
         self.ai_max_tokens: int = int(os.getenv('AI_MAX_TOKENS', '160'))
         self.ai_disable_thinking: bool = os.getenv('AI_DISABLE_THINKING', 'True').lower() == 'true'
         self.ai_temperature: float = float(os.getenv('AI_TEMPERATURE', '0.2'))
+        # Hard cap on the logged reasoning string, enforced in the JSON grammar. 0 = omit the field.
+        self.ai_reasoning_max_chars: int = int(os.getenv('AI_REASONING_MAX_CHARS', '200'))
 
         # Memory tracker (SQLite). Filter history is write-only data at ~45 rows/s — off by default.
         self.memory_db_path: str = os.getenv("MEMORY_DB_PATH", "./logs/memory_tracker.db")

@@ -35,23 +35,27 @@ SYSTEM_PROMPT = (
     "- Reversal Likelihood Score: probability (0-1) that price reverses AGAINST the trade direction. "
     "A high value is a major red flag.\n"
     "Primary goal is capital preservation. Only 'Execute' on high-probability setups.\n"
-    "Return JSON with 'action' (Execute|Abort|Reanalyze), 'confidence' (0-1) and 'reasoning' "
-    "(one short sentence, max 25 words)."
+    "Return JSON with 'action' (Execute|Abort|Reanalyze), 'confidence' (0-1) and, if the schema asks for it, "
+    "'reasoning' (one short sentence, max 20 words)."
 )
 
-VERDICT_JSON_SCHEMA = {
-    "name": "trading_decision",
-    "schema": {
-        "type": "object",
-        "properties": {
-            "action": {"type": "string", "enum": list(VALID_ACTIONS)},
-            "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
-            "reasoning": {"type": "string"},
-        },
-        "required": ["action", "confidence", "reasoning"],
-        "additionalProperties": False,
-    },
-}
+def build_verdict_schema(reasoning_max_chars: int) -> Dict[str, Any]:
+    """JSON schema for the verdict. `reasoning` is only logged, so its length is capped in the
+    grammar itself (llama.cpp honours string maxLength) — every extra token is latency.
+    reasoning_max_chars <= 0 drops the field entirely (fastest: ~15 output tokens)."""
+    properties: Dict[str, Any] = {
+        "action": {"type": "string", "enum": list(VALID_ACTIONS)},
+        "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    }
+    required = ["action", "confidence"]
+    if reasoning_max_chars > 0:
+        properties["reasoning"] = {"type": "string", "maxLength": reasoning_max_chars}
+        required.append("reasoning")
+    return {"name": "trading_decision",
+            "schema": {"type": "object", "properties": properties, "required": required, "additionalProperties": False}}
+
+
+VERDICT_JSON_SCHEMA = build_verdict_schema(200)
 
 FALLBACK_EXECUTE_MIN_SCORE = 0.8      # cts + orderbook must both beat this
 FALLBACK_EXECUTE_MAX_REVERSAL = 0.2   # and reversal risk must be below this
@@ -93,6 +97,7 @@ class AIClient:
         self.client = httpx.AsyncClient(timeout=timeout, limits=httpx.Limits(max_keepalive_connections=2, keepalive_expiry=300.0))
         self.model_logger = get_ai_model_logger(config)
         self._verdict_url = f"{config.ai_provider_url}/chat/completions"
+        self._schema = build_verdict_schema(config.ai_reasoning_max_chars)
         logger.debug("AIClient initialized → %s (model=%s)", self._verdict_url, config.ai_model)
 
     # ------------------------------------------------------------------ request
@@ -111,7 +116,7 @@ class AIClient:
             ],
             "max_tokens": self.config.ai_max_tokens,
             "temperature": self.config.ai_temperature,
-            "response_format": {"type": "json_schema", "json_schema": VERDICT_JSON_SCHEMA},
+            "response_format": {"type": "json_schema", "json_schema": self._schema},
             "stream": False,
         }
         if self.config.ai_disable_thinking:

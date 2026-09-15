@@ -133,7 +133,9 @@ def test_request_is_shaped_for_local_openai_compatible_server(client, config, re
     assert body["max_tokens"] == config.ai_max_tokens
     assert body["chat_template_kwargs"]["enable_thinking"] is False
     assert body["response_format"]["type"] == "json_schema"
-    assert body["response_format"]["json_schema"]["schema"]["additionalProperties"] is False
+    schema = body["response_format"]["json_schema"]["schema"]
+    assert schema["additionalProperties"] is False
+    assert schema["properties"]["reasoning"]["maxLength"] == config.ai_reasoning_max_chars
     assert body["stream"] is False
     assert "Authorization" not in captured.get("headers", {})
     assert json.loads(body["messages"][1]["content"].split("Market Data: ", 1)[1]) == STRONG_LONG
@@ -147,3 +149,15 @@ def test_authorization_header_sent_when_key_configured(config, records):
     run(client.get_ai_verdict(STRONG_LONG))
     run(client.close())
     assert captured["headers"]["Authorization"] == "Bearer sk-test"
+
+
+def test_reasoning_can_be_dropped_from_the_schema(config, records):
+    config.ai_reasoning_max_chars = 0
+    client = AIClient(config)
+    captured = {}
+    _mock_post(client, payload=_chat_payload(json.dumps({"action": "Abort", "confidence": 0.5})), capture=captured)
+    verdict = run(client.get_ai_verdict(STRONG_LONG))
+    run(client.close())
+    schema = captured["json"]["response_format"]["json_schema"]["schema"]
+    assert "reasoning" not in schema["properties"] and schema["required"] == ["action", "confidence"]
+    assert verdict["action"] == "Abort" and verdict["reasoning"] == ""
