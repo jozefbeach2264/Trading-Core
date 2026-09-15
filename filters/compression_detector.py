@@ -1,5 +1,4 @@
 import logging
-import os
 import json
 from typing import Dict, Any
 from config.config import Config
@@ -10,7 +9,23 @@ import statistics
 def setup_compression_logger(config: Config) -> logging.Logger:
     return file_logger("CompressionDetectorLogger", config.compression_detector_log_path)
 
+SCORE_SCALE_MULTIPLIER = 1.2
+HARD_PASS_SCORE = 0.75
+SOFT_FLAG_SCORE = 0.50
+MIN_STATS_WINDOW = 5      # samples needed before percentile diagnostics are reported
+ROLLING_WINDOW_MAX = 200
+
+
 class CompressionDetector:
+    @staticmethod
+    def _window_stats(prior_ratios: list) -> Dict[str, Any]:
+        """Median / p20 / p80 of the ratios seen BEFORE this cycle (diagnostics for tuning)."""
+        if len(prior_ratios) < MIN_STATS_WINDOW:
+            return {"median_ratio": None, "p20_ratio": None, "p80_ratio": None}
+        quantiles = statistics.quantiles(prior_ratios, n=5)
+        return {"median_ratio": round(statistics.median(prior_ratios), 4),
+                "p20_ratio": round(quantiles[0], 4), "p80_ratio": round(quantiles[-1], 4)}
+
     def __init__(self, config: Config):
         self.config = config
         self.logger = setup_compression_logger(config)
@@ -18,7 +33,7 @@ class CompressionDetector:
         self.range_ratio = self.config.compression_range_ratio
         # Simple rolling buffer for adaptive thresholds
         self._recent_ratios = []
-        self._recent_max = 200  # cap to avoid unbounded growth
+        self._recent_max = ROLLING_WINDOW_MAX  # cap to avoid unbounded growth
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         report = {"filter_name": "CompressionDetector", "score": 0.0, "metrics": {}, "flag": "❌ Block"}
@@ -45,32 +60,29 @@ class CompressionDetector:
             return report
 
         compression_ratio = current_range / avg_range
-        # Update rolling stats (bounded)
+
+        # Rolling stats are DIAGNOSTICS ONLY, computed from the PRIOR window (current sample excluded).
+        # Review finding 5: deriving thresholds from a window that includes the current sample means the
+        # bottom ~20% of samples hard-block by construction; a prior-window percentile still does.
+        window_stats = self._window_stats(self._recent_ratios)
         self._recent_ratios.append(compression_ratio)
         if len(self._recent_ratios) > self._recent_max:
             self._recent_ratios.pop(0)
 
-        # Adaptive thresholds from rolling window
-        median_ratio = statistics.median(self._recent_ratios) if self._recent_ratios else compression_ratio
-        p20_ratio = statistics.quantiles(self._recent_ratios, n=5)[0] if len(self._recent_ratios) >= 5 else compression_ratio * 0.5
-        p80_ratio = statistics.quantiles(self._recent_ratios, n=5)[-1] if len(self._recent_ratios) >= 5 else compression_ratio * 1.2
+        # Thresholds anchored on the operator's COMPRESSION_RANGE_RATIO (pre-review semantics):
+        # score = ratio / (range_ratio * 1.2); Hard Pass ≥ 0.75, Soft Flag ≥ 0.50, else Block.
+        score_scale = self.range_ratio * SCORE_SCALE_MULTIPLIER
+        hard_threshold = score_scale * HARD_PASS_SCORE
+        soft_threshold = score_scale * SOFT_FLAG_SCORE
+        score = min(compression_ratio / score_scale, 1.0) if score_scale > 0 else 0.0
 
-        # Hysteresis: require higher ratio to move from block to pass
-        soft_threshold = max(self.range_ratio * 0.5, p20_ratio)
-        hard_threshold = max(self.range_ratio, max(median_ratio, p80_ratio * 0.8))
-
-        # Score normalized to hard threshold
-        score = min(compression_ratio / hard_threshold, 1.0) if hard_threshold > 0 else 0.0
-        
         report["score"] = round(score, 4)
         report["metrics"] = {
             "average_range": round(avg_range, 4), "current_range": round(current_range, 4),
             "compression_ratio": round(compression_ratio, 2), "config_threshold_ratio": self.range_ratio,
-            "median_ratio": round(median_ratio, 4),
-            "p20_ratio": round(p20_ratio, 4),
-            "p80_ratio": round(p80_ratio, 4),
             "soft_threshold": round(soft_threshold, 4),
-            "hard_threshold": round(hard_threshold, 4)
+            "hard_threshold": round(hard_threshold, 4),
+            **window_stats,
         }
 
         if compression_ratio >= hard_threshold:

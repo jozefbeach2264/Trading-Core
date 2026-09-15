@@ -66,14 +66,8 @@ class OrderBookParser:
             bid_walls = [{"price": float(p), "qty": float(q)} for p, q in bids if float(q) >= bid_wall_threshold]
             ask_walls = [{"price": float(p), "qty": float(q)} for p, q in asks if float(q) >= ask_wall_threshold]
 
-            # Fallback: if no walls meet the threshold, take the strongest side so downstream logic always has a wall
-            if not bid_walls and bids:
-                strongest_bid = max(bids, key=lambda x: float(x[1]))
-                bid_walls = [{"price": float(strongest_bid[0]), "qty": float(strongest_bid[1])}]
-            if not ask_walls and asks:
-                strongest_ask = max(asks, key=lambda x: float(x[1]))
-                ask_walls = [{"price": float(strongest_ask[0]), "qty": float(strongest_ask[1])}]
-
+            # No fallback (review finding 3): fabricating a "wall" from the largest ordinary level turned
+            # routine top-of-book churn on the 5-level feed into permanent SPOOFING blocks. No wall = [].
             return {"bid_walls": bid_walls, "ask_walls": ask_walls}
         except (ValueError, TypeError, IndexError) as e:
             logger.warning("Failed to find wall clusters", extra={"error": str(e)})

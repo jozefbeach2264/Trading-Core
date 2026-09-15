@@ -9,6 +9,14 @@ from data_managers.market_state import MarketState
 def setup_cts_logger(config: Config) -> logging.Logger:
     return file_logger("CtsFilterLogger", config.cts_filter_log_path)
 
+WICK_BASE_SCORE = 0.6          # compressed candle with a confirmed wick rejection
+WICK_STRENGTH_WEIGHT = 0.2     # per unit of wick strength above the rejection threshold
+HARD_PASS_SCORE = 0.75
+SOFT_FLAG_SCORE = 0.50
+LOW_SCORE_STREAK_LIMIT = 5     # consecutive blocks before a short cooldown
+COOLDOWN_SECONDS = 3.0
+
+
 class CtsFilter:
     def __init__(self, config: Config):
         self.config = config
@@ -102,44 +110,36 @@ class CtsFilter:
             "mark_price": round(mark_price, 4)
         }
 
-        # Simple expansion evidence aligned with CTS spec:
-        # - strong body relative to range
-        # - range expanding toward the average
-        body_ratio = current_body / current_range if current_range > 0 else 0.0
-        expansion_evidence = (
-            body_ratio >= 0.5 or
-            current_range >= average_range * 0.8 or
-            wick_signal != "none"
-        )
-
-        score = 0.0
+        # Scoring (restored 2026-09-15, review findings 4/7/8):
+        #   not compressed                     → 1.0  (normal expansion)
+        #   compressed + wick rejection        → 0.6 + wick strength bonus, capped at 1.0 (the trap pattern)
+        #   compressed + no rejection evidence → 0.0  (dead chop: HARD BLOCK — this is the gate's whole job)
+        # The reviewed diff floored the last case at 0.55, which made "❌ Block" unreachable.
         if not is_compressed:
             score = 1.0
             report["metrics"]["reason"] = "EXPANSION_NORMAL"
-        elif expansion_evidence:
-            # Compression present but we have impulse evidence; let it pass
-            score = 0.8
-            report["metrics"]["reason"] = "EXP_IMPULSE_CONFIRMED"
+        elif wick_signal != "none":
+            score = min(WICK_BASE_SCORE + (wick_strength - 1.0) * WICK_STRENGTH_WEIGHT, 1.0)
+            report["metrics"]["reason"] = "COMPRESSION_WITH_WICK_REJECTION"
         else:
-            # Still compressed with no expansion; keep it a soft flag (not hard block) so the pipeline can proceed
-            score = max(0.55, grind_ratio * 0.7)
+            score = 0.0
             report["metrics"]["reason"] = "COMPRESSION_NO_EXPANSION"
 
         report["score"] = round(score, 4)
 
-        if score >= 0.75:
-            report["flag"] = "✅ Hard Pass"; report["metrics"]["reason"] = report["metrics"].get("reason", "VALID_CANDLE_STRUCTURE")
+        if score >= HARD_PASS_SCORE:
+            report["flag"] = "✅ Hard Pass"
             self._low_score_streak = 0
-        elif score >= 0.50:
+        elif score >= SOFT_FLAG_SCORE:
             report["flag"] = "⚠️ Soft Flag"; report["metrics"]["reason"] = "WEAK_TRAP_SIGNAL"
             self._low_score_streak = 0
         else:
             report["flag"] = "❌ Block"; report["metrics"]["reason"] = "NO_TRAP_SIGNAL"
             self._low_score_streak += 1
 
-        # If we’ve seen repeated low scores, enter a short cooldown to avoid log/decision churn
-        if self._low_score_streak >= 5 and self._cooldown_until == 0.0:
-            self._cooldown_until = now + 3.0  # seconds
+        # Repeated blocks → short cooldown to avoid log/decision churn (now reachable again).
+        if self._low_score_streak >= LOW_SCORE_STREAK_LIMIT and self._cooldown_until == 0.0:
+            self._cooldown_until = now + COOLDOWN_SECONDS
             report["metrics"]["reason"] = "CTS_COOLDOWN_TRIGGERED"
             report["flag"] = "❌ Block"
             
