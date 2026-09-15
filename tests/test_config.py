@@ -38,3 +38,10 @@ def test_trailing_slash_on_provider_url_is_stripped(monkeypatch):
 
 def test_memory_db_path_is_configurable(config):
     assert config.memory_db_path == os.environ["MEMORY_DB_PATH"]
+
+
+def test_compression_range_ratio_must_be_positive(monkeypatch):
+    import pytest
+    monkeypatch.setenv("COMPRESSION_RANGE_RATIO", "0")
+    with pytest.raises(ValueError):
+        Config()

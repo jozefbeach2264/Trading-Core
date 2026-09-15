@@ -129,6 +129,8 @@ class Config:
             raise ValueError("ENGINE_CYCLE_INTERVAL must be a positive float.")
         if not 0 <= self.cts_narrow_range_ratio <= 1.0:
             raise ValueError("CTS_NARROW_RANGE_RATIO must be between 0 and 1.0.")
+        if not 0 < self.compression_range_ratio <= 1.0:
+            raise ValueError("COMPRESSION_RANGE_RATIO must be greater than 0 and at most 1.0.")
         if self.cts_wick_rejection_multiplier < 1.0:
             raise ValueError("CTS_WICK_REJECTION_MULTIPLIER must be >= 1.0.")
         if self.ai_confidence_threshold < 0 or self.ai_confidence_threshold > 1.0:

@@ -20,13 +20,19 @@ def test_compressed_without_wick_hard_blocks(config):
     assert report["metrics"]["wick_signal"] == "none"
 
 
-def test_repeated_blocks_reach_the_cooldown_path(config):
+def test_repeated_blocks_keep_evaluating_every_cycle(config):
+    """No cooldown: the gate must re-evaluate every cycle so the first expansion candle after a
+    compressed run is seen immediately (a 3 s blind window is a latency regression on a 200x scalper)."""
     cts = CtsFilter(config)
     ms = _compressed_no_wick(config)
     reports = [run(cts.generate_report(ms)) for _ in range(6)]
-    assert reports[4]["metrics"]["reason"] == "CTS_COOLDOWN_TRIGGERED"
-    assert reports[5]["metrics"]["reason"] == "CTS_COOLDOWN_ACTIVE"
     assert all(r["flag"] == "❌ Block" for r in reports)
+    assert reports[5]["metrics"]["block_streak"] == 6
+    ms.live_reconstructed_candle = make_live_candle(2994.0, 3006.0, 2994.0, 3006.0)  # expansion
+    ms.mark_price = 3000.0
+    after = run(cts.generate_report(ms))
+    assert after["flag"] == "✅ Hard Pass" and after["score"] == 1.0
+    assert after["metrics"]["block_streak"] == 0
 
 
 def test_not_compressed_is_a_hard_pass(config):

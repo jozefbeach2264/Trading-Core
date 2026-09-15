@@ -1,6 +1,5 @@
 import logging
 import json
-import time
 from typing import Dict, Any
 from config.config import Config
 from log_utils import file_logger
@@ -13,8 +12,6 @@ WICK_BASE_SCORE = 0.6          # compressed candle with a confirmed wick rejecti
 WICK_STRENGTH_WEIGHT = 0.2     # per unit of wick strength above the rejection threshold
 HARD_PASS_SCORE = 0.75
 SOFT_FLAG_SCORE = 0.50
-LOW_SCORE_STREAK_LIMIT = 5     # consecutive blocks before a short cooldown
-COOLDOWN_SECONDS = 3.0
 
 
 class CtsFilter:
@@ -25,7 +22,6 @@ class CtsFilter:
         self.narrow_range_ratio = self.config.cts_narrow_range_ratio
         self.rejection_multiplier = self.config.cts_wick_rejection_multiplier
         self._low_score_streak = 0
-        self._cooldown_until = 0.0
         self.logger.debug(
             "CtsFilter initialized: lookback=%d, narrow_range_ratio=%.2f, rejection_multiplier=%.2f",
             self.lookback_period, self.narrow_range_ratio, self.rejection_multiplier
@@ -33,19 +29,6 @@ class CtsFilter:
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         report = {"filter_name": "CtsFilter", "score": 0.0, "metrics": {}, "flag": "❌ Block"}
-        now = time.time()
-
-        # Cooldown: if we have repeatedly low scores, pause re-evaluation briefly to reduce churn
-        if now < self._cooldown_until:
-            report["metrics"]["reason"] = "CTS_COOLDOWN_ACTIVE"
-            report["score"] = 0.0
-            report["flag"] = "❌ Block"
-            await market_state.update_filter_audit_report("CtsFilter", report)
-            return report
-        # Reset cooldown sentinel if expired
-        if self._cooldown_until and now >= self._cooldown_until:
-            self._low_score_streak = 0
-            self._cooldown_until = 0.0
         klines = list(market_state.klines)
         live_candle = market_state.live_reconstructed_candle
         mark_price = market_state.mark_price or 0.0
@@ -136,12 +119,10 @@ class CtsFilter:
         else:
             report["flag"] = "❌ Block"; report["metrics"]["reason"] = "NO_TRAP_SIGNAL"
             self._low_score_streak += 1
-
-        # Repeated blocks → short cooldown to avoid log/decision churn (now reachable again).
-        if self._low_score_streak >= LOW_SCORE_STREAK_LIMIT and self._cooldown_until == 0.0:
-            self._cooldown_until = now + COOLDOWN_SECONDS
-            report["metrics"]["reason"] = "CTS_COOLDOWN_TRIGGERED"
-            report["flag"] = "❌ Block"
+        # Consecutive-block streak is reported as a metric only. The reviewed diff's "cooldown" (skip
+        # evaluation for 3 s after 5 blocks) would have blinded the primary gate for ~75% of wall-clock
+        # time during compression — exactly when the compression→expansion transition must be caught.
+        report["metrics"]["block_streak"] = self._low_score_streak
             
         self.logger.debug(f"CtsFilter report generated: {json.dumps(report)}")
         await market_state.update_filter_audit_report("CtsFilter", report)
