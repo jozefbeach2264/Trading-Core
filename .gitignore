@@ -13,3 +13,4 @@ logs/filters/*.log
 stuff
 =*
 .pytest_cache/
+.env.*
