@@ -72,6 +72,7 @@ async def lifespan(app: FastAPI):
     })
     
     await trade_executor.initialize()
+    await ai_client.check_provider()
     # Link event queue for intra-candle triggers
     okx_data_manager.set_event_queue(engine.event_queue)
     await okx_data_manager.start()

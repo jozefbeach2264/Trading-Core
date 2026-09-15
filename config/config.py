@@ -8,8 +8,11 @@ class Config:
         # Credentials & API Keys
         self.asterdex_api_key: str = os.getenv("ASTERDEX_API_KEY")
         self.asterdex_api_secret: str = os.getenv("ASTERDEX_API_SECRET")
-        self.xai_api_key: str = os.getenv("XAI_API_KEY")
-        self.ai_provider_url: str = os.getenv("AI_PROVIDER_URL", "https://api.x.ai/v1")
+        # AI verdict provider: any OpenAI-compatible chat-completions endpoint.
+        # Default = local llama-server (llm-serve <profile>) — Grok/xAI was retired 2026-09-15.
+        self.ai_provider_url: str = os.getenv("AI_PROVIDER_URL", "http://127.0.0.1:8081/v1").rstrip("/")
+        self.ai_api_key: str = os.getenv("AI_API_KEY") or os.getenv("XAI_API_KEY") or ""
+        self.ai_model: str = os.getenv("AI_MODEL", "local")
         self.okx_base_url: str = os.getenv("OKX_BASE_URL", "https://www.okx.com")
         self.asterdex_base_url: str = os.getenv("ASTERDEX_BASE_URL", "https://fapi.asterdex.com")
         self.okx_ws_url: str = os.getenv("OKX_WS_URL", "wss://ws.okx.com:8443/ws/v5/public")
@@ -20,7 +23,7 @@ class Config:
         self.adex_symbol: str = os.getenv("ADEX_SYMBOL", "ETHUSDT")
         self.dry_run_mode: bool = os.getenv('DRY_RUN_MODE', 'True').lower() == 'true'
         self.kline_deque_maxlen: int = int(os.getenv('KLINE_DEQUE_MAXLEN', '500'))
-        self.ai_client_timeout: int = int(os.getenv('AI_CLIENT_TIMEOUT', '5'))
+        self.ai_client_timeout: float = float(os.getenv('AI_CLIENT_TIMEOUT', '10'))
         self.engine_cycle_interval: float = float(os.getenv('ENGINE_CYCLE_INTERVAL', '0.2'))
 
         # Core Trading & Risk Parameters
@@ -69,6 +72,11 @@ class Config:
         
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
+        # Verdict generation budget. The reasoning string is only logged, so keep it short: fewer
+        # tokens = lower latency. Thinking/reasoning modes burn thousands of hidden tokens → off.
+        self.ai_max_tokens: int = int(os.getenv('AI_MAX_TOKENS', '160'))
+        self.ai_disable_thinking: bool = os.getenv('AI_DISABLE_THINKING', 'True').lower() == 'true'
+        self.ai_temperature: float = float(os.getenv('AI_TEMPERATURE', '0.2'))
 
         # Memory tracker (SQLite). Filter history is write-only data at ~45 rows/s — off by default.
         self.memory_db_path: str = os.getenv("MEMORY_DB_PATH", "./logs/memory_tracker.db")
@@ -101,8 +109,10 @@ class Config:
     def _validate(self):
         # Validate Credentials
         if not self.dry_run_mode:
-            if not self.asterdex_api_key or not self.asterdex_api_secret or not self.xai_api_key:
-                raise ValueError("API keys for Asterdex and XAI must be provided when not in dry run mode.")
+            if not self.asterdex_api_key or not self.asterdex_api_secret:
+                raise ValueError("ASTERDEX_API_KEY and ASTERDEX_API_SECRET must be provided when not in dry run mode.")
+        if not self.ai_provider_url:
+            raise ValueError("AI_PROVIDER_URL must be set (OpenAI-compatible chat-completions base URL).")
 
         # Validate Numerical Ranges
         if not 0 < self.risk_cap_percent <= 1.0:
@@ -110,7 +120,9 @@ class Config:
         if self.leverage <= 0:
             raise ValueError("LEVERAGE must be a positive integer.")
         if self.ai_client_timeout <= 0:
-            raise ValueError("AI_CLIENT_TIMEOUT must be a positive integer.")
+            raise ValueError("AI_CLIENT_TIMEOUT must be a positive number of seconds.")
+        if self.ai_max_tokens <= 0:
+            raise ValueError("AI_MAX_TOKENS must be a positive integer.")
         if self.engine_cycle_interval <= 0:
             raise ValueError("ENGINE_CYCLE_INTERVAL must be a positive float.")
         if not 0 <= self.cts_narrow_range_ratio <= 1.0:
