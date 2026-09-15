@@ -6,6 +6,18 @@ from data_managers.market_state import MarketState
 
 logger = logging.getLogger(__name__)
 
+TREND_LOOKBACK_CANDLES = 10
+FORECAST_HORIZON_CANDLES = 6
+TREND_WEIGHT = 0.5
+PRESSURE_WEIGHT = 0.3
+SENTIMENT_WEIGHT = 0.2
+NEUTRAL_TERM = 0.5
+
+
+def _clamp01(value: float) -> float:
+    return max(0.0, min(float(value), 1.0))
+
+
 class RollingLifecycleState:
     """
     Tracks the per-trade Rolling5 lifecycle (C1–C5 + REM extensions).
@@ -70,7 +82,7 @@ class Rolling5Engine:
     def _calculate_trend(self, klines: List[List[Any]]) -> Dict[str, float]:
         """Calculates the linear regression trendline for the given klines."""
         # MarketState stores klines newest-first; reverse to chronological for regression
-        recent_klines = list(reversed(klines[:10]))
+        recent_klines = list(reversed(klines[:TREND_LOOKBACK_CANDLES]))
         y = [float(k[4]) for k in recent_klines]  # Closing prices in time order
         x = list(range(len(y)))
         n = len(y)
@@ -92,7 +104,7 @@ class Rolling5Engine:
 
     def _calculate_average_range(self, klines: List[List[Any]]) -> float:
         """Calculates the average candle range (high - low) for volatility."""
-        recent_klines = klines[:10]
+        recent_klines = klines[:TREND_LOOKBACK_CANDLES]
         if not recent_klines:
             return 0.0
         
@@ -114,85 +126,92 @@ class Rolling5Engine:
                 pass
         return None
 
-    async def generate_forecast(self, market_state: MarketState) -> Dict[str, Any]:
+    @staticmethod
+    def _reversal_likelihood(direction: Optional[str], slope: float, average_range: float,
+                             bid_pressure: float, ask_pressure: float, sentiment_report: Dict[str, Any]) -> float:
+        """Probability-like score in [0, 1] that price reverses AGAINST the trade.
+
+        Rewritten 2026-09-15: the previous formula added a ≈1.0 "mark price factor" to a 0.17–1.0 trend
+        term, so after clamping it was 1.0 on every cycle (see logs/ai_model.log history) and the AI
+        aborted every trade. Three direction-aware terms, weights sum to 1:
+          trend     projected drift over the forecast horizon, in average-range units, mapped so that
+                    one full range against the trade → 1.0, flat → 0.5, one full range with it → 0.0
+          pressure  order-book imbalance against the trade (0.5 = balanced)
+          sentiment CVD divergence against the trade (0 unless the SentimentDivergenceFilter flagged it)
+        """
+        sign = {"LONG": 1.0, "SHORT": -1.0}.get((direction or "").upper(), 0.0)
+
+        if sign and average_range > 0:
+            # Drift over the horizon in average-range units, signed against the trade:
+            # +1 range against → 1.0, flat → 0.5, +1 range with the trade → 0.0.
+            adverse_ranges = -sign * slope * FORECAST_HORIZON_CANDLES / average_range
+            trend_term = _clamp01((1.0 + adverse_ranges) / 2.0)
+        else:
+            trend_term = NEUTRAL_TERM
+
+        total_pressure = bid_pressure + ask_pressure
+        imbalance = (bid_pressure - ask_pressure) / total_pressure if total_pressure > 0 else 0.0  # +1 = all bids
+        pressure_term = _clamp01((1.0 - sign * imbalance) / 2.0)
+
+        divergence = (sentiment_report.get("metrics") or {}).get("divergence_type", "none")
+        opposes_trade = (sign > 0 and divergence == "bearish") or (sign < 0 and divergence == "bullish")
+        sentiment_term = _clamp01(1.0 - float(sentiment_report.get("score", 1.0))) if opposes_trade else 0.0
+
+        score = (TREND_WEIGHT * trend_term + PRESSURE_WEIGHT * pressure_term + SENTIMENT_WEIGHT * sentiment_term)
+        return round(_clamp01(score), 4)
+
+    async def generate_forecast(self, market_state: MarketState, direction: Optional[str] = None) -> Dict[str, Any]:
         """
         Generates a 6-candle forecast including a projected high/low range and a
-        reversal likelihood score based on trend, volatility, and order book pressure.
-        Also returns lifecycle metadata if a lifecycle session is active.
+        reversal likelihood score (against `direction`) based on trend, order book
+        pressure and CVD divergence. Also returns lifecycle metadata if a lifecycle
+        session is active.
         """
         klines = list(market_state.klines)
-        mark_price = market_state.mark_price or 0.0
         lifecycle_meta = self.lifecycle.update(self._current_candle_ts(market_state))
+        bid_pressure = market_state.order_book_pressure.get("bid_pressure", 0.0)
+        ask_pressure = market_state.order_book_pressure.get("ask_pressure", 0.0)
 
         report = {
             "forecast_generated": False,
-            "reversal_zone_strength": 0.0,
+            "reversal_likelihood_score": 0.0,
             "forecast": {},
             "order_book_metrics": {
-                "bid_pressure": market_state.order_book_pressure.get("bid_pressure", 0.0),
-                "ask_pressure": market_state.order_book_pressure.get("ask_pressure", 0.0),
+                "bid_pressure": bid_pressure,
+                "ask_pressure": ask_pressure,
                 "bid_walls": market_state.order_book_walls.get("bid_walls", []),
                 "ask_walls": market_state.order_book_walls.get("ask_walls", [])
             },
             "lifecycle": lifecycle_meta
         }
 
-        if len(klines) < 10:
+        if len(klines) < TREND_LOOKBACK_CANDLES:
             logger.debug("Insufficient klines for forecast: %d", len(klines))
             return report
 
         trend = self._calculate_trend(klines)
         slope, intercept = trend["slope"], trend["intercept"]
         average_range = self._calculate_average_range(klines)
-        
+
         # Project the next 6 candle close prices based on the trend
-        recent_len = min(len(klines), 10)
+        recent_len = min(len(klines), TREND_LOOKBACK_CANDLES)
         last_index = max(recent_len - 1, 0)
-        projected_prices = [intercept + slope * (last_index + i) for i in range(1, 7)]
-        
+        projected_prices = [intercept + slope * (last_index + i) for i in range(1, FORECAST_HORIZON_CANDLES + 1)]
+
         predictions = {}
         for i, pred_price in enumerate(projected_prices, 1):
-            # Create a high/low range using the average volatility
-            projected_high = pred_price + (average_range / 2)
-            projected_low = pred_price - (average_range / 2)
-            
-            # The forecast now includes the necessary high and low values
             predictions[f"c{i}"] = {
-                "high": round(projected_high, 4),
-                "low": round(projected_low, 4)
+                "high": round(pred_price + (average_range / 2), 4),
+                "low": round(pred_price - (average_range / 2), 4)
             }
 
-        # --- Reversal Score Calculation (remains the same) ---
         sentiment_report = market_state.filter_audit_report.get("SentimentDivergenceFilter", {})
-        
-        peak_price = max(projected_prices)
-        peak_index = projected_prices.index(peak_price)
-        internal_score = (6 - peak_index) / 6.0
-        
-        sentiment_confidence = sentiment_report.get("score", 1.0)
-        sentiment_direction = sentiment_report.get("metrics", {}).get("divergence_type", "none")
-
-        external_booster = 0.0
-        if sentiment_direction == "bearish" and slope > 0:
-            external_booster = (1.0 - sentiment_confidence) * -1
-        elif sentiment_direction == "bullish" and slope < 0:
-            external_booster = (1.0 - sentiment_confidence) * -1
-            
-        bid_pressure = market_state.order_book_pressure.get("bid_pressure", 0.0)
-        ask_pressure = market_state.order_book_pressure.get("ask_pressure", 0.0)
-        total_pressure = bid_pressure + ask_pressure
-        pressure_factor = (bid_pressure - ask_pressure) / total_pressure if total_pressure > 0 else 0.0
-        pressure_adjustment = pressure_factor * 0.2
-
-        mark_price_factor = 0.0
-        if mark_price > 0 and peak_price > 0:
-            mark_price_factor = 1 - (abs(mark_price - peak_price) / mark_price) * 0.1
-            
-        reversal_score = internal_score + (external_booster * 0.5) + pressure_adjustment + mark_price_factor
+        reversal_score = self._reversal_likelihood(direction, float(slope), average_range,
+                                                   bid_pressure, ask_pressure, sentiment_report)
 
         report.update({
             "forecast_generated": True,
-            "reversal_zone_strength": round(max(0, min(reversal_score, 1.0)), 4),
+            "reversal_likelihood_score": reversal_score,
             "forecast": predictions,
             "lifecycle": lifecycle_meta
         })

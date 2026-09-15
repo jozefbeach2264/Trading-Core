@@ -86,7 +86,7 @@ class AIStrategy(AIStrategyProtocol):
             return {"reason": reason, "validator_report": final_validator_log}
         self.logger.info("Post-Signal Validators passed. Proceeding to AI Core.")
         
-        forecast = await self.forecaster.generate_forecast(market_state)
+        forecast = await self.forecaster.generate_forecast(market_state, signal_packet.get("direction"))
         
         # Create flat context_packet for AIClient
         snapshot = market_state.get_latest_data_snapshot()
@@ -100,6 +100,7 @@ class AIStrategy(AIStrategyProtocol):
             "close": candle[4],
             "volume": candle[5],
             "direction": signal_packet.get("direction", "N/A"),
+            # Canonical key (2026-09-15): the forecaster emits exactly this name (review findings 1/9/10).
             "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
             "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
             "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
@@ -119,10 +120,8 @@ class AIStrategy(AIStrategyProtocol):
             confidence = 0.0
         
         log_reason = ai_verdict.get('reasoning', 'No reasoning provided')
-        if ai_verdict.get("action") == "⛔ Abort" and "AI request timed out" in log_reason:
-            self.logger.error(f"AI VERDICT FAILED: Request Timed Out.")
-        elif ai_verdict.get("action") == "⛔ Abort" and "Invalid JSON" in log_reason:
-            self.logger.error(f"AI VERDICT FAILED: Unreadable Response. Reason: {log_reason}")
+        if ai_verdict.get("action") == "🤔 Reanalyze" and confidence == 0.0:
+            self.logger.error(f"AI VERDICT UNAVAILABLE: {log_reason}")
         else:
             self.logger.info(f"AI VERDICT: Action={ai_verdict.get('action')}, Confidence={confidence:.2f}, Reasoning='{log_reason}'")
 
