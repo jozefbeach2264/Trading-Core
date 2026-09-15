@@ -124,12 +124,20 @@ class MemoryTracker:
     def filter_history_enabled(self) -> bool:
         return bool(getattr(self.config, "memory_filter_history", False))
 
+    async def _write(self, filter_rows: List[tuple], trade_rows: List[tuple]) -> None:
+        """Off-loop write. A storage failure is logged, never raised: a history write must
+        not stall the trading cycle (the engine sleeps 60 s on an escaped exception)."""
+        try:
+            await asyncio.to_thread(self._store.write, filter_rows, trade_rows)
+        except sqlite3.Error as e:
+            logger.error("MemoryTracker write failed (%d filter rows, %d trade rows): %r",
+                         len(filter_rows), len(trade_rows), e)
+
     async def update_filter_reports(self, reports: List[Dict[str, Any]]) -> None:
         """Persist a whole cycle's filter reports in ONE transaction, off-loop."""
         if not self.filter_history_enabled or not reports:
             return
-        rows = [_filter_row(r) for r in reports if isinstance(r, dict)]
-        await asyncio.to_thread(self._store.write, rows, [])
+        await self._write([_filter_row(r) for r in reports if isinstance(r, dict)], [])
 
     async def update_memory(self, filter_report: Optional[Dict[str, Any]] = None,
                             trade_data: Optional[Dict[str, Any]] = None) -> None:
@@ -138,7 +146,7 @@ class MemoryTracker:
         trade_rows = [_trade_row(trade_data)] if trade_data else []
         if not filter_rows and not trade_rows:
             return
-        await asyncio.to_thread(self._store.write, filter_rows, trade_rows)
+        await self._write(filter_rows, trade_rows)
         logger.debug("Memory database updated.")
 
     def get_memory(self) -> Dict[str, Any]:

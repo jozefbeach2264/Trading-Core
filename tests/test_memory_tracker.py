@@ -42,3 +42,15 @@ def test_db_uses_wal_journal(config):
     MemoryTracker(config)
     with sqlite3.connect(config.memory_db_path) as conn:
         assert conn.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
+
+
+def test_storage_errors_never_escape_into_the_cycle(config):
+    config.memory_filter_history = True
+    tracker = MemoryTracker(config)
+
+    def boom(*_a, **_kw):
+        raise sqlite3.OperationalError("database is locked")
+
+    tracker._store.write = boom
+    run(tracker.update_filter_reports(_reports(2)))   # must not raise
+    run(tracker.update_memory(trade_data={"direction": "LONG"}))
