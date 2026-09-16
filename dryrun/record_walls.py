@@ -32,7 +32,7 @@ async def main():
     ap.add_argument("--inst", default="ETH-USDT-SWAP")
     a = ap.parse_args()
     book = L2Book()
-    tracker = WallTracker(min_share=0.07, skip_levels=3, min_age_s=5.0)
+    tracker = WallTracker(size_multiple=8.0, skip_levels=3, min_age_s=10.0, max_distance_pct=0.15)
     live = {}                 # (side, price) -> record being built
     mids = deque()            # (ts, mid) for looking forward
     pending = []              # records waiting for their horizons to elapse
@@ -62,32 +62,14 @@ async def main():
             while mids and now - mids[0][0] > max(HORIZONS) + 60:
                 mids.popleft()
 
-            walls = tracker.update(depth, now)
-            seen = set()
-            for side_key, side in (("bid_walls", "bid"), ("ask_walls", "ask")):
-                for w in walls[side_key]:
-                    key = (side, w["price"])
-                    seen.add(key)
-                    rec = live.get(key)
-                    if rec is None:
-                        live[key] = {"side": side, "price": w["price"], "first_seen": now, "mid_at_appear": mid,
-                                     "peak_qty": w["qty"], "peak_share": w["share"], "last_qty": w["qty"],
-                                     "distance_pct": (w["price"] - mid) / mid * 100}
-                    else:
-                        rec["peak_qty"] = max(rec["peak_qty"], w["qty"])
-                        rec["peak_share"] = max(rec["peak_share"], w["share"])
-                        rec["last_qty"] = w["qty"]
-            # walls that vanished from the tracker this tick: resolve them
-            for key in [k for k in live if k not in seen]:
-                rec = live.pop(key)
-                side, price = key
-                # was it eaten (price traded through it) or pulled (size withdrawn)?
-                traded_through = (mid <= price) if side == "bid" else (mid >= price)
-                rec.update({"ended": now, "lifetime_s": round(now - rec["first_seen"], 1),
-                            "outcome": "absorbed" if traded_through else
-                                       ("pulled" if rec["last_qty"] < rec["peak_qty"] * PULLED_FRACTION else "faded"),
-                            "mid_at_end": mid})
-                pending.append(rec)
+            depth_full = book.top(400)
+            walls = tracker.update(depth_full, now, mid=mid)
+            # the tracker now reports each wall's ENDING itself, with how it ended
+            for e in walls.get("events", []):
+                pending.append({"side": e["side"], "price": e["price"], "first_seen": now - e["lifetime_s"],
+                                "mid_at_appear": mid, "peak_qty": e["peak_qty"], "last_qty": e["last_qty"],
+                                "distance_pct": e.get("distance_pct"), "lifetime_s": e["lifetime_s"],
+                                "outcome": e["outcome"], "mid_at_end": mid, "ended": now})
             # write out records whose longest horizon has elapsed
             ready = [r for r in pending if now - r["first_seen"] >= max(HORIZONS)]
             for r in ready:

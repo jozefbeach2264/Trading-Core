@@ -49,9 +49,17 @@ class Config:
         # Wall detection: "depth_share" (level ≥ WALL_MIN_DEPTH_SHARE of the side's visible depth (hysteresis: stays tracked ≥ half), beyond the best
         # WALL_SKIP_LEVELS, alive ≥ WALL_MIN_AGE_S — calibrated live 2026-09-16) or "multiplier" (legacy: ≥ N × the
         # top-of-book quantity, which on this market is the largest level and therefore never finds anything).
-        self.wall_mode: str = os.getenv("WALL_MODE", "depth_share").strip()
-        self.wall_min_depth_share: float = float(os.getenv("WALL_MIN_DEPTH_SHARE", "0.07"))
+        self.wall_mode: str = os.getenv("WALL_MODE", "size_persistence").strip()
+        # A wall is a price level whose size reaches WALL_SIZE_MULTIPLE x the typical level size on its side
+        # (slow EWMA baseline) and that has rested there for WALL_MIN_AGE_S. Calibrated live 2026-09-16:
+        # levels of 200+ contracts persist a median 77 s, so this is a real, observable object.
+        self.wall_size_multiple: float = float(os.getenv("WALL_SIZE_MULTIPLE", "6.0"))
         self.wall_skip_levels: int = int(os.getenv("WALL_SKIP_LEVELS", "3"))
+        # Levels the wall tracker watches. Must span enough PRICE for a wall to stay in view: 50 levels on a
+        # $0.01 tick is only $0.50 and price leaves it in seconds; 400 spans ~$4.
+        self.wall_book_levels: int = int(os.getenv("WALL_BOOK_LEVELS", "400"))
+        # Only walls this close to price are "in play" — further out is inventory, not a trap.
+        self.wall_max_distance_pct: float = float(os.getenv("WALL_MAX_DISTANCE_PCT", "0.15"))
         self.wall_min_age_s: float = float(os.getenv("WALL_MIN_AGE_S", "5"))
         
         # System & Operational Parameters
@@ -225,10 +233,10 @@ class Config:
             raise ValueError("ORDERBOOK_CHANNEL must be 'books' or 'books5'.")
         if self.orderbook_depth_levels <= 0:
             raise ValueError("ORDERBOOK_DEPTH_LEVELS must be a positive integer.")
-        if self.wall_mode not in ("depth_share", "multiplier"):
-            raise ValueError("WALL_MODE must be 'depth_share' or 'multiplier'.")
-        if not 0 < self.wall_min_depth_share < 1 or self.wall_skip_levels < 0 or self.wall_min_age_s < 0:
-            raise ValueError("WALL_MIN_DEPTH_SHARE must be in (0,1); WALL_SKIP_LEVELS and WALL_MIN_AGE_S must be >= 0.")
+        if self.wall_mode not in ("size_persistence", "multiplier"):
+            raise ValueError("WALL_MODE must be 'size_persistence' or 'multiplier'.")
+        if self.wall_size_multiple <= 1 or self.wall_skip_levels < 0 or self.wall_min_age_s < 0:
+            raise ValueError("WALL_SIZE_MULTIPLE must be > 1; WALL_SKIP_LEVELS and WALL_MIN_AGE_S must be >= 0.")
         if not self.ai_provider_url:
             raise ValueError("AI_PROVIDER_URL must be set (OpenAI-compatible chat-completions base URL).")
         expected = expected_exchange_symbol(self.trading_symbol)

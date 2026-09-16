@@ -79,28 +79,67 @@ def _side(n=50, base=1.0):
     return [base] * n
 
 
-def test_wall_tracker_requires_share_distance_and_persistence():
+def test_wall_tracker_follows_a_level_for_its_whole_life():
+    """The old share-based test re-evaluated a moving threshold every tick, so one motionless 90-second whale
+    order was reported as dozens of separate 0.1-second walls. A wall is a LEVEL, tracked while it rests."""
     from data_managers.orderbook_parser import WallTracker
-    tr = WallTracker(min_share=0.10, skip_levels=3, min_age_s=5.0)
-    qtys = [30.0, 2.0, 1.0] + [1.0] * 47                    # touch holds most depth; nothing beyond it is big
-    qtys[10] = 12.0                                          # a level 7 deep holding 12/92 ≈ 13% of the side
-    bids = [(3000 - i * 0.1, q) for i, q in enumerate(qtys)]
-    asks = [(3000.1 + i * 0.1, 1.0) for i in range(50)]
-    tr.update({"bids": bids, "asks": asks}, now=100.0)
-    dipped = list(qtys); dipped[0] = 90.0                    # touch balloons: the level's share dips to 12/152 ≈ 8% (< 10%, ≥ 5%)
-    tr.update({"bids": [(3000 - i * 0.1, q) for i, q in enumerate(dipped)], "asks": asks}, now=102.0)
-    assert ("bids", 2999.0) in tr._first_seen, "hysteresis keeps the level tracked through a share dip"
-    assert tr.update({"bids": bids, "asks": asks}, now=105.0)["bid_walls"][0]["age_s"] == 5.0
-    tr = WallTracker(min_share=0.10, skip_levels=3, min_age_s=5.0)
-    bids = [(3000 - i * 0.1, q) for i, q in enumerate(qtys)]
-    asks = [(3000.1 + i * 0.1, 1.0) for i in range(50)]
-    assert tr.update({"bids": bids, "asks": asks}, now=100.0) == {"bid_walls": [], "ask_walls": []}   # seen, not yet aged
-    assert tr.update({"bids": bids, "asks": asks}, now=104.9)["bid_walls"] == []
-    walls = tr.update({"bids": bids, "asks": asks}, now=105.0)["bid_walls"]
-    assert len(walls) == 1 and walls[0]["price"] == 2999.0 and walls[0]["qty"] == 12.0 and walls[0]["age_s"] == 5.0
-    big_touch = [(3000 - i * 0.1, q) for i, q in enumerate([80.0] + [1.0] * 49)]          # touch is huge: not a wall
-    assert tr.update({"bids": big_touch, "asks": asks}, now=200.0)["bid_walls"] == []
-    assert tr.update({"bids": bids, "asks": asks}, now=201.0)["bid_walls"] == []              # it left and came back: age resets
+    tr = WallTracker(size_multiple=6.0, skip_levels=3, min_age_s=5.0)
+    quiet = [3.0] * 50
+    big = list(quiet); big[10] = 600.0                     # a whale order 200x the typical level
+    def depth(bid_qtys):
+        return {"bids": [(3000 - i * 0.1, q) for i, q in enumerate(bid_qtys)],
+                "asks": [(3000.1 + i * 0.1, 3.0) for i in range(50)]}
+    for tick in range(40):                                  # it rests for 4 s: not yet old enough
+        r = tr.update(depth(big), 100.0 + tick * 0.1, mid=3000.05)
+    assert r["bid_walls"] == []
+    r = tr.update(depth(big), 105.0, mid=3000.05)           # past min_age_s
+    assert len(r["bid_walls"]) == 1 and r["bid_walls"][0]["price"] == 2999.0
+    for tick in range(100):                                 # it keeps resting — still ONE wall, not many
+        r = tr.update(depth(big), 105.0 + tick * 0.1, mid=3000.05)
+        assert len(r["bid_walls"]) == 1 and r["events"] == []
+    assert r["bid_walls"][0]["age_s"] > 14
+
+
+def test_a_pulled_wall_is_reported_as_an_event():
+    from data_managers.orderbook_parser import WallTracker
+    tr = WallTracker(size_multiple=6.0, skip_levels=3, min_age_s=2.0)
+    quiet = [3.0] * 50
+    big = list(quiet); big[10] = 600.0
+    def depth(qtys):
+        return {"bids": [(3000 - i * 0.1, q) for i, q in enumerate(qtys)],
+                "asks": [(3000.1 + i * 0.1, 3.0) for i in range(50)]}
+    for tick in range(40):
+        tr.update(depth(big), 100.0 + tick * 0.1, mid=3000.05)
+    ev = tr.update(depth(quiet), 110.0, mid=3000.05)["events"]      # the whale withdraws
+    assert len(ev) == 1 and ev[0]["outcome"] == "pulled" and ev[0]["side"] == "bid"
+    assert ev[0]["peak_qty"] == 600.0 and ev[0]["lifetime_s"] >= 2.0
+
+
+def test_an_absorbed_wall_is_distinguished_from_a_pulled_one():
+    from data_managers.orderbook_parser import WallTracker
+    tr = WallTracker(size_multiple=6.0, skip_levels=3, min_age_s=2.0)
+    big = [3.0] * 50; big[10] = 600.0
+    def depth(qtys):
+        return {"bids": [(3000 - i * 0.1, q) for i, q in enumerate(qtys)],
+                "asks": [(3000.1 + i * 0.1, 3.0) for i in range(50)]}
+    for tick in range(40):
+        tr.update(depth(big), 100.0 + tick * 0.1, mid=3000.05)
+    # price trades down THROUGH the wall's price → it was eaten, not pulled
+    ev = tr.update(depth([3.0] * 50), 110.0, mid=2998.5)["events"]
+    assert len(ev) == 1 and ev[0]["outcome"] == "absorbed"
+
+
+def test_ordinary_churn_never_becomes_a_wall():
+    from data_managers.orderbook_parser import WallTracker
+    tr = WallTracker(size_multiple=6.0, skip_levels=3, min_age_s=5.0)
+    import random
+    rnd = random.Random(7)
+    for tick in range(200):
+        qtys = [rnd.uniform(1.0, 8.0) for _ in range(50)]     # noisy but nothing whale-sized
+        d = {"bids": [(3000 - i * 0.1, q) for i, q in enumerate(qtys)],
+             "asks": [(3000.1 + i * 0.1, 3.0) for i in range(50)]}
+        r = tr.update(d, 100.0 + tick * 0.1, mid=3000.05)
+        assert r["bid_walls"] == [], "dust must never qualify as a whale wall"
 
 
 def test_thinning_of_tracked_walls_is_per_price():

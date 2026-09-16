@@ -19,7 +19,10 @@ class MarketState:
         self.last_update_time: float = time.time()
         self.order_book_parser = OrderBookParser()
         self.l2_book = L2Book()
-        self.wall_tracker = WallTracker(config.wall_min_depth_share, config.wall_skip_levels, config.wall_min_age_s)
+        self.wall_tracker = WallTracker(config.wall_size_multiple, config.wall_skip_levels,
+                                        config.wall_min_age_s, config.wall_max_distance_pct)
+        self.wall_events: List[Dict[str, Any]] = []              # endings from the most recent book update
+        self.recent_wall_events: deque = deque(maxlen=200)       # rolling history for TrapX
         self.initial_data_ready = asyncio.Event()
 
         # --- Caching Flag ---
@@ -121,9 +124,16 @@ class MarketState:
             logger.debug("Order book metrics are dirty. Recalculating...")
             self.order_book_pressure = self.order_book_parser.calculate_pressure_vectors(self.depth_20)
             now = time.time()
-            if self.config.wall_mode == "depth_share":
+            if self.config.wall_mode == "size_persistence":
                 previous_walls = self.order_book_walls
-                self.order_book_walls = self.wall_tracker.update(self.depth_20, now)
+                bids, asks = self.depth_20.get("bids") or [], self.depth_20.get("asks") or []
+                mid = (bids[0][0] + asks[0][0]) / 2.0 if bids and asks else None
+                # The wall tracker needs the FULL book: 50 levels on a $0.01 tick spans only $0.50, and price
+                # walks out of that in seconds, so a resting wall looked like it vanished every few ticks.
+                self.order_book_walls = self.wall_tracker.update(self.l2_book.top(self.config.wall_book_levels), now, mid=mid)
+                # Wall endings are the TrapX signal: a pulled wall is a trap being sprung.
+                self.wall_events = list(self.order_book_walls.get("events") or [])
+                self.recent_wall_events.extend(self.wall_events)
                 # Thinning = what happened to the walls we KNEW about, at their price, in the current book.
                 tick = self.order_book_parser.thinning_of_walls(previous_walls, self.depth_20)
             else:
