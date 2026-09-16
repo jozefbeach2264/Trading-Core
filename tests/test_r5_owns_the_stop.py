@@ -104,3 +104,20 @@ def test_rolling5_widens_scalpels_stop_before_the_trade_is_judged_or_sized(confi
     # 1.5 x the c5 half-width of 10 = 15 below a 3000 entry, and it is Rolling5's number that survives
     assert result["stop_loss"] == pytest.approx(2985.0)
     assert result["stop_loss"] != 2998.5, "Scalpel's geometry must not decide when the trade dies"
+
+
+def test_both_stops_are_recorded_whichever_one_wins():
+    """A trade record has to answer 'who set this stop?' without inference."""
+    widened = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2997.0}
+    apply_predicted_stop(widened, BAND, CFG)
+    assert widened["module_stop"] == pytest.approx(2997.0) and widened["r5_stop"] == pytest.approx(2985.0)
+    assert widened["stop_loss"] == pytest.approx(2985.0)
+
+    kept = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2950.0}
+    apply_predicted_stop(kept, BAND, CFG)
+    assert kept["module_stop"] == pytest.approx(2950.0) and kept["r5_stop"] == pytest.approx(2985.0)
+    assert kept["stop_loss"] == pytest.approx(2950.0), "the wider module stop stands"
+
+    no_band = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2997.0}
+    apply_predicted_stop(no_band, {}, CFG)
+    assert no_band["r5_stop"] is None, "None means Rolling5 had no band, not that it agreed"

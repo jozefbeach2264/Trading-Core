@@ -84,7 +84,11 @@ def apply_predicted_stop(signal: Dict[str, Any], band: Optional[Dict[str, Dict[s
     fee a bigger notional to feed on, so the entry module's stop stays the floor.
     """
     entry = float(signal.get("entry_price") or 0.0)
+    # Always record what each side wanted, whichever wins, so a trade record answers "who set this stop?"
+    # without inference. A missing r5_stop means Rolling5 had no band — too few candles, or zero volatility.
+    signal["module_stop"] = signal.get("stop_loss")
     proposed = predicted_stop(signal.get("direction"), entry, band, config)
+    signal["r5_stop"] = proposed
     if proposed is None:
         return None
     sign = _sign(signal.get("direction"))

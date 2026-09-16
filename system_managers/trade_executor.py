@@ -404,6 +404,11 @@ class TradeExecutor:
             "stop_loss": _as_float(signal.get("stop_loss")),
             "take_profit": _as_float(signal.get("take_profit")),
             "initial_risk": abs(entry_price - _as_float(signal.get("stop_loss"))) if _as_float(signal.get("stop_loss")) else None,
+            # Who set the stop: the entry module's own number, Rolling5's predicted number, and the note if
+            # Rolling5 overrode it. r5_stop = None means Rolling5 had no forecast band at that moment.
+            "module_stop": _as_float(signal.get("module_stop")),
+            "r5_stop": _as_float(signal.get("r5_stop")),
+            "stop_note": signal.get("stop_note"),
             "best_price": entry_price,
             "worst_price": entry_price,
             "opened_at": datetime.now(timezone.utc).timestamp(),
