@@ -19,6 +19,7 @@ from system_managers.trade_executor import TradeExecutor
 from system_managers.engine import Engine
 from memory_tracker import MemoryTracker
 import log_utils
+from freshness import market_data_age_s
 
 config = Config()
 
@@ -109,6 +110,27 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/status")
 async def get_status():
     return {"status": "ok", "service": "REALITY_CORE"}
+
+
+@app.get("/stats")
+async def get_stats():
+    """Dry-run scoreboard: simulation statistics, the open position, lifecycle and feed freshness."""
+    engine = app_state.get("engine")
+    executor = engine.trade_executor if engine else None
+    market_state = engine.market_state if engine else None
+    state = await asyncio.to_thread(executor._get_simulation_state) if executor and config.dry_run_mode else {}
+    lifecycle = engine._lifecycle() if engine else None
+    return {
+        "mode": "DRY_RUN" if config.dry_run_mode else "LIVE",
+        "model": config.ai_model, "provider": config.ai_provider_url,
+        "balance": state.get("balance"), "initial_capital": state.get("initial_capital"),
+        "open_position": (state.get("positions") or {}).get(config.adex_symbol),
+        "stats": state.get("stats"),
+        "lifecycle": {"active": lifecycle.active, "candle_count": lifecycle.candle_count} if lifecycle else None,
+        "mark_price": market_state.mark_price if market_state else None,
+        "market_data_age_s": round(market_data_age_s(market_state), 2) if market_state else None,
+        "klines": len(market_state.klines) if market_state else 0,
+    }
 
 @app.get("/")
 async def root():
