@@ -73,3 +73,32 @@ def test_wall_threshold_uses_best_ask_not_deepest():
         {"bids": [(3000.0, 1.0)] * 5, "asks": [(3000.1, 1.0), (3000.2, 1.0), (3000.3, 12.0), (3000.4, 1.0), (3000.5, 30.0)]},
         multiplier=10.0)
     assert [w["qty"] for w in walls["ask_walls"]] == [12.0, 30.0]
+
+
+def _side(n=50, base=1.0):
+    return [base] * n
+
+
+def test_wall_tracker_requires_share_distance_and_persistence():
+    from data_managers.orderbook_parser import WallTracker
+    tr = WallTracker(min_share=0.10, skip_levels=3, min_age_s=5.0)
+    qtys = [30.0, 2.0, 1.0] + [1.0] * 47                    # touch holds most depth; nothing beyond it is big
+    qtys[10] = 12.0                                          # a level 7 deep holding 12/92 ≈ 13% of the side
+    bids = [(3000 - i * 0.1, q) for i, q in enumerate(qtys)]
+    asks = [(3000.1 + i * 0.1, 1.0) for i in range(50)]
+    assert tr.update({"bids": bids, "asks": asks}, now=100.0) == {"bid_walls": [], "ask_walls": []}   # seen, not yet aged
+    assert tr.update({"bids": bids, "asks": asks}, now=104.9)["bid_walls"] == []
+    walls = tr.update({"bids": bids, "asks": asks}, now=105.0)["bid_walls"]
+    assert len(walls) == 1 and walls[0]["price"] == 2999.0 and walls[0]["qty"] == 12.0 and walls[0]["age_s"] == 5.0
+    big_touch = [(3000 - i * 0.1, q) for i, q in enumerate([80.0] + [1.0] * 49)]          # touch is huge: not a wall
+    assert tr.update({"bids": big_touch, "asks": asks}, now=200.0)["bid_walls"] == []
+    assert tr.update({"bids": bids, "asks": asks}, now=201.0)["bid_walls"] == []              # it left and came back: age resets
+
+
+def test_thinning_of_tracked_walls_is_per_price():
+    parser = OrderBookParser()
+    walls = {"bid_walls": [{"price": 2999.0, "qty": 12.0}], "ask_walls": []}
+    book = {"bids": [(3000.0, 30.0), (2999.9, 2.0), (2999.0, 3.0)], "asks": [(3000.1, 1.0)]}
+    m = parser.thinning_of_walls(walls, book)
+    assert abs(m["bid_thin_rate"] - 75.0) < 1e-9 and m["ask_thin_rate"] == 0.0 and abs(m["spoof_thin_rate"] - 75.0) < 1e-9
+    assert parser.thinning_of_walls({}, book)["spoof_thin_rate"] == 0.0

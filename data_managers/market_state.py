@@ -5,7 +5,7 @@ import time
 from typing import Dict, Any, Optional, List
 from config.config import Config
 from data_managers.orderbook_l2 import L2Book, SequenceGap
-from data_managers.orderbook_parser import OrderBookParser
+from data_managers.orderbook_parser import OrderBookParser, WallTracker
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,7 @@ class MarketState:
         self.last_update_time: float = time.time()
         self.order_book_parser = OrderBookParser()
         self.l2_book = L2Book()
+        self.wall_tracker = WallTracker(config.wall_min_depth_share, config.wall_skip_levels, config.wall_min_age_s)
         self.initial_data_ready = asyncio.Event()
 
         # --- Caching Flag ---
@@ -119,11 +120,17 @@ class MarketState:
         if self._is_ob_metrics_dirty:
             logger.debug("Order book metrics are dirty. Recalculating...")
             self.order_book_pressure = self.order_book_parser.calculate_pressure_vectors(self.depth_20)
-            self.order_book_walls = self.order_book_parser.find_wall_clusters(self.depth_20, self.config.orderbook_reversal_wall_multiplier)
-            tick = self.order_book_parser.analyze_thinning_and_spoofing(
-                self.previous_depth_20, self.depth_20,
-                self.config.spoof_distance_percent, self.config.spoof_large_order_multiplier)
             now = time.time()
+            if self.config.wall_mode == "depth_share":
+                previous_walls = self.order_book_walls
+                self.order_book_walls = self.wall_tracker.update(self.depth_20, now)
+                # Thinning = what happened to the walls we KNEW about, at their price, in the current book.
+                tick = self.order_book_parser.thinning_of_walls(previous_walls, self.depth_20)
+            else:
+                self.order_book_walls = self.order_book_parser.find_wall_clusters(self.depth_20, self.config.orderbook_reversal_wall_multiplier)
+                tick = self.order_book_parser.analyze_thinning_and_spoofing(
+                    self.previous_depth_20, self.depth_20,
+                    self.config.spoof_distance_percent, self.config.spoof_large_order_multiplier)
             self._spoof_ticks.append((now, tick))
             window = [t for ts, t in self._spoof_ticks if now - ts <= SPOOF_WINDOW_S]
             worst = max(window, key=lambda t: t.get("spoof_thin_rate", 0.0), default=tick)

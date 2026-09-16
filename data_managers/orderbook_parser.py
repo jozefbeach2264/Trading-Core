@@ -4,6 +4,44 @@ import time
 
 logger = logging.getLogger(__name__)
 
+class WallTracker:
+    """Whale-sized resting liquidity, measured on the 50-level book (2026-09-16 live calibration).
+
+    A wall is a level that (1) sits beyond the best `skip_levels` (the touch holds ~23% of depth just by being the
+    touch), (2) holds at least `min_share` of the side's visible depth (the largest non-touch level is ~13% at the
+    median, ~20% at the 90th percentile) and (3) has been there for at least `min_age_s` (most outsized levels
+    live ~1 s; whales park size). Neighbour-relative tests were useless: the window is mostly dust levels."""
+
+    def __init__(self, min_share: float = 0.10, skip_levels: int = 3, min_age_s: float = 5.0):
+        self.min_share = min_share
+        self.skip_levels = skip_levels
+        self.min_age_s = min_age_s
+        self._first_seen: Dict[Tuple[str, float], float] = {}
+
+    def update(self, depth: Dict[str, Any], now: float) -> Dict[str, Any]:
+        result = {"bid_walls": [], "ask_walls": []}
+        alive = set()
+        for side in ("bids", "asks"):
+            levels = [(float(p), float(q)) for p, q in depth.get(side, [])]
+            total = sum(q for _, q in levels)
+            if total <= 0:
+                continue
+            for price, qty in levels[self.skip_levels:]:
+                if qty / total < self.min_share:
+                    continue
+                key = (side, price)
+                alive.add(key)
+                born = self._first_seen.setdefault(key, now)
+                age = now - born
+                if age >= self.min_age_s:
+                    result["bid_walls" if side == "bids" else "ask_walls"].append(
+                        {"price": price, "qty": qty, "share": round(qty / total, 4), "age_s": round(age, 1)})
+        for key in list(self._first_seen):
+            if key not in alive:
+                del self._first_seen[key]
+        return result
+
+
 class OrderBookParser:
     """
     A utility class to parse raw order book data into actionable metrics
@@ -108,6 +146,19 @@ class OrderBookParser:
             return zero
         delta_pct = (curr_total - prev_total) / prev_total * 100.0
         return {"thin_rate": max(-delta_pct, 0.0), "delta_pct": delta_pct}
+
+    def thinning_of_walls(self, previous_walls: Dict[str, Any], current_ob: Dict[str, Any]) -> Dict[str, Any]:
+        """Spoof metric for tracked walls: compare each previously known wall with the quantity now resting at
+        its price (per price level, so a wall never 'vanishes' because the threshold moved)."""
+        zero = {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0, "bid_thin_rate": 0.0, "ask_thin_rate": 0.0}
+        if not previous_walls:
+            return zero
+        mid = self._mid_price(current_ob)
+        bid = self._side_thinning(previous_walls.get("bid_walls") or [], current_ob.get("bids", []), mid, 100.0)
+        ask = self._side_thinning(previous_walls.get("ask_walls") or [], current_ob.get("asks", []), mid, 100.0)
+        worst = bid if bid["thin_rate"] >= ask["thin_rate"] else ask
+        return {"spoof_thin_rate": worst["thin_rate"], "wall_delta_pct": worst["delta_pct"],
+                "bid_thin_rate": bid["thin_rate"], "ask_thin_rate": ask["thin_rate"]}
 
     def analyze_thinning_and_spoofing(
         self, previous_ob: Dict[str, Any], current_ob: Dict[str, Any], distance_percent: float = 2.0,

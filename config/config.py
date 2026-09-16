@@ -46,6 +46,13 @@ class Config:
         # designed for) or "books5" (5-level snapshots; what the bot used until 2026-09-16, which starved TrapX).
         self.orderbook_channel: str = os.getenv("ORDERBOOK_CHANNEL", "books").strip()
         self.orderbook_depth_levels: int = int(os.getenv("ORDERBOOK_DEPTH_LEVELS", "50"))
+        # Wall detection: "depth_share" (level ≥ WALL_MIN_DEPTH_SHARE of the side's visible depth, beyond the best
+        # WALL_SKIP_LEVELS, alive ≥ WALL_MIN_AGE_S — calibrated live 2026-09-16) or "multiplier" (legacy: ≥ N × the
+        # top-of-book quantity, which on this market is the largest level and therefore never finds anything).
+        self.wall_mode: str = os.getenv("WALL_MODE", "depth_share").strip()
+        self.wall_min_depth_share: float = float(os.getenv("WALL_MIN_DEPTH_SHARE", "0.10"))
+        self.wall_skip_levels: int = int(os.getenv("WALL_SKIP_LEVELS", "3"))
+        self.wall_min_age_s: float = float(os.getenv("WALL_MIN_AGE_S", "5"))
         
         # System & Operational Parameters
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -175,6 +182,10 @@ class Config:
             raise ValueError("ORDERBOOK_CHANNEL must be 'books' or 'books5'.")
         if self.orderbook_depth_levels <= 0:
             raise ValueError("ORDERBOOK_DEPTH_LEVELS must be a positive integer.")
+        if self.wall_mode not in ("depth_share", "multiplier"):
+            raise ValueError("WALL_MODE must be 'depth_share' or 'multiplier'.")
+        if not 0 < self.wall_min_depth_share < 1 or self.wall_skip_levels < 0 or self.wall_min_age_s < 0:
+            raise ValueError("WALL_MIN_DEPTH_SHARE must be in (0,1); WALL_SKIP_LEVELS and WALL_MIN_AGE_S must be >= 0.")
         if not self.ai_provider_url:
             raise ValueError("AI_PROVIDER_URL must be set (OpenAI-compatible chat-completions base URL).")
         expected = expected_exchange_symbol(self.trading_symbol)
