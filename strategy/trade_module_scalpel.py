@@ -66,14 +66,14 @@ class TradeModuleScalpel:
 
         if trend_is_up and retest_of_high_confirmed:
             entry_price = live_close
-            stop_loss = entry_price - breakout_range
-            take_profit = entry_price + (breakout_range * 1.5)
+            stop_loss = entry_price - breakout_range * self.config.scalpel_stop_range_multiple
+            take_profit = entry_price + breakout_range * self.config.scalpel_target_range_multiple
             return {"trade_type": "Scalpel", "direction": "LONG", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: LONG on retest of the prior high."}
         
         elif trend_is_down and retest_of_low_confirmed:
             entry_price = live_close
-            stop_loss = entry_price + breakout_range
-            take_profit = entry_price - (breakout_range * 1.5)
+            stop_loss = entry_price + breakout_range * self.config.scalpel_stop_range_multiple
+            take_profit = entry_price - breakout_range * self.config.scalpel_target_range_multiple
             return {"trade_type": "Scalpel", "direction": "SHORT", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: SHORT on retest of the prior low."}
             
         return None

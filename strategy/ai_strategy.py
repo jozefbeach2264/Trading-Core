@@ -30,6 +30,7 @@ REJECTION_CODE_MAP = {
     "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel",
     "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK",
     "FORECAST_UNAVAILABLE": "FORECAST UNAVAILABLE",
+    "REWARD_TOO_SMALL": "REWARD BELOW FEES",
     "AI_VERDICT": "AI VERDICT",
     "STALE_DATA": "STALE MARKET DATA",
     "STALE_DECISION": "STALE DECISION",
@@ -98,6 +99,21 @@ class AIStrategy(AIStrategyProtocol):
         if len(self._verdict_cache) > 256:   # drop expired entries; keys change every candle anyway
             self._verdict_cache = {k: v for k, v in self._verdict_cache.items() if now - v[0] <= self.config.ai_verdict_cache_s}
 
+    def _reward_too_small(self, signal_packet: Dict[str, Any]) -> str:
+        """'' when the target is worth taking; otherwise why it is not."""
+        required = self.config.min_reward_fee_multiple
+        if required <= 0:
+            return ""
+        entry = float(signal_packet.get("entry_price") or 0.0)
+        target = signal_packet.get("take_profit")
+        if entry <= 0 or target is None:
+            return ""
+        reward_pct = abs(float(target) - entry) / entry * 100.0
+        fee_pct = self.config.round_trip_fee_percent
+        if fee_pct > 0 and reward_pct < required * fee_pct:
+            return f"target {reward_pct:.3f}% < {required:g}x the {fee_pct:.3f}% round-trip fee"
+        return ""
+
     def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
         reason = f"Rejected - {REJECTION_CODE_MAP[code]}: {detail}" if detail else f"Rejected - {REJECTION_CODE_MAP[code]}"
         getattr(self.logger, level)(f"REJECTED: {reason}")
@@ -123,6 +139,12 @@ class AIStrategy(AIStrategyProtocol):
             self.logger.info(f"HALTED: {reason}")
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
         self.logger.info(f"Signal Packet Generated: Type={signal_packet.get('trade_type')}, Direction={signal_packet.get('direction')}")
+
+        # A target that does not clear the round-trip fee several times over cannot make money even when the
+        # trade is right. Refuse it before spending a model call on it.
+        reward_reason = self._reward_too_small(signal_packet)
+        if reward_reason:
+            return self._reject("REWARD_TOO_SMALL", reward_reason, primary_gate_report["filters"], level="info")
 
         market_state.pending_signal_direction = str(signal_packet.get("direction") or "").upper() or None
         try:

@@ -29,7 +29,8 @@ class _Gate:
 
 class _Router:
     async def route_and_generate_signal(self, _ms, _report):
-        return {"trade_type": "TrapX", "direction": "SHORT", "entry_price": 3000.0, "take_profit": 2990.0, "stop_loss": 3005.0,
+        # target 0.667% of entry — clears the 3x round-trip-fee guard (3 x 0.16% = 0.48%)
+        return {"trade_type": "TrapX", "direction": "SHORT", "entry_price": 3000.0, "take_profit": 2980.0, "stop_loss": 3007.5,
                 "reason": "GENESIS TrapX: SHORT signal identified."}   # the strategies' own descriptive key
 
 

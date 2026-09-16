@@ -84,7 +84,9 @@ def test_scalpel_uses_the_newest_closed_candle(config):
     ms.live_reconstructed_candle = make_live_candle(klines[0][2] - 0.5, klines[0][2], klines[0][2] - 1.0, klines[0][2] - 0.2)
     signal = run(TradeModuleScalpel(config).generate_signal(ms))
     assert signal is not None
-    assert abs(signal["stop_loss"] - (signal["entry_price"] - (klines[0][2] - klines[0][3]))) < 1e-9
+    # the stop is a configurable multiple of the LEVEL candle's range — check it uses klines[0], not klines[1]
+    rng = klines[0][2] - klines[0][3]
+    assert abs(signal["stop_loss"] - (signal["entry_price"] - rng * config.scalpel_stop_range_multiple)) < 1e-9
 
 
 def test_scalpel_retest_band_is_a_fraction_of_the_candle_range(config):

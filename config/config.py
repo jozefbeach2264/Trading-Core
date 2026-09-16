@@ -111,6 +111,10 @@ class Config:
         self.event_spoof_delta_threshold: float = float(os.getenv('EVENT_SPOOF_DELTA_THRESHOLD', '5'))
         self.event_queue_max_size: int = int(os.getenv('EVENT_QUEUE_MAX_SIZE', '10'))
         
+        # A trade whose target does not clear the round-trip fee by this multiple is refused outright. Without it
+        # the bot took trades that lose money even when they win (measured live: break-even win rate 108%).
+        self.min_reward_fee_multiple: float = float(os.getenv('MIN_REWARD_FEE_MULTIPLE', '3.0'))
+
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
         # Verdict generation budget. The reasoning string is only logged, so keep it short: fewer
@@ -147,6 +151,11 @@ class Config:
         # trades, and BOTH directions available in every session. With it on, a session sits inside one regime
         # (169 of 174 minutes below the EMA in the first live run) and can only trade one way. Default OFF.
         self.scalpel_require_trend: bool = _env_bool('SCALPEL_REQUIRE_TREND', False)
+        # Stop and target as multiples of the level candle's range. Were hardcoded 1.0 / 1.5, which on 1m ETH is a
+        # ~0.10% stop and a ~0.14% target against a 0.16% round-trip fee — a target SMALLER than the cost, needing
+        # a 108% win rate. Measured 2026-09-16 over 7.7 days; 3/8 keeps the target ~3.3x the fee.
+        self.scalpel_stop_range_multiple: float = float(os.getenv('SCALPEL_STOP_RANGE_MULTIPLE', '3.0'))
+        self.scalpel_target_range_multiple: float = float(os.getenv('SCALPEL_TARGET_RANGE_MULTIPLE', '8.0'))
         # TrapX wick test: the wick must exceed this multiple of the BODY and this fraction of the candle's RANGE.
         # The range test kills the degenerate case where a live candle's body is ~0 for the first seconds of every
         # minute, which made both wicks qualify and handed every tie to SHORT (63% short vs 49% when ties are fair).
@@ -182,6 +191,11 @@ class Config:
         self.ai_strategy_log_path: str = os.getenv("AI_STRATEGY_LOG_PATH", "./logs/ai_strategy.log")
 
         self._validate()
+
+    @property
+    def round_trip_fee_percent(self) -> float:
+        """Entry + exit taker fee as a percentage of notional (EXCHANGE_FEE_RATE_TAKER is one side)."""
+        return 2.0 * self.exchange_fee_rate_taker
 
     def _validate(self):
         # Validate Credentials
@@ -222,6 +236,10 @@ class Config:
             raise ValueError("AI_VERDICT_CACHE_S must be >= 0.")
         if not 0 < self.scalpel_retest_range_fraction <= 2.0:
             raise ValueError("SCALPEL_RETEST_RANGE_FRACTION must be in (0, 2].")
+        if self.scalpel_stop_range_multiple <= 0 or self.scalpel_target_range_multiple <= 0:
+            raise ValueError("SCALPEL_STOP_RANGE_MULTIPLE and SCALPEL_TARGET_RANGE_MULTIPLE must be positive.")
+        if self.min_reward_fee_multiple < 0:
+            raise ValueError("MIN_REWARD_FEE_MULTIPLE must be >= 0.")
         if self.trapx_wick_body_multiplier <= 0:
             raise ValueError("TRAPX_WICK_BODY_MULTIPLIER must be positive.")
         if not 0 < self.trapx_wick_min_range_fraction < 1.0:
