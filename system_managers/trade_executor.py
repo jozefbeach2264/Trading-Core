@@ -340,6 +340,8 @@ class TradeExecutor:
             "fee": fee,
             "stop_loss": _as_float(signal.get("stop_loss")),
             "take_profit": _as_float(signal.get("take_profit")),
+            "initial_risk": abs(entry_price - _as_float(signal.get("stop_loss"))) if _as_float(signal.get("stop_loss")) else None,
+            "best_price": entry_price,
             "liquidation_price": liquidation_price,
             "reasoning": signal.get("signal_reason") or signal.get("reason", "N/A"),
             "ai_verdict": signal.get("ai_verdict", {}),
@@ -364,6 +366,37 @@ class TradeExecutor:
         if favourable(position.get("take_profit")):
             return float(position["take_profit"]), "TAKE_PROFIT"
         return None
+
+    async def get_open_position(self) -> Optional[Dict[str, Any]]:
+        """The open position record (simulation: from the state file; live: in memory), or None."""
+        if self.config.dry_run_mode:
+            state = await asyncio.to_thread(self._get_simulation_state)
+            return (state.get("positions") or {}).get(self.config.adex_symbol)
+        return self.open_position
+
+    async def update_position_exits(self, stop_loss: Optional[float], take_profit: Optional[float],
+                                    best_price: Optional[float] = None, note: str = "") -> None:
+        """Rolling5 management writes the new levels. Simulation: into the state file (mark_to_market honours
+        them next cycle). Live: in memory + a log line — amending exchange-side orders is not wired yet."""
+        if self.config.dry_run_mode:
+            await asyncio.to_thread(self._update_sim_exits, stop_loss, take_profit, best_price, note)
+            return
+        if self.open_position is not None:
+            self.open_position.update({"stop_loss": stop_loss, "take_profit": take_profit, "best_price": best_price})
+            logger.info("Position exits updated (live, in memory only): stop=%s target=%s %s", stop_loss, take_profit, note)
+
+    def _update_sim_exits(self, stop_loss, take_profit, best_price, note: str) -> None:
+        state = self._get_simulation_state()
+        position = (state.get("positions") or {}).get(self.config.adex_symbol)
+        if not position:
+            return
+        position["stop_loss"], position["take_profit"] = stop_loss, take_profit
+        if best_price is not None:
+            position["best_price"] = best_price
+        position.setdefault("adjustments", []).append({"ts": datetime.now(timezone.utc).isoformat(), "stop": stop_loss,
+                                                        "target": take_profit, "note": note})
+        self._save_simulation_state(state)
+        logger.info("SIMULATION: exits updated stop=%s target=%s (%s)", stop_loss, take_profit, note)
 
     async def mark_to_market(self, mark_price: Any) -> bool:
         """Simulation: close the open position if the mark crossed its liquidation / stop / target level.

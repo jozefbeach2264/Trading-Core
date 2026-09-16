@@ -203,3 +203,16 @@ def test_run_statistics(tmp_path):
     assert stats["final_equity"] == 97.0 and stats["closes_by_reason"] == {"TAKE_PROFIT": 1, "STOP_LOSS": 1}
     assert stats["max_drawdown_pct"] > 0
     assert "win 50.0%" in summary_line(stats)
+
+
+def test_sim_exits_can_be_updated_and_are_honoured(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG", "stop_loss": 2990.0, "take_profit": 3015.0}))
+    pos = run(ex.get_open_position())
+    assert pos["initial_risk"] == 10.0 and pos["best_price"] == 3000.0
+    run(ex.update_position_exits(3000.5, 3020.0, best_price=3005.0, note="test"))
+    pos = run(ex.get_open_position())
+    assert pos["stop_loss"] == 3000.5 and pos["take_profit"] == 3020.0 and pos["adjustments"][-1]["note"] == "test"
+    assert run(ex.mark_to_market(3001.0)) is False
+    assert run(ex.mark_to_market(3000.4)) is True                          # the moved stop is live
+    assert ex._get_simulation_state()["history"][-1]["reason"] == "STOP_LOSS"

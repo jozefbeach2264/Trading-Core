@@ -116,8 +116,13 @@ class Config:
         self.max_data_staleness_s: float = float(os.getenv('MAX_DATA_STALENESS_S', '3.0'))
         self.max_decision_age_s: float = float(os.getenv('MAX_DECISION_AGE_S', '5.0'))
         self.max_entry_drift_pct: float = float(os.getenv('MAX_ENTRY_DRIFT_PCT', '0.15'))
-        # One position at a time: no new entry while the Rolling5 lifecycle is within this many candles.
-        self.max_position_candles: int = int(os.getenv('MAX_POSITION_CANDLES', '5'))
+        # Rolling5 position management (position_manager.py). The trade is re-assessed every cycle; this is only
+        # a safety ceiling for a trade that hits neither stop nor target for a very long time.
+        self.max_position_candles: int = int(os.getenv('MAX_POSITION_CANDLES', '120'))
+        self.trail_breakeven_r: float = float(os.getenv('TRAIL_BREAKEVEN_R', '0.5'))     # earn this many R before locking
+        self.trail_distance_r: float = float(os.getenv('TRAIL_DISTANCE_R', '1.0'))       # stop trails this far behind the best
+        self.target_extend_r: float = float(os.getenv('TARGET_EXTEND_R', '1.5'))         # target stays this far beyond the best
+        self.exit_reversal_risk: float = float(os.getenv('EXIT_REVERSAL_RISK', '0.8'))   # take the trade off risk above this
         # One model verdict per setup per candle: an identical setup asked again within this window reuses
         # the verdict instead of re-rolling the model until it says yes (0 disables the cache).
         self.ai_verdict_cache_s: float = float(os.getenv('AI_VERDICT_CACHE_S', '60'))
@@ -178,6 +183,10 @@ class Config:
             raise ValueError("MAX_DATA_STALENESS_S, MAX_DECISION_AGE_S and MAX_ENTRY_DRIFT_PCT must be positive.")
         if self.max_position_candles <= 0:
             raise ValueError("MAX_POSITION_CANDLES must be a positive integer.")
+        if self.trail_breakeven_r <= 0 or self.trail_distance_r <= 0 or self.target_extend_r <= 0:
+            raise ValueError("TRAIL_BREAKEVEN_R, TRAIL_DISTANCE_R and TARGET_EXTEND_R must be positive.")
+        if not 0 < self.exit_reversal_risk <= 1.0:
+            raise ValueError("EXIT_REVERSAL_RISK must be in (0, 1].")
         if self.ai_verdict_cache_s < 0:
             raise ValueError("AI_VERDICT_CACHE_S must be >= 0.")
         if not 0 < self.scalpel_retest_range_fraction <= 2.0:

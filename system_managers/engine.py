@@ -11,6 +11,7 @@ from strategy.ai_strategy import AIStrategy
 from .trade_executor import TradeExecutor 
 from console_display import format_market_state_for_console
 from log_utils import file_logger
+from position_manager import plan_exits
 
 logger = logging.getLogger(__name__)
 
@@ -80,23 +81,42 @@ class Engine:
         return self.ai_strategy.forecaster.lifecycle
 
     def _position_is_open(self) -> bool:
-        lc = self._lifecycle()
-        return bool(lc.active) and lc.candle_count <= self.config.max_position_candles
+        return bool(self._lifecycle().active)
 
     async def _settle_open_position(self) -> None:
-        """Advance the lifecycle on the current candle; once it has run its course, close the position
-        (simulation realises PnL at the mark price; live mode only clears the guard — see trade_executor)."""
+        """Rolling5 management, every cycle while a position is open: settle stop/target/liquidation, then
+        re-assess the trade against a fresh forecast and move the stop/target (position_manager.plan_exits).
+        The lifecycle counts C1–C5 and REM extensions; MAX_POSITION_CANDLES is only a safety ceiling."""
         lc = self._lifecycle()
         if not lc.active:
             return
-        # Stop-loss / take-profit / liquidation first (simulation), then the time horizon.
-        if await self.trade_executor.mark_to_market(self.market_state.mark_price):
-            self.ai_strategy.forecaster.stop_lifecycle()
+        forecaster = self.ai_strategy.forecaster
+        mark = self.market_state.mark_price
+        if await self.trade_executor.mark_to_market(mark):
+            forecaster.stop_lifecycle()
             return
-        lc.update(self.ai_strategy.forecaster._current_candle_ts(self.market_state))
+        position = await self.trade_executor.get_open_position()
+        if not position:
+            forecaster.stop_lifecycle()      # closed elsewhere (or never recorded): clear the guard
+            return
+        meta = lc.update(forecaster._current_candle_ts(self.market_state))
         if lc.candle_count > self.config.max_position_candles:
-            await self.trade_executor.close_position(self.market_state.mark_price, reason="ROLLING5_COMPLETE")
-            self.ai_strategy.forecaster.stop_lifecycle()
+            await self.trade_executor.close_position(mark, reason="MAX_CANDLES")
+            forecaster.stop_lifecycle()
+            return
+        if not mark or mark <= 0:
+            return
+        forecast = await forecaster.generate_forecast(self.market_state, position.get("direction"))
+        recheck = bool(meta.get("ob_recheck_due"))
+        if recheck:
+            forecaster.mark_orderbook_rechecked()
+            position["ob_rechecked"] = True
+        new_stop, new_target, best, notes = plan_exits(position, float(mark), forecast, self.config, ob_recheck=recheck)
+        changed = (new_stop != position.get("stop_loss") or new_target != position.get("take_profit")
+                   or best != position.get("best_price"))
+        if changed:
+            await self.trade_executor.update_position_exits(new_stop, new_target, best_price=best,
+                                                            note=f"C{lc.candle_count} " + "; ".join(notes))
 
     @staticmethod
     def _is_approved(final_signal: Dict[str, Any]) -> bool:
