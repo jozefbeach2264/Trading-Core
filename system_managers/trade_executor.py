@@ -13,8 +13,16 @@ import httpx
 from config.config import Config
 from data_managers.market_state import MarketState
 from memory_tracker import MemoryTracker
+from sim_stats import compute_stats, summary_line
 
 logger = logging.getLogger(__name__)
+
+def _as_float(value: Any) -> Optional[float]:
+    try:
+        return float(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+
 
 ORDER_TIMEOUT_S = 5.0  # a market order that has not answered in 5 s is not going to get faster
 ORDER_SIDE = {"LONG": "BUY", "SHORT": "SELL"}       # Binance-style /fapi order side enum
@@ -211,8 +219,12 @@ class TradeExecutor:
             await self._record_failure(direction, "Exchange filters unknown (exchangeInfo fetch failed)")
             return
 
-        risk_amount_usd = Decimal(str(self.market_state.account_balance)) * Decimal(str(self.config.risk_cap_percent))
-        position_size_qty = risk_amount_usd / Decimal(str(entry_price))
+        # Same math as the simulation: margin = balance × RISK_CAP_PERCENT, notional = margin × LEVERAGE.
+        margin_usd = Decimal(str(self.market_state.account_balance)) * Decimal(str(self.config.risk_cap_percent))
+        notional_usd = margin_usd * Decimal(str(self.config.leverage))
+        position_size_qty = notional_usd / Decimal(str(entry_price))
+        logger.info("Sizing: balance=%s margin=%s notional=%s at %sx", self.market_state.account_balance, margin_usd, notional_usd,
+                    self.config.leverage)
         final_qty, _ = self._adjust_to_filters(position_size_qty, Decimal(str(entry_price)))
         rejection = self._check_order_filters(final_qty, Decimal(str(entry_price)))
         if rejection:
@@ -265,7 +277,8 @@ class TradeExecutor:
     def _get_simulation_state(self) -> Dict[str, Any]:
         path = self.config.simulation_state_file_path
         if not os.path.exists(path):
-            return {"balance": self.config.simulation_initial_capital, "positions": {}, "history": []}
+            return {"balance": self.config.simulation_initial_capital, "initial_capital": self.config.simulation_initial_capital,
+                    "positions": {}, "history": []}
         try:
             with open(path, 'r') as f:
                 return json.load(f)
@@ -297,27 +310,37 @@ class TradeExecutor:
 
     def _open_simulated_position(self, signal: Dict[str, Any], entry_price: float) -> Optional[Dict[str, Any]]:
         """Margin = balance × RISK_CAP_PERCENT; notional = margin × LEVERAGE; fee = notional × taker % / 100.
-        (The old fee used 0.08 as a fraction — 8% — which sent a $10 account to -$30 on its first trade.)"""
+        (The old fee used 0.08 as a fraction — 8% — which sent a $10 account to -$30 on its first trade.)
+        The strategy's stop_loss / take_profit and the liquidation price are stored so mark_to_market can
+        close the position the way an exchange would."""
         state = self._get_simulation_state()
         balance = float(state["balance"])
         if balance <= 0:
             logger.error("SIMULATION: balance %.2f exhausted; refusing to open a position", balance)
             return None
+        direction = str(signal.get("direction", "")).upper()
+        sign = 1.0 if direction == "LONG" else -1.0
         margin = balance * self.config.risk_cap_percent
         notional = margin * self.config.leverage
         quantity = notional / entry_price
         fee = notional * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = balance - fee
+        # Liquidation ≈ the move that consumes the whole margin (maintenance margin ignored → slightly optimistic).
+        liquidation_price = entry_price * (1.0 - sign / self.config.leverage)
         record = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "event": "open",
             "symbol": self.config.adex_symbol,
             "signal_type": signal.get("trade_type", "N/A"),
-            "direction": signal.get("direction"),
+            "direction": direction,
             "quantity": quantity,
             "entry_price": entry_price,
             "margin": margin,
             "notional": notional,
             "fee": fee,
+            "stop_loss": _as_float(signal.get("stop_loss")),
+            "take_profit": _as_float(signal.get("take_profit")),
+            "liquidation_price": liquidation_price,
             "reasoning": signal.get("signal_reason") or signal.get("reason", "N/A"),
             "ai_verdict": signal.get("ai_verdict", {}),
             "simulated": True,
@@ -327,14 +350,51 @@ class TradeExecutor:
         self._save_simulation_state(state)
         return record
 
-    def _close_simulated_position(self, mark_price: Any, reason: str) -> None:
+    @staticmethod
+    def _exit_trigger(position: Dict[str, Any], mark_price: float) -> Optional[Tuple[float, str]]:
+        """(fill price, reason) if the mark has crossed liquidation, stop-loss or take-profit; else None.
+        Liquidation is checked first (worst case wins), then the stop, then the target."""
+        sign = 1.0 if str(position.get("direction", "")).upper() == "LONG" else -1.0
+        adverse = lambda level: level is not None and sign * (mark_price - level) <= 0   # mark at/beyond the level, against us
+        favourable = lambda level: level is not None and sign * (mark_price - level) >= 0
+        if adverse(position.get("liquidation_price")):
+            return float(position["liquidation_price"]), "LIQUIDATION"
+        if adverse(position.get("stop_loss")):
+            return float(position["stop_loss"]), "STOP_LOSS"
+        if favourable(position.get("take_profit")):
+            return float(position["take_profit"]), "TAKE_PROFIT"
+        return None
+
+    async def mark_to_market(self, mark_price: Any) -> bool:
+        """Simulation: close the open position if the mark crossed its liquidation / stop / target level.
+        Returns True when a position was closed. Live mode returns False (exchange-side SL/TP orders are an
+        operator decision not yet wired)."""
+        if not self.config.dry_run_mode or not mark_price or float(mark_price) <= 0:
+            return False
+        return await asyncio.to_thread(self._mark_to_market_sim, float(mark_price))
+
+    def _mark_to_market_sim(self, mark_price: float) -> bool:
         state = self._get_simulation_state()
+        position = state["positions"].get(self.config.adex_symbol)
+        if not position:
+            return False
+        trigger = self._exit_trigger(position, mark_price)
+        if trigger is None:
+            return False
+        fill_price, reason = trigger
+        self._close_simulated_position(fill_price, reason, state=state)
+        return True
+
+    def _close_simulated_position(self, mark_price: Any, reason: str, state: Optional[Dict[str, Any]] = None) -> None:
+        state = state if state is not None else self._get_simulation_state()
         position = state["positions"].pop(self.config.adex_symbol, None)
         if not position or not mark_price or float(mark_price) <= 0:
             return
         exit_price = float(mark_price)
         sign = 1.0 if str(position.get("direction", "")).upper() == "LONG" else -1.0
         pnl = (exit_price - float(position["entry_price"])) * float(position["quantity"]) * sign
+        if reason == "LIQUIDATION":
+            pnl = -float(position.get("margin", abs(pnl)))   # the whole margin is gone, never more
         fee = float(position.get("notional", 0.0)) * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = float(state["balance"]) + pnl - fee
         state["history"].append({
@@ -342,6 +402,9 @@ class TradeExecutor:
             "direction": position.get("direction"), "entry_price": position["entry_price"], "exit_price": exit_price,
             "quantity": position["quantity"], "pnl": pnl, "fee": fee, "reason": reason, "simulated": True,
         })
+        state.setdefault("initial_capital", self.config.simulation_initial_capital)
+        stats = compute_stats(state["history"], float(state["initial_capital"]))
+        state["stats"] = stats
         self._save_simulation_state(state)
-        logger.info("SIMULATION: closed %s at %.2f (%s) pnl=%.4f fee=%.4f balance=%.4f",
-                    position.get("direction"), exit_price, reason, pnl, fee, state["balance"])
+        logger.info("SIMULATION: closed %s at %.2f (%s) pnl=%.4f fee=%.4f balance=%.4f | %s",
+                    position.get("direction"), exit_price, reason, pnl, fee, state["balance"], summary_line(stats))

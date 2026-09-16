@@ -58,7 +58,7 @@ These control the core behavior of trades.
 
 | LEVERAGE | The leverage to use for trades. | 1 - 250 (int) | 250 |
 
-| RISK_CAP_PERCENT | Max percentage of total capital to risk on a single trade. | 0.01 - 1.0 (float) | 0.25 |
+| RISK_CAP_PERCENT | Fraction of the account posted as margin per trade (position notional = margin × LEVERAGE). Hard cap 0.10. | 0.01 - 0.10 (float) | 0.10 |
 
 | MAX_ROI_LIMIT | Sets a maximum Return on Investment limit for a trade. 0 means no limit. | 0 - 1000 (float) | 0 |
 

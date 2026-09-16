@@ -84,3 +84,12 @@ def test_malformed_trading_window_fails_at_startup(monkeypatch):
         Config()
     monkeypatch.setenv("ALLOWED_WINDOWS", "09:00-11:00, 13:00-16:00")
     Config()
+
+
+def test_margin_per_trade_is_capped_at_ten_percent(monkeypatch):
+    import pytest
+    monkeypatch.setenv("RISK_CAP_PERCENT", "0.25")
+    with pytest.raises(ValueError):
+        Config()
+    monkeypatch.setenv("RISK_CAP_PERCENT", "0.10")
+    assert Config().risk_cap_percent == 0.10

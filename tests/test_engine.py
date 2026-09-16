@@ -14,6 +14,9 @@ class _Executor:
     async def close_position(self, mark_price, reason):
         self.closed.append((mark_price, reason))
 
+    async def mark_to_market(self, mark_price):
+        return False
+
 
 class _Strategy:
     def __init__(self, config):

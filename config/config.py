@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
+MAX_RISK_CAP_PERCENT = 0.10   # hard ceiling on margin per trade, as a fraction of the account
+
 _TRUE = {"true", "1", "yes", "on"}
 _FALSE = {"false", "0", "no", "off"}
 
@@ -52,7 +54,9 @@ class Config:
 
         # Core Trading & Risk Parameters
         self.leverage: int = int(os.getenv('LEVERAGE', '200'))
-        self.risk_cap_percent: float = float(os.getenv('RISK_CAP_PERCENT', '0.25'))
+        # Fraction of the account posted as MARGIN per trade (operator decision 2026-09-16: never more than 10%).
+        # Position notional = margin × LEVERAGE, identically in simulation and live.
+        self.risk_cap_percent: float = float(os.getenv('RISK_CAP_PERCENT', '0.10'))
         self.max_liquidation_threshold: float = float(os.getenv('MAX_LIQUIDATION_THRESHOLD', '8.0'))
         self.exchange_fee_rate_taker: float = float(os.getenv('EXCHANGE_FEE_RATE_TAKER', '0.08'))
         self.max_roi_limit: float = float(os.getenv('MAX_ROI_LIMIT', '0'))
@@ -170,8 +174,9 @@ class Config:
             raise ValueError("MAX_POSITION_CANDLES must be a positive integer.")
 
         # Validate Numerical Ranges
-        if not 0 < self.risk_cap_percent <= 1.0:
-            raise ValueError("RISK_CAP_PERCENT must be between 0 and 1.0.")
+        if not 0 < self.risk_cap_percent <= MAX_RISK_CAP_PERCENT:
+            raise ValueError(f"RISK_CAP_PERCENT is the margin fraction per trade and must be in (0, {MAX_RISK_CAP_PERCENT}] "
+                             f"(operator rule: never post more than 10% of the account).")
         if self.leverage <= 0:
             raise ValueError("LEVERAGE must be a positive integer.")
         if self.ai_client_timeout <= 0:

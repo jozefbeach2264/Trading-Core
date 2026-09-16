@@ -73,6 +73,14 @@ def _live_executor(config, client):
     return ex
 
 
+def test_live_sizing_matches_the_simulation_margin_math(config):
+    client = _OkClient()
+    ex = _live_executor(config, client)             # balance 1000, RISK_CAP 0.10, LEVERAGE 200, price 3000
+    run(ex._execute_live_trade({"direction": "LONG"}))
+    qty = float(client.calls[0][1]["params"]["quantity"])
+    assert abs(qty - (1000 * 0.10 * 200 / 3000)) < 0.001    # 6.667 ETH → 6.666 after the 0.001 step
+
+
 def test_order_side_is_the_exchange_enum_and_order_data_is_recorded(config):
     client = _OkClient()
     ex = _live_executor(config, client)
@@ -100,7 +108,7 @@ def test_missing_exchange_filters_or_dust_quantity_refuses_to_send(config):
     run(ex._execute_live_trade({"direction": "LONG"}))
     assert client.calls == [] and "filters unknown" in ex.memory_tracker.records[-1]["trade_data"]["reason"]
     ex = _live_executor(config, client)
-    ex.market_state.account_balance = 1.0     # 0.25 USDT / 3000 → below a 0.001 step
+    ex.market_state.account_balance = 0.01    # 0.001 margin × 200 = 0.2 USDT notional → 0.00007 ETH < 0.001 step
     run(ex._execute_live_trade({"direction": "LONG"}))
     assert client.calls == [] and "step size" in ex.memory_tracker.records[-1]["trade_data"]["reason"]
 
@@ -121,16 +129,22 @@ def test_reduce_only_close_uses_the_opposite_side(config):
     assert params["side"] == "SELL" and params["reduceOnly"] == "true" and ex.open_position is None
 
 
-def test_simulation_fee_is_a_percentage_and_close_realises_pnl(config, tmp_path):
+def _sim(config, tmp_path, capital=100.0, risk=0.10):
     config.dry_run_mode = True
     config.simulation_state_file_path = str(tmp_path / "sim.json")
-    config.simulation_initial_capital = 100.0
-    config.risk_cap_percent = 0.25
+    config.simulation_initial_capital = capital
+    config.risk_cap_percent = risk
     config.leverage = 200
     config.exchange_fee_rate_taker = 0.05
     ms = make_market_state(config)
     ex = TradeExecutor(config, ms, None)
     ex.memory_tracker = _Memory()
+    return ex, ms
+
+
+def test_simulation_fee_is_a_percentage_and_close_realises_pnl(config, tmp_path):
+    ex, ms = _sim(config, tmp_path, risk=0.25)
+    config.risk_cap_percent = 0.25   # direct attribute: the config cap only applies to env-loaded values
     run(ex._execute_simulated_trade({"direction": "LONG", "trade_type": "TrapX"}))
     state = ex._get_simulation_state()
     notional = 100.0 * 0.25 * 200                       # 5000 USDT
@@ -141,3 +155,51 @@ def test_simulation_fee_is_a_percentage_and_close_realises_pnl(config, tmp_path)
     assert state["positions"] == {}
     assert abs(state["balance"] - (100.0 - 2 * notional * 0.0005 + 5.0)) < 1e-6
     assert state["history"][-1]["event"] == "close" and abs(state["history"][-1]["pnl"] - 5.0) < 1e-6
+
+
+def test_sim_stop_loss_closes_at_the_stop(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG", "stop_loss": 2995.0, "take_profit": 3010.0}))
+    assert run(ex.mark_to_market(2998.0)) is False
+    assert run(ex.mark_to_market(2994.5)) is True
+    close = ex._get_simulation_state()["history"][-1]
+    assert close["reason"] == "STOP_LOSS" and close["exit_price"] == 2995.0
+    qty = 100.0 * 0.10 * 200 / 3000.0
+    assert abs(close["pnl"] - (2995.0 - 3000.0) * qty) < 1e-9
+
+
+def test_sim_take_profit_closes_at_the_target_for_a_short(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "SHORT", "stop_loss": 3005.0, "take_profit": 2990.0}))
+    assert run(ex.mark_to_market(3002.0)) is False
+    assert run(ex.mark_to_market(2989.0)) is True
+    close = ex._get_simulation_state()["history"][-1]
+    assert close["reason"] == "TAKE_PROFIT" and close["exit_price"] == 2990.0 and close["pnl"] > 0
+
+
+def test_sim_liquidation_loses_exactly_the_margin(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG"}))          # no stop: only liquidation can end it
+    liq = 3000.0 * (1 - 1 / 200)                                      # 2985.0
+    assert run(ex.mark_to_market(liq + 0.5)) is False
+    assert run(ex.mark_to_market(liq - 0.5)) is True
+    state = ex._get_simulation_state()
+    close = state["history"][-1]
+    assert close["reason"] == "LIQUIDATION" and abs(close["pnl"] + 10.0) < 1e-9   # margin = 10% of 100
+    assert state["stats"]["trades_closed"] == 1 and state["stats"]["win_rate_pct"] == 0.0
+    assert state["stats"]["max_drawdown_pct"] > 10.0
+
+
+def test_run_statistics(tmp_path):
+    from sim_stats import compute_stats, summary_line
+    history = [
+        {"event": "open", "fee": 1.0}, {"event": "close", "pnl": 5.0, "fee": 1.0, "reason": "TAKE_PROFIT"},
+        {"event": "open", "fee": 1.0}, {"event": "close", "pnl": -3.0, "fee": 1.0, "reason": "STOP_LOSS"},
+        {"event": "open", "fee": 1.0},
+    ]
+    stats = compute_stats(history, 100.0)
+    assert stats["trades_opened"] == 3 and stats["trades_closed"] == 2 and stats["open_now"] == 1
+    assert stats["win_rate_pct"] == 50.0 and stats["gross_pnl"] == 2.0 and stats["fees"] == 5.0 and stats["net_pnl"] == -3.0
+    assert stats["final_equity"] == 97.0 and stats["closes_by_reason"] == {"TAKE_PROFIT": 1, "STOP_LOSS": 1}
+    assert stats["max_drawdown_pct"] > 0
+    assert "win 50.0%" in summary_line(stats)

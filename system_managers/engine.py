@@ -87,6 +87,10 @@ class Engine:
         lc = self._lifecycle()
         if not lc.active:
             return
+        # Stop-loss / take-profit / liquidation first (simulation), then the time horizon.
+        if await self.trade_executor.mark_to_market(self.market_state.mark_price):
+            self.ai_strategy.forecaster.stop_lifecycle()
+            return
         lc.update(self.ai_strategy.forecaster._current_candle_ts(self.market_state))
         if lc.candle_count > self.config.max_position_candles:
             await self.trade_executor.close_position(self.market_state.mark_price, reason="ROLLING5_COMPLETE")
