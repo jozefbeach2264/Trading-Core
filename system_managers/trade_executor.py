@@ -318,6 +318,12 @@ class TradeExecutor:
         if balance <= 0:
             logger.error("SIMULATION: balance %.2f exhausted; refusing to open a position", balance)
             return None
+        existing = (state.get("positions") or {}).get(self.config.adex_symbol)
+        if existing:
+            # Never silently overwrite: the old record's fee was already charged and its outcome would be lost.
+            logger.error("SIMULATION: a %s position from %s is still open; refusing to open another",
+                         existing.get("direction"), existing.get("timestamp"))
+            return None
         direction = str(signal.get("direction", "")).upper()
         sign = 1.0 if direction == "LONG" else -1.0
         margin = balance * self.config.risk_cap_percent
@@ -370,6 +376,17 @@ class TradeExecutor:
         if favourable(position.get("take_profit")):
             return float(position["take_profit"]), "TAKE_PROFIT"
         return None
+
+    async def recover_open_position(self) -> Optional[Dict[str, Any]]:
+        """Called at start-up. A position survives a restart in the simulation state file, but the Rolling5
+        lifecycle that manages it lives only in memory — so without this the engine believes it is flat and the
+        next trade overwrites the record, losing an already-charged fee and an unrealised outcome (observed
+        2026-09-16: the 11:25:49 SHORT was orphaned by the 11:30 restart)."""
+        position = await self.get_open_position()
+        if position:
+            logger.warning("Recovered an open %s position from %s at %s — resuming management of it",
+                           position.get("direction"), position.get("timestamp"), position.get("entry_price"))
+        return position
 
     async def get_open_position(self) -> Optional[Dict[str, Any]]:
         """The open position record (simulation: from the state file; live: in memory), or None."""

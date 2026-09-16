@@ -230,3 +230,33 @@ def test_close_record_carries_excursions_context_and_duration(config, tmp_path):
     assert abs(close["mfe_pct"] - 0.2667) < 0.001 and abs(close["mae_pct"] + 0.3667) < 0.001   # worst = the stop fill itself
     assert close["context_packet"]["orderbook_zone"] == "support" and close["filter_snapshot"]["CtsFilter"]["flag"] == "✅ Hard Pass"
     assert close["signal_type"] == "TrapX" and close["duration_s"] is not None and close["duration_s"] >= 0
+
+
+def test_a_position_survives_a_restart_and_is_not_overwritten(config, tmp_path):
+    """A restart loses the in-memory lifecycle; the stored position must be recovered, and a second open
+    refused, or its already-charged fee and unrealised outcome vanish (observed live 2026-09-16)."""
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "SHORT", "stop_loss": 3010.0, "take_profit": 2985.0}))
+    balance_after_open = ex._get_simulation_state()["balance"]
+
+    fresh = TradeExecutor(config, ms, None)          # simulates the process restarting
+    fresh.memory_tracker = _Memory()
+    recovered = run(fresh.recover_open_position())
+    assert recovered and recovered["direction"] == "SHORT"
+
+    run(fresh._execute_simulated_trade({"direction": "LONG", "stop_loss": 2990.0, "take_profit": 3015.0}))
+    state = fresh._get_simulation_state()
+    assert state["positions"][config.adex_symbol]["direction"] == "SHORT", "the original position must survive"
+    assert state["balance"] == balance_after_open, "a refused open must not charge a fee"
+    assert len([h for h in state["history"] if h.get("event", "open") == "open"]) == 1
+
+    assert run(fresh.mark_to_market(3011.0)) is True       # and it can still be closed normally
+    assert fresh._get_simulation_state()["history"][-1]["reason"] == "STOP_LOSS"
+
+
+def test_sim_stats_reports_orphaned_opens():
+    from sim_stats import compute_stats
+    history = [{"event": "open", "fee": 1.0}, {"event": "open", "fee": 1.0},
+               {"event": "close", "pnl": 2.0, "fee": 1.0, "reason": "TAKE_PROFIT"}]
+    stats = compute_stats(history, 100.0)
+    assert stats["orphaned_opens"] == 1 and stats["open_now"] == 0

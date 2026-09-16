@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import time
 import json
 from datetime import datetime, timezone
 from typing import Dict, Any
@@ -53,6 +54,22 @@ class Engine:
             except Exception as e:
                 logger.error("Error in console display loop", extra={"error": str(e)})
                 await asyncio.sleep(5)
+
+    async def resume_open_position(self) -> None:
+        """Re-attach the Rolling5 lifecycle to a position that survived a restart, so it is managed and closed
+        instead of being silently overwritten by the next trade."""
+        try:
+            position = await self.trade_executor.recover_open_position()
+        except Exception as e:  # noqa: BLE001 - never block start-up on this
+            logger.error("Could not check for an open position at start-up: %r", e)
+            return
+        if not position:
+            return
+        ts = self.ai_strategy.forecaster._current_candle_ts(self.market_state)
+        if ts is None:
+            ts = int(time.time() * 1000)
+        self.ai_strategy.forecaster.lifecycle.start(ts)
+        logger.warning("Rolling5 lifecycle resumed for the recovered %s position", position.get("direction"))
 
     async def start(self):
         if not self.is_running:

@@ -85,6 +85,7 @@ async def lifespan(app: FastAPI):
     await market_state.initial_data_ready.wait()
     logger.info("Initial market data received. Proceeding with engine start.")
     
+    await engine.resume_open_position()
     await engine.start()
     
     logger.info("--- REALITY_CORE Bootstrap Complete. System is LIVE. ---")
