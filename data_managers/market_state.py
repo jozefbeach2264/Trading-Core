@@ -42,6 +42,9 @@ class MarketState:
         
         self.previous_depth_20: Dict[str, Any] = {"bids": [], "asks": []}
         self.filter_audit_report: Dict[str, Any] = {}
+        # Direction of the signal currently being validated (LONG/SHORT); set by AIStrategy before the
+        # post-signal filters run so a filter can judge context AGAINST the trade, cleared afterwards.
+        self.pending_signal_direction: Optional[str] = None
 
         # OKX SWAP sizes (trade sz, candle vol) are in CONTRACTS; ctVal converts to the base asset (ETH).
         # Every consumer (volume guard, CVD, HUD, AI packet) assumes base-asset units.

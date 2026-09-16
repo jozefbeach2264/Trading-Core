@@ -17,11 +17,13 @@ def fresh_state(config, **kw):
 class _Gate:
     def __init__(self):
         self.calls = 0
+        self.seen_direction = None
 
     async def run_primary_gate(self, _ms):
         return {"filters": {"CtsFilter": {"score": 0.9, "flag": "✅ Hard Pass"}}, "hard_blocks": 0}
 
-    async def run_post_signal_validators(self, _ms):
+    async def run_post_signal_validators(self, ms):
+        self.seen_direction = ms.pending_signal_direction     # filters may judge context against the trade
         return {"filters": {"OrderBookReversalZoneDetector": {"score": 0.8, "flag": "✅ Hard Confirmed"}}, "hard_blocks": 0}
 
 
@@ -71,7 +73,9 @@ class _Memory:
 def test_context_packet_carries_real_reversal_score(config):
     forecaster, ai = _Forecaster(), _AIClient()
     strategy = AIStrategy(config, _Router(), forecaster, ai, _Simulator(), _Memory())
-    result = run(strategy.generate_signal(fresh_state(config), _Gate()))
+    gate = _Gate(); ms = fresh_state(config)
+    result = run(strategy.generate_signal(ms, gate))
+    assert gate.seen_direction == "SHORT" and ms.pending_signal_direction is None   # set for the filters, cleared after
     assert result["ai_verdict"]["action"] == "⛔ Abort"
     packet = ai.packets[0]
     assert packet["reversal_likelihood_score"] == 0.5

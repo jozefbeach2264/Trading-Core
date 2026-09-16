@@ -86,6 +86,8 @@ class Config:
         self.low_volume_min_notional: float = float(os.getenv('LOW_VOLUME_MIN_NOTIONAL', '2000'))
         self.sentiment_divergence_lookback: int = int(os.getenv('SENTIMENT_DIVERGENCE_LOOKBACK', '20'))
         self.min_cvd_threshold: float = float(os.getenv('MIN_CVD_THRESHOLD', '5000.0'))
+        # Measured 2026-09-16 (2,658 setups): flow divergence against the trade → 34% wins vs 69% without. Veto it.
+        self.sentiment_divergence_blocks: bool = _env_bool('SENTIMENT_DIVERGENCE_BLOCKS', True)
         self.orderbook_reversal_depth_percent: float = float(os.getenv('ORDERBOOK_REVERSAL_DEPTH_PERCENT', '0.3'))
         self.orderbook_reversal_wall_multiplier: float = float(os.getenv('ORDERBOOK_REVERSAL_WALL_MULTIPLIER', '2.0'))
 

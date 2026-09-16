@@ -124,7 +124,11 @@ class AIStrategy(AIStrategyProtocol):
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
         self.logger.info(f"Signal Packet Generated: Type={signal_packet.get('trade_type')}, Direction={signal_packet.get('direction')}")
 
-        post_signal_report = await validator_stack.run_post_signal_validators(market_state)
+        market_state.pending_signal_direction = str(signal_packet.get("direction") or "").upper() or None
+        try:
+            post_signal_report = await validator_stack.run_post_signal_validators(market_state)
+        finally:
+            market_state.pending_signal_direction = None
         final_validator_log = {**primary_gate_report["filters"], **post_signal_report["filters"]}
         if post_signal_report.get("hard_blocks", 0) > 0:
             reason = format_rejection_reason(post_signal_report["filters"], "Post-Signal")
