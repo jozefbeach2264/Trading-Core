@@ -16,6 +16,8 @@ from memory_tracker import MemoryTracker
 
 logger = logging.getLogger(__name__)
 
+ORDER_TIMEOUT_S = 5.0  # a market order that has not answered in 5 s is not going to get faster
+
 class TradeExecutor:
     def __init__(self, config: Config, market_state: MarketState, httpx_client: httpx.AsyncClient):
         self.config = config
@@ -123,7 +125,7 @@ class TradeExecutor:
         url = f"{self.base_url}/fapi/v1/order"
         
         try:
-            response = await self.client.post(url, headers=headers, params=params)
+            response = await self.client.post(url, headers=headers, params=params, timeout=ORDER_TIMEOUT_S)
             response.raise_for_status()
             trade_data = {
                 "direction": direction,
@@ -138,6 +140,15 @@ class TradeExecutor:
             await self.memory_tracker.update_memory(trade_data={
                 "direction": direction,
                 "reason": f"Order failed: {e.response.text}",
+                "failed": True
+            })
+        except httpx.HTTPError as e:
+            # Timeout / connect / protocol error. The order MAY have reached the exchange: log loudly and
+            # record it as failed rather than letting the exception stall the engine for 60 s.
+            logger.error("Order request errored (fill state UNKNOWN — check the exchange): %r", e)
+            await self.memory_tracker.update_memory(trade_data={
+                "direction": direction,
+                "reason": f"Order transport error: {e!r}",
                 "failed": True
             })
 

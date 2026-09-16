@@ -127,6 +127,8 @@ class Config:
             raise ValueError("AI_CLIENT_TIMEOUT must be a positive number of seconds.")
         if self.ai_max_tokens <= 0:
             raise ValueError("AI_MAX_TOKENS must be a positive integer.")
+        if self.exchange_keepalive_seconds <= 0:
+            raise ValueError("EXCHANGE_KEEPALIVE_SECONDS must be a positive number of seconds.")
         if self.engine_cycle_interval <= 0:
             raise ValueError("ENGINE_CYCLE_INTERVAL must be a positive float.")
         if not 0 < self.cts_narrow_range_ratio <= 1.0:

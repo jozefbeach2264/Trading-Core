@@ -45,3 +45,10 @@ def test_compression_range_ratio_must_be_positive(monkeypatch):
     monkeypatch.setenv("COMPRESSION_RANGE_RATIO", "0")
     with pytest.raises(ValueError):
         Config()
+
+
+def test_exchange_keepalive_must_be_positive(monkeypatch):
+    import pytest
+    monkeypatch.setenv("EXCHANGE_KEEPALIVE_SECONDS", "0")
+    with pytest.raises(ValueError):
+        Config()

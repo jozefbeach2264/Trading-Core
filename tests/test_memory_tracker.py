@@ -44,13 +44,13 @@ def test_db_uses_wal_journal(config):
         assert conn.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
 
 
-def test_storage_errors_never_escape_into_the_cycle(config):
+def test_storage_errors_never_escape_into_the_cycle(config, monkeypatch):
     config.memory_filter_history = True
     tracker = MemoryTracker(config)
 
     def boom(*_a, **_kw):
         raise sqlite3.OperationalError("database is locked")
 
-    tracker._store.write = boom
+    monkeypatch.setattr(tracker._store, "write", boom)   # the store is process-wide: auto-restored
     run(tracker.update_filter_reports(_reports(2)))   # must not raise
     run(tracker.update_memory(trade_data={"direction": "LONG"}))
