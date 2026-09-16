@@ -34,6 +34,10 @@ _PINNED_ENV = {
     "TRAIL_DISTANCE_R": "1.0",
     "TARGET_EXTEND_R": "1.5",
     "EXIT_REVERSAL_RISK": "0.8",
+    # fixed-size mode OFF for the suite: the operator's live .env turns it on, and it changes what every
+    # sizing and stop test is measuring. The dedicated tests set it on the config object instead.
+    "FIXED_MARGIN_USD": "0",
+    "MAX_LOSS_USD": "0",
     "RISK_PER_TRADE_PERCENT": "2.0",
     "RISK_CAP_PERCENT": "0.10",
     "LEVERAGE": "200",
