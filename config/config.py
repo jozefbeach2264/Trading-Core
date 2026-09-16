@@ -124,6 +124,10 @@ class Config:
         #     fee as a fraction of the amount risked = round-trip fee % / stop distance %.
         # Measured 2026-09-16: stops of 0.05-0.12% against a 0.16% fee meant paying 1.3-3.4x the risk in fees.
         self.min_stop_fee_multiple: float = float(os.getenv('MIN_STOP_FEE_MULTIPLE', '2.0'))
+        # A stop beyond the liquidation price can never be reached — the position is liquidated first, so the
+        # trade's stated risk/reward is fiction and the real risk is the whole margin. Observed live
+        # 2026-09-16: a stop 4.67% away at 200x leverage, where liquidation is 0.50%.
+        self.max_stop_liquidation_fraction: float = float(os.getenv('MAX_STOP_LIQUIDATION_FRACTION', '0.8'))
 
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
@@ -203,6 +207,11 @@ class Config:
         self._validate()
 
     @property
+    def liquidation_distance_percent(self) -> float:
+        """How far price must move against the position to consume the margin, ignoring maintenance margin."""
+        return 100.0 / self.leverage if self.leverage else float("inf")
+
+    @property
     def round_trip_fee_percent(self) -> float:
         """Entry + exit taker fee as a percentage of notional (EXCHANGE_FEE_RATE_TAKER is one side)."""
         return 2.0 * self.exchange_fee_rate_taker
@@ -252,6 +261,15 @@ class Config:
             raise ValueError("MIN_REWARD_FEE_MULTIPLE must be >= 0.")
         if self.min_stop_fee_multiple < 0:
             raise ValueError("MIN_STOP_FEE_MULTIPLE must be >= 0.")
+        if not 0 < self.max_stop_liquidation_fraction <= 1.0:
+            raise ValueError("MAX_STOP_LIQUIDATION_FRACTION must be in (0, 1].")
+        floor = self.min_stop_fee_multiple * self.round_trip_fee_percent
+        ceiling = self.max_stop_liquidation_fraction * self.liquidation_distance_percent
+        if floor > ceiling:
+            raise ValueError(
+                f"No stop width can satisfy both guards: fees demand >= {floor:.3f}% but liquidation at "
+                f"{self.leverage}x caps it at {ceiling:.3f}%. Lower LEVERAGE, lower the fee (maker orders), "
+                f"or relax MIN_STOP_FEE_MULTIPLE / MAX_STOP_LIQUIDATION_FRACTION.")
         if self.trapx_wick_body_multiplier <= 0:
             raise ValueError("TRAPX_WICK_BODY_MULTIPLIER must be positive.")
         if not 0 < self.trapx_wick_min_range_fraction < 1.0:

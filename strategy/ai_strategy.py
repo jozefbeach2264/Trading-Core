@@ -32,6 +32,7 @@ REJECTION_CODE_MAP = {
     "FORECAST_UNAVAILABLE": "FORECAST UNAVAILABLE",
     "REWARD_TOO_SMALL": "REWARD BELOW FEES",
     "STOP_TOO_TIGHT": "STOP TOO TIGHT FOR FEES",
+    "STOP_BEYOND_LIQUIDATION": "STOP BEYOND LIQUIDATION",
     "AI_VERDICT": "AI VERDICT",
     "STALE_DATA": "STALE MARKET DATA",
     "STALE_DECISION": "STALE DECISION",
@@ -135,6 +136,20 @@ class AIStrategy(AIStrategyProtocol):
                     f"(fees would be {fee_pct/stop_pct:.1f}x the risk)")
         return ""
 
+    def _stop_beyond_liquidation(self, signal_packet: Dict[str, Any]) -> str:
+        """'' when the stop can actually be reached before the position is liquidated; otherwise why not."""
+        fraction = self.config.max_stop_liquidation_fraction
+        entry = float(signal_packet.get("entry_price") or 0.0)
+        stop = signal_packet.get("stop_loss")
+        if entry <= 0 or stop is None or fraction <= 0:
+            return ""
+        stop_pct = abs(float(stop) - entry) / entry * 100.0
+        liq_pct = self.config.liquidation_distance_percent
+        if stop_pct > fraction * liq_pct:
+            return (f"stop {stop_pct:.3f}% exceeds {fraction:g}x the {liq_pct:.3f}% liquidation distance at "
+                    f"{self.config.leverage}x — it could never be reached")
+        return ""
+
     def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
         reason = f"Rejected - {REJECTION_CODE_MAP[code]}: {detail}" if detail else f"Rejected - {REJECTION_CODE_MAP[code]}"
         getattr(self.logger, level)(f"REJECTED: {reason}")
@@ -169,6 +184,9 @@ class AIStrategy(AIStrategyProtocol):
         stop_reason = self._stop_too_tight(signal_packet)
         if stop_reason:
             return self._reject("STOP_TOO_TIGHT", stop_reason, primary_gate_report["filters"], level="info")
+        liq_reason = self._stop_beyond_liquidation(signal_packet)
+        if liq_reason:
+            return self._reject("STOP_BEYOND_LIQUIDATION", liq_reason, primary_gate_report["filters"], level="info")
 
         market_state.pending_signal_direction = str(signal_packet.get("direction") or "").upper() or None
         try:
