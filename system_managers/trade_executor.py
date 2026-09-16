@@ -342,9 +342,13 @@ class TradeExecutor:
             "take_profit": _as_float(signal.get("take_profit")),
             "initial_risk": abs(entry_price - _as_float(signal.get("stop_loss"))) if _as_float(signal.get("stop_loss")) else None,
             "best_price": entry_price,
+            "worst_price": entry_price,
+            "opened_at": datetime.now(timezone.utc).timestamp(),
             "liquidation_price": liquidation_price,
             "reasoning": signal.get("signal_reason") or signal.get("reason", "N/A"),
             "ai_verdict": signal.get("ai_verdict", {}),
+            "context_packet": signal.get("context_packet", {}),
+            "filter_snapshot": signal.get("filter_snapshot", {}),
             "simulated": True,
         }
         state["history"].append(record)
@@ -411,8 +415,15 @@ class TradeExecutor:
         position = state["positions"].get(self.config.adex_symbol)
         if not position:
             return False
+        # Excursion tracking: how far price went FOR (best) and AGAINST (worst) the trade while it was open.
+        sign = 1.0 if str(position.get("direction", "")).upper() == "LONG" else -1.0
+        best, worst = position.get("best_price", mark_price), position.get("worst_price", mark_price)
+        position["best_price"] = max(best, mark_price) if sign > 0 else min(best, mark_price)
+        position["worst_price"] = min(worst, mark_price) if sign > 0 else max(worst, mark_price)
         trigger = self._exit_trigger(position, mark_price)
         if trigger is None:
+            if (position["best_price"], position["worst_price"]) != (best, worst):
+                self._save_simulation_state(state)
             return False
         fill_price, reason = trigger
         self._close_simulated_position(fill_price, reason, state=state)
@@ -430,10 +441,22 @@ class TradeExecutor:
             pnl = -float(position.get("margin", abs(pnl)))   # the whole margin is gone, never more
         fee = float(position.get("notional", 0.0)) * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = float(state["balance"]) + pnl - fee
+        entry = float(position["entry_price"])
+        best = float(position.get("best_price", entry)); worst = float(position.get("worst_price", entry))
+        opened_at = float(position.get("opened_at") or 0.0)
         state["history"].append({
             "timestamp": datetime.now(timezone.utc).isoformat(), "symbol": self.config.adex_symbol, "event": "close",
-            "direction": position.get("direction"), "entry_price": position["entry_price"], "exit_price": exit_price,
+            "direction": position.get("direction"), "entry_price": entry, "exit_price": exit_price,
             "quantity": position["quantity"], "pnl": pnl, "fee": fee, "reason": reason, "simulated": True,
+            # trade-quality fields: excursions in % of entry, duration, and what the trade was taken on
+            "mfe_pct": round(sign * (best - entry) / entry * 100, 4),
+            "mae_pct": round(sign * (worst - entry) / entry * 100, 4),
+            "duration_s": round(datetime.now(timezone.utc).timestamp() - opened_at, 1) if opened_at else None,
+            "signal_type": position.get("signal_type"),
+            "ai_confidence": (position.get("ai_verdict") or {}).get("confidence"),
+            "context_packet": position.get("context_packet", {}),
+            "filter_snapshot": position.get("filter_snapshot", {}),
+            "adjustments": len(position.get("adjustments") or []),
         })
         state.setdefault("initial_capital", self.config.simulation_initial_capital)
         stats = compute_stats(state["history"], float(state["initial_capital"]))

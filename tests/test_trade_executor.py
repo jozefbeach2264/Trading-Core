@@ -216,3 +216,17 @@ def test_sim_exits_can_be_updated_and_are_honoured(config, tmp_path):
     assert run(ex.mark_to_market(3001.0)) is False
     assert run(ex.mark_to_market(3000.4)) is True                          # the moved stop is live
     assert ex._get_simulation_state()["history"][-1]["reason"] == "STOP_LOSS"
+
+
+def test_close_record_carries_excursions_context_and_duration(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    signal = {"direction": "LONG", "stop_loss": 2990.0, "take_profit": 3015.0, "trade_type": "TrapX",
+              "context_packet": {"cts_score": 0.9, "orderbook_zone": "support"}, "filter_snapshot": {"CtsFilter": {"flag": "✅ Hard Pass"}}}
+    run(ex._execute_simulated_trade(signal))
+    assert run(ex.mark_to_market(2996.0)) is False      # down 0.13% first
+    assert run(ex.mark_to_market(3008.0)) is False      # then up 0.27%
+    assert run(ex.mark_to_market(2989.0)) is True       # stopped out
+    close = ex._get_simulation_state()["history"][-1]
+    assert abs(close["mfe_pct"] - 0.2667) < 0.001 and abs(close["mae_pct"] + 0.3667) < 0.001   # worst = the stop fill itself
+    assert close["context_packet"]["orderbook_zone"] == "support" and close["filter_snapshot"]["CtsFilter"]["flag"] == "✅ Hard Pass"
+    assert close["signal_type"] == "TrapX" and close["duration_s"] is not None and close["duration_s"] >= 0

@@ -146,6 +146,7 @@ def test_approved_execute_passes_freshness_and_risk_checks(config):
     strategy = AIStrategy(config, _Router(), _Forecaster(), _ExecuteAI(), _Simulator(), _Memory())
     result = run(strategy.generate_signal(fresh_state(config), _Gate()))
     assert "reason" not in result and result["ai_verdict"]["action"] == "✅ Execute" and result["direction"] == "SHORT"
+    assert result["context_packet"]["direction"] == "SHORT" and "CtsFilter" in result["filter_snapshot"]
     assert result["signal_reason"].startswith("GENESIS TrapX")
     from system_managers.engine import Engine
     assert Engine._is_approved(result), "an approved signal must execute despite the strategy's descriptive reason"
