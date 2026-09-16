@@ -318,7 +318,7 @@ class TradeExecutor:
             "margin": margin,
             "notional": notional,
             "fee": fee,
-            "reasoning": signal.get("reason", "N/A"),
+            "reasoning": signal.get("signal_reason") or signal.get("reason", "N/A"),
             "ai_verdict": signal.get("ai_verdict", {}),
             "simulated": True,
         }

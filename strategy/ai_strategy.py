@@ -162,7 +162,10 @@ class AIStrategy(AIStrategyProtocol):
             rejected_verdict = {**ai_verdict, "action": "🤔 Reanalyze"}
             return {"reason": reason, "ai_verdict": rejected_verdict, "validator_report": final_validator_log}
 
-        final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
+        # The strategy's own descriptive "reason" ("Scalpel: ...") must not look like a rejection reason:
+        # the engine executes only signals WITHOUT a "reason". Keep it under signal_reason.
+        final_signal = {"ai_verdict": ai_verdict, **{k: v for k, v in signal_packet.items() if k != "reason"},
+                        "signal_reason": signal_packet.get("reason", ""), "validator_report": final_validator_log}
 
         if ai_verdict.get("action") != "✅ Execute":
             # Abort / Reanalyze with confidence above the gate: a rejection, with the model's own words.

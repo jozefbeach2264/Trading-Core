@@ -27,7 +27,8 @@ class _Gate:
 
 class _Router:
     async def route_and_generate_signal(self, _ms, _report):
-        return {"trade_type": "TrapX", "direction": "SHORT", "entry_price": 3000.0, "take_profit": 2990.0, "stop_loss": 3005.0}
+        return {"trade_type": "TrapX", "direction": "SHORT", "entry_price": 3000.0, "take_profit": 2990.0, "stop_loss": 3005.0,
+                "reason": "GENESIS TrapX: SHORT signal identified."}   # the strategies' own descriptive key
 
 
 class _Forecaster:
@@ -141,6 +142,9 @@ def test_approved_execute_passes_freshness_and_risk_checks(config):
     strategy = AIStrategy(config, _Router(), _Forecaster(), _ExecuteAI(), _Simulator(), _Memory())
     result = run(strategy.generate_signal(fresh_state(config), _Gate()))
     assert "reason" not in result and result["ai_verdict"]["action"] == "✅ Execute" and result["direction"] == "SHORT"
+    assert result["signal_reason"].startswith("GENESIS TrapX")
+    from system_managers.engine import Engine
+    assert Engine._is_approved(result), "an approved signal must execute despite the strategy's descriptive reason"
 
 
 def test_price_drift_during_the_verdict_rejects_the_decision(config):
