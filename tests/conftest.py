@@ -26,6 +26,11 @@ _PINNED_ENV = {
     "MAX_STOP_LIQUIDATION_FRACTION": "0.8",
     "SCALPEL_STOP_RANGE_MULTIPLE": "3.0",
     "SCALPEL_TARGET_RANGE_MULTIPLE": "8.0",
+    # exit management: pinned so tuning the live .env cannot change what these tests assert
+    "TRAIL_BREAKEVEN_R": "0.5",
+    "TRAIL_DISTANCE_R": "1.0",
+    "TARGET_EXTEND_R": "1.5",
+    "EXIT_REVERSAL_RISK": "0.8",
     "RISK_PER_TRADE_PERCENT": "2.0",
     "RISK_CAP_PERCENT": "0.10",
     "LEVERAGE": "200",
