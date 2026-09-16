@@ -22,13 +22,23 @@ def compute_stats(history: List[Dict[str, Any]], initial_capital: float) -> Dict
         peak = max(peak, equity)
         if peak > 0:
             max_drawdown_pct = max(max_drawdown_pct, (peak - equity) / peak * 100.0)
+    # An "open" with a later "open" before any "close" was orphaned (a restart lost the lifecycle).
+    orphans, depth = 0, 0
+    for h in history:
+        if h.get("event", "open") == "open":
+            if depth:
+                orphans += 1
+            depth += 1
+        elif depth:
+            depth -= 1
     by_reason: Dict[str, int] = {}
     for c in closes:
         by_reason[c.get("reason", "?")] = by_reason.get(c.get("reason", "?"), 0) + 1
     return {
         "trades_opened": len(opens),
         "trades_closed": len(closes),
-        "open_now": max(len(opens) - len(closes), 0),
+        "open_now": max(len(opens) - len(closes) - orphans, 0),
+        "orphaned_opens": orphans,
         "win_rate_pct": round(100.0 * len(wins) / len(closes), 2) if closes else None,
         "gross_pnl": round(gross, 6),
         "fees": round(fees, 6),
