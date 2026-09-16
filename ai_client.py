@@ -34,6 +34,8 @@ SYSTEM_PROMPT = (
     "- Orderbook Score: Market depth assessment. High score (>0.8) suggests strong support/resistance.\n"
     "- Reversal Likelihood Score: probability (0-1) that price reverses AGAINST the trade direction. "
     "A high value is a major red flag.\n"
+    "- orderbook_zone: side of the strongest wall. 'resistance' (ask wall above price) opposes a LONG; "
+    "'support' (bid wall below price) opposes a SHORT. A wall against the trade is a red flag, not confirmation.\n"
     "Primary goal is capital preservation. Only 'Execute' on high-probability setups.\n"
     "Return JSON with 'action' (Execute|Abort|Reanalyze), 'confidence' (0-1) and, if the schema asks for it, "
     "'reasoning' (one short sentence, max 20 words)."
@@ -57,6 +59,7 @@ def build_verdict_schema(reasoning_max_chars: int) -> Dict[str, Any]:
 
 VERDICT_JSON_SCHEMA = build_verdict_schema(200)
 
+CONFIDENCE_TOLERANCE = 0.01           # float noise around the [0, 1] bounds is clamped; beyond it is rejected
 FALLBACK_EXECUTE_MIN_SCORE = 0.8      # cts + orderbook must both beat this
 FALLBACK_EXECUTE_MAX_REVERSAL = 0.2   # and reversal risk must be below this
 TOKEN_WARN_LIMIT = 2000
@@ -84,6 +87,8 @@ def parse_verdict(content: str) -> Optional[Dict[str, Any]]:
         return None
     if math.isnan(confidence) or math.isinf(confidence):
         return None
+    if confidence < -CONFIDENCE_TOLERANCE or confidence > 1.0 + CONFIDENCE_TOLERANCE:
+        return None  # e.g. "85" (a percentage) — garbage, not a maximum-confidence verdict
     reasoning = data.get("reasoning", "")
     return {"action": action, "confidence": _clamp01(confidence),
             "reasoning": reasoning if isinstance(reasoning, str) else str(reasoning)}
@@ -133,11 +138,9 @@ class AIClient:
             logger.debug("AI decision log write failed", exc_info=True)
 
     async def _remember(self, context_packet: Dict[str, Any], verdict: Dict[str, Any]) -> None:
-        try:
-            await self.memory_tracker.update_memory(
-                trade_data={"direction": context_packet.get("direction", "N/A"), "ai_verdict": verdict})
-        except Exception:
-            logger.debug("MemoryTracker update failed", exc_info=True)
+        """Verdicts live in ai_model.log (NDJSON). They used to be written into the SQLite *trades* table
+        as quantity-0 'trades', which polluted the only durable order record."""
+        logger.debug("AI verdict for %s: %s", context_packet.get("direction", "N/A"), verdict.get("action"))
 
     # ------------------------------------------------------------------ verdict
     async def get_ai_verdict(self, context_packet: Dict[str, Any]) -> Dict[str, Any]:
@@ -191,11 +194,19 @@ class AIClient:
         self._log_token_usage(response_data.get("usage") or {})
         ai_strategy_logger.info(f"FINISH REASON: {finish_reason}")
         ai_strategy_logger.info(f"RAW AI RESPONSE RECEIVED: ---{content}---")
+        reasoning_content = message.get("reasoning_content") or ""
+        if reasoning_content and not content:
+            ai_strategy_logger.error("MODEL IS THINKING despite AI_DISABLE_THINKING (%d chars of reasoning, no content). "
+                                     "Serve a model/template that honours enable_thinking.", len(reasoning_content))
+        if finish_reason == "length":
+            ai_strategy_logger.error("AI VERDICT TRUNCATED at max_tokens=%d — raise AI_MAX_TOKENS or shorten the reasoning cap.",
+                                     self.config.ai_max_tokens)
 
         verdict = parse_verdict(content) if content else None
         if verdict is None:
-            ai_strategy_logger.error(f"AI VERDICT FAILED: invalid or empty verdict content: {content[:300]!r}")
-            return await self._fallback(context_packet, error="invalid verdict content", latency_ms=latency_ms)
+            error = "truncated verdict" if finish_reason == "length" else "invalid verdict content"
+            ai_strategy_logger.error(f"AI VERDICT FAILED: {error}: {content[:300]!r}")
+            return await self._fallback(context_packet, error=error, latency_ms=latency_ms)
 
         await self._remember(context_packet, verdict)
         self._record({"ts": response_data.get("created"), "type": "api_verdict", "context": context_packet,
@@ -237,9 +248,12 @@ class AIClient:
         if direction not in ("long", "short"):
             return {"action": "Reanalyze", "confidence": 0.0,
                     "reasoning": f"Unknown trade direction {direction!r}; heuristic cannot judge."}
-        gates_strong = (cts_score > FALLBACK_EXECUTE_MIN_SCORE and orderbook_score > FALLBACK_EXECUTE_MIN_SCORE
-                        and reversal_risk < FALLBACK_EXECUTE_MAX_REVERSAL and volume > 0)
         is_short = direction == "short"
+        zone = str(context_packet.get("orderbook_zone", "none")).lower()
+        wall_against_trade = (zone == "resistance" and not is_short) or (zone == "support" and is_short)
+        gates_strong = (cts_score > FALLBACK_EXECUTE_MIN_SCORE and orderbook_score > FALLBACK_EXECUTE_MIN_SCORE
+                        and not wall_against_trade
+                        and reversal_risk < FALLBACK_EXECUTE_MAX_REVERSAL and volume > 0)
         price_with_trade = close_price < open_price if is_short else close_price > open_price
         price_against_trade = close_price > open_price if is_short else close_price < open_price
         label = direction

@@ -3,6 +3,30 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
+_TRUE = {"true", "1", "yes", "on"}
+_FALSE = {"false", "0", "no", "off"}
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    """Strict boolean env parsing. A live-money flag must never flip on a typo: anything that is not a
+    recognised true/false spelling raises instead of silently evaluating to False."""
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    value = raw.strip().lower()
+    if value in _TRUE:
+        return True
+    if value in _FALSE:
+        return False
+    raise ValueError(f"{name} must be true/false (got {raw!r}).")
+
+
+def expected_exchange_symbol(okx_symbol: str) -> str:
+    """ETH-USDT-SWAP → ETHUSDT (the Binance-style symbol the executor trades)."""
+    parts = okx_symbol.split("-")
+    return "".join(parts[:2]).upper() if len(parts) >= 2 else okx_symbol.upper()
+
+
 class Config:
     def __init__(self):
         # Credentials & API Keys
@@ -21,7 +45,7 @@ class Config:
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
         self.trading_symbol: str = os.getenv("TRADING_SYMBOL", "ETH-USDT-SWAP")
         self.adex_symbol: str = os.getenv("ADEX_SYMBOL", "ETHUSDT")
-        self.dry_run_mode: bool = os.getenv('DRY_RUN_MODE', 'True').lower() == 'true'
+        self.dry_run_mode: bool = _env_bool('DRY_RUN_MODE', True)
         self.kline_deque_maxlen: int = int(os.getenv('KLINE_DEQUE_MAXLEN', '500'))
         self.ai_client_timeout: float = float(os.getenv('AI_CLIENT_TIMEOUT', '10'))
         self.engine_cycle_interval: float = float(os.getenv('ENGINE_CYCLE_INTERVAL', '0.2'))
@@ -35,7 +59,7 @@ class Config:
         self.simulation_initial_capital: float = float(os.getenv("SIMULATION_INITIAL_CAPITAL", "10.00"))
         
         # Autonomous Mode & Time Filter
-        self.autonomous_mode_enabled: bool = os.getenv('AUTONOMOUS_MODE_ENABLED', 'True').lower() == 'true'
+        self.autonomous_mode_enabled: bool = _env_bool('AUTONOMOUS_MODE_ENABLED', True)
         self.allowed_windows: str = os.getenv('ALLOWED_WINDOWS', '00:00-23:59')
         
         # Filter Parameters
@@ -75,22 +99,33 @@ class Config:
         # Verdict generation budget. The reasoning string is only logged, so keep it short: fewer
         # tokens = lower latency. Thinking/reasoning modes burn thousands of hidden tokens → off.
         self.ai_max_tokens: int = int(os.getenv('AI_MAX_TOKENS', '160'))
-        self.ai_disable_thinking: bool = os.getenv('AI_DISABLE_THINKING', 'True').lower() == 'true'
+        self.ai_disable_thinking: bool = _env_bool('AI_DISABLE_THINKING', True)
         self.ai_temperature: float = float(os.getenv('AI_TEMPERATURE', '0.2'))
         # Hard cap on the logged reasoning string, enforced in the JSON grammar. 0 = omit the field.
         self.ai_reasoning_max_chars: int = int(os.getenv('AI_REASONING_MAX_CHARS', '200'))
         # May the context heuristic (used only when the model returns nothing usable) authorise an Execute?
-        self.ai_fallback_can_execute: bool = os.getenv('AI_FALLBACK_CAN_EXECUTE', 'False').lower() == 'true'
+        self.ai_fallback_can_execute: bool = _env_bool('AI_FALLBACK_CAN_EXECUTE', False)
+        # Deterministic backstop: above this reversal risk the setup is rejected without asking the model.
+        self.ai_max_reversal_risk: float = float(os.getenv('AI_MAX_REVERSAL_RISK', '0.8'))
+
+        # Freshness gates (the original design had none)
+        self.max_data_staleness_s: float = float(os.getenv('MAX_DATA_STALENESS_S', '3.0'))
+        self.max_decision_age_s: float = float(os.getenv('MAX_DECISION_AGE_S', '5.0'))
+        self.max_entry_drift_pct: float = float(os.getenv('MAX_ENTRY_DRIFT_PCT', '0.15'))
+        # One position at a time: no new entry while the Rolling5 lifecycle is within this many candles.
+        self.max_position_candles: int = int(os.getenv('MAX_POSITION_CANDLES', '5'))
+        # Live only: push LEVERAGE to the exchange at start-up (otherwise the account's stored leverage governs).
+        self.exchange_set_leverage: bool = _env_bool('EXCHANGE_SET_LEVERAGE', False)
 
         # Memory tracker (SQLite). Filter history is write-only data at ~45 rows/s — off by default.
         self.memory_db_path: str = os.getenv("MEMORY_DB_PATH", "./logs/memory_tracker.db")
-        self.memory_filter_history: bool = os.getenv('MEMORY_FILTER_HISTORY', 'False').lower() == 'true'
+        self.memory_filter_history: bool = _env_bool('MEMORY_FILTER_HISTORY', False)
 
         # Exchange HTTP keep-alive (live mode): ping so the TLS session is warm when an order fires.
         self.exchange_keepalive_seconds: float = float(os.getenv('EXCHANGE_KEEPALIVE_SECONDS', '20'))
         
         # Toggles & UI
-        self.live_print_headers: bool = os.getenv('LIVE_PRINT_HEADERS', 'True').lower() == 'true'
+        self.live_print_headers: bool = _env_bool('LIVE_PRINT_HEADERS', True)
         
         # File & Log Paths
         self.log_file_path: str = os.getenv("LOG_FILE_PATH", "./logs/system.log")
@@ -117,6 +152,22 @@ class Config:
                 raise ValueError("ASTERDEX_API_KEY and ASTERDEX_API_SECRET must be provided when not in dry run mode.")
         if not self.ai_provider_url:
             raise ValueError("AI_PROVIDER_URL must be set (OpenAI-compatible chat-completions base URL).")
+        expected = expected_exchange_symbol(self.trading_symbol)
+        if self.adex_symbol.upper() != expected:
+            raise ValueError(f"ADEX_SYMBOL ({self.adex_symbol}) does not match TRADING_SYMBOL ({self.trading_symbol}); "
+                             f"expected {expected}. Orders would be sized on one instrument and sent to another.")
+        from filters.time_of_day_filter import parse_trade_windows  # local import: filters import Config
+        parse_trade_windows(self.allowed_windows)  # raises on a malformed window list
+        if not 0.0 <= self.exchange_fee_rate_taker <= 5.0:
+            raise ValueError("EXCHANGE_FEE_RATE_TAKER is a percentage (e.g. 0.05); must be between 0 and 5.")
+        if self.simulation_initial_capital <= 0:
+            raise ValueError("SIMULATION_INITIAL_CAPITAL must be positive.")
+        if not 0.0 < self.ai_max_reversal_risk <= 1.0:
+            raise ValueError("AI_MAX_REVERSAL_RISK must be in (0, 1].")
+        if self.max_data_staleness_s <= 0 or self.max_decision_age_s <= 0 or self.max_entry_drift_pct <= 0:
+            raise ValueError("MAX_DATA_STALENESS_S, MAX_DECISION_AGE_S and MAX_ENTRY_DRIFT_PCT must be positive.")
+        if self.max_position_candles <= 0:
+            raise ValueError("MAX_POSITION_CANDLES must be a positive integer.")
 
         # Validate Numerical Ranges
         if not 0 < self.risk_cap_percent <= 1.0:

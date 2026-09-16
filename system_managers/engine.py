@@ -1,7 +1,7 @@
 import logging
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 from config.config import Config
@@ -10,15 +10,16 @@ from validator_stack import ValidatorStack
 from strategy.ai_strategy import AIStrategy
 from .trade_executor import TradeExecutor 
 from console_display import format_market_state_for_console
+from log_utils import file_logger
 
 logger = logging.getLogger(__name__)
 
 def log_failed_signal(report: Dict[str, Any], reason: str, config: Config):
-    """Logs a failed/rejected signal to a dedicated JSON file for later analysis."""
+    """Logs a failed/rejected signal as NDJSON — through the queue-backed logger, since this is the
+    hottest write path (most cycles are rejections) and used to be a synchronous open/append on the loop."""
     try:
-        with open(config.failed_signals_path, 'a') as f:
-            log_entry = {"timestamp": datetime.utcnow().isoformat() + "Z", "reason": reason, "report": report}
-            f.write(json.dumps(log_entry) + "\n")
+        entry = {"timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "reason": reason, "report": report}
+        file_logger("FailedSignalsLogger", config.failed_signals_path, fmt="%(message)s", level=logging.INFO).info(json.dumps(entry))
     except Exception as e:
         logger.error("Failed to log rejected signal", extra={"error": str(e)}, exc_info=True)
 
@@ -42,7 +43,7 @@ class Engine:
         while self.is_running:
             try:
                 display_output = format_market_state_for_console(self.market_state)
-                print(display_output)
+                await asyncio.to_thread(print, display_output)  # a blocked stdout must not stall the loop
                 await asyncio.sleep(1)
             except asyncio.CancelledError:
                 break
@@ -73,6 +74,32 @@ class Engine:
             self.ai_strategy.forecaster.stop_lifecycle()
             logger.info("System Engine stopped.")
 
+    def _lifecycle(self):
+        return self.ai_strategy.forecaster.lifecycle
+
+    def _position_is_open(self) -> bool:
+        lc = self._lifecycle()
+        return bool(lc.active) and lc.candle_count <= self.config.max_position_candles
+
+    async def _settle_open_position(self) -> None:
+        """Advance the lifecycle on the current candle; once it has run its course, close the position
+        (simulation realises PnL at the mark price; live mode only clears the guard — see trade_executor)."""
+        lc = self._lifecycle()
+        if not lc.active:
+            return
+        lc.update(self.ai_strategy.forecaster._current_candle_ts(self.market_state))
+        if lc.candle_count > self.config.max_position_candles:
+            await self.trade_executor.close_position(self.market_state.mark_price, reason="ROLLING5_COMPLETE")
+            self.ai_strategy.forecaster.stop_lifecycle()
+
+    @staticmethod
+    def _is_approved(final_signal: Dict[str, Any]) -> bool:
+        """Only a fully approved signal executes: an Execute action, no rejection reason, and a direction."""
+        if not final_signal or final_signal.get("reason"):
+            return False
+        action = (final_signal.get("ai_verdict") or {}).get("action")
+        return action in ("✅ Execute", "Execute") and bool(final_signal.get("direction"))
+
     async def run_autonomous_cycle(self):
         await asyncio.sleep(10)
         while self.is_running:
@@ -81,29 +108,33 @@ class Engine:
                 # This allows for event-driven decisions during candle formation
                 event_task = asyncio.create_task(self.event_queue.get())
                 sleep_task = asyncio.create_task(asyncio.sleep(self.config.engine_cycle_interval))
-                done, pending = await asyncio.wait(
-                    [event_task, sleep_task],
-                    return_when=asyncio.FIRST_COMPLETED
-                )
-
-                # If an event was received, process it. Otherwise, it was a periodic wake-up.
+                try:
+                    done, pending = await asyncio.wait([event_task, sleep_task], return_when=asyncio.FIRST_COMPLETED)
+                finally:
+                    for task in (event_task, sleep_task):  # asyncio.wait never cancels its children
+                        if not task.done():
+                            task.cancel()
                 for task in done:
                     if task is event_task:
-                        event = task.result()
-                        logger.info(f"Processing event from queue: {event}")
-                    # No else needed, if it wasn't event_task, it was sleep_task
-                for task in pending:
-                    task.cancel()
+                        logger.info(f"Processing event from queue: {task.result()}")
+
+                # One position at a time: while the Rolling5 lifecycle of the last entry is running, do not
+                # re-enter. Without this the same setup re-executed every 0.2 s cycle (three stacked entries
+                # 8 s apart are visible in the old simulation_state.json).
+                await self._settle_open_position()
+                if self._position_is_open():
+                    log_failed_signal({}, f"POSITION OPEN (Rolling5 C{self._lifecycle().candle_count})", self.config)
+                    continue
 
                 # The AIStrategy module now handles the entire validation and signal generation flow
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, self.validator_stack)
-                
-                action = final_signal.get("ai_verdict", {}).get("action")
-                if final_signal and action in ("✅ Execute", "Execute"):
+
+                if self._is_approved(final_signal):
                     # Start Rolling5 lifecycle tracking when a trade is authorized for execution
                     self.ai_strategy.forecaster.start_lifecycle(self.market_state)
                     if self.config.autonomous_mode_enabled:
-                        await self.trade_executor.execute_trade(final_signal)
+                        # Shielded: a shutdown mid-POST must not leave an order on the exchange with no record.
+                        await asyncio.shield(self.trade_executor.execute_trade(final_signal))
                     else:
                         logger.info("AUTONOMOUS MODE DISABLED. Suppressing execution.", extra={"signal": final_signal})
                 else:

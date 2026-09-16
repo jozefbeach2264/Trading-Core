@@ -68,8 +68,8 @@ def test_http_error_returns_reanalyze(client, records):
     assert any(r["type"] == "api_error" for r in records)
 
 
-def test_valid_verdict_is_parsed_and_confidence_clamped(client, records):
-    _mock_post(client, payload=_chat_payload(json.dumps({"action": "execute", "confidence": 1.7, "reasoning": "ok"})))
+def test_valid_verdict_is_parsed_and_float_noise_clamped(client, records):
+    _mock_post(client, payload=_chat_payload(json.dumps({"action": "execute", "confidence": 1.004, "reasoning": "ok"})))
     verdict = run(client.get_ai_verdict(STRONG_LONG))
     assert verdict["action"] == "Execute"
     assert verdict["confidence"] == 1.0
@@ -77,9 +77,25 @@ def test_valid_verdict_is_parsed_and_confidence_clamped(client, records):
     assert any(r["type"] == "api_verdict" for r in records)
 
 
-def test_negative_confidence_clamped_to_zero(client, records):
-    _mock_post(client, payload=_chat_payload(json.dumps({"action": "Abort", "confidence": -0.2, "reasoning": "x"})))
+def test_out_of_range_confidence_is_garbage_not_max_confidence(client, records):
+    """A model answering in percent ("85") must not be promoted to a 1.0-confidence Execute."""
+    _mock_post(client, payload=_chat_payload(json.dumps({"action": "Execute", "confidence": 85, "reasoning": "x"})))
+    verdict = run(client.get_ai_verdict(STRONG_LONG))
+    assert verdict["action"] != "Execute"
+    assert any(r["type"] == "fallback" for r in records)
+
+
+def test_slightly_negative_confidence_clamped_to_zero(client, records):
+    _mock_post(client, payload=_chat_payload(json.dumps({"action": "Abort", "confidence": -0.004, "reasoning": "x"})))
     assert run(client.get_ai_verdict(STRONG_LONG))["confidence"] == 0.0
+
+
+def test_fallback_never_executes_into_a_wall_against_the_trade(client):
+    client.config.ai_fallback_can_execute = True
+    into_resistance = {**STRONG_LONG, "orderbook_zone": "resistance"}
+    assert client._fallback_from_context(into_resistance)["action"] != "Execute"
+    with_support = {**STRONG_LONG, "orderbook_zone": "support"}
+    assert client._fallback_from_context(with_support)["action"] == "Execute"
 
 
 def test_nan_confidence_is_rejected(client, records):

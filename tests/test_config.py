@@ -52,3 +52,35 @@ def test_exchange_keepalive_must_be_positive(monkeypatch):
     monkeypatch.setenv("EXCHANGE_KEEPALIVE_SECONDS", "0")
     with pytest.raises(ValueError):
         Config()
+
+
+def test_dry_run_flag_is_strict(monkeypatch):
+    import pytest
+    monkeypatch.setenv("DRY_RUN_MODE", "1")
+    assert Config().dry_run_mode is True
+    monkeypatch.setenv("DRY_RUN_MODE", "no")
+    monkeypatch.setenv("ASTERDEX_API_KEY", "k"); monkeypatch.setenv("ASTERDEX_API_SECRET", "s")
+    assert Config().dry_run_mode is False
+    monkeypatch.setenv("DRY_RUN_MODE", "True ")
+    assert Config().dry_run_mode is True          # whitespace tolerated
+    monkeypatch.setenv("DRY_RUN_MODE", "maybe")
+    with pytest.raises(ValueError):
+        Config()
+
+
+def test_exchange_symbol_must_match_the_data_symbol(monkeypatch):
+    import pytest
+    monkeypatch.setenv("TRADING_SYMBOL", "SOL-USDT-SWAP")
+    with pytest.raises(ValueError):
+        Config()
+    monkeypatch.setenv("ADEX_SYMBOL", "SOLUSDT")
+    assert Config().adex_symbol == "SOLUSDT"
+
+
+def test_malformed_trading_window_fails_at_startup(monkeypatch):
+    import pytest
+    monkeypatch.setenv("ALLOWED_WINDOWS", "9:00-11:00")
+    with pytest.raises(ValueError):
+        Config()
+    monkeypatch.setenv("ALLOWED_WINDOWS", "09:00-11:00, 13:00-16:00")
+    Config()

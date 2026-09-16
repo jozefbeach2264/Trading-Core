@@ -1,5 +1,6 @@
 import logging
 import json
+import time
 from typing import Dict, Any, Optional
 from typing import Protocol
 from strategy.ai_strategy_protocol import AIStrategyProtocol
@@ -11,6 +12,7 @@ from validator_stack import ValidatorStack
 from rolling5_engine import Rolling5Engine
 from simulators.entry_range_simulator import EntryRangeSimulator
 from ai_client import AIClient
+from freshness import stale_market_reason, stale_decision_reason
 from memory_tracker import MemoryTracker
 
 main_logger = logging.getLogger(__name__)
@@ -28,7 +30,11 @@ REJECTION_CODE_MAP = {
     "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel",
     "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK",
     "FORECAST_UNAVAILABLE": "FORECAST UNAVAILABLE",
-    "AI_VERDICT": "AI VERDICT"
+    "AI_VERDICT": "AI VERDICT",
+    "STALE_DATA": "STALE MARKET DATA",
+    "STALE_DECISION": "STALE DECISION",
+    "REVERSAL_RISK": "REVERSAL RISK",
+    "NO_ENTRY_PRICE": "NO ENTRY PRICE"
 }
 
 def format_rejection_reason(filter_reports: Dict[str, Any], prefix: str) -> Optional[str]:
@@ -64,9 +70,19 @@ class AIStrategy(AIStrategyProtocol):
         self.logger = setup_ai_strategy_logger(config)
         self.logger.info("AIStrategy initialized.")
 
+    def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
+        reason = f"Rejected - {REJECTION_CODE_MAP[code]}: {detail}" if detail else f"Rejected - {REJECTION_CODE_MAP[code]}"
+        getattr(self.logger, level)(f"REJECTED: {reason}")
+        return {"reason": reason, "validator_report": validator_report}
+
     async def generate_signal(self, market_state: MarketState, validator_stack: ValidatorStack) -> Dict[str, Any]:
         self.logger.info("--- New AI Strategy Cycle Started ---")
-        
+
+        # Never evaluate a frozen snapshot (feed outage, stalled trades channel).
+        stale = stale_market_reason(market_state, self.config.max_data_staleness_s)
+        if stale:
+            return self._reject("STALE_DATA", stale, {})
+
         primary_gate_report = await validator_stack.run_primary_gate(market_state)
         if primary_gate_report.get("hard_blocks", 0) > 0:
             reason = format_rejection_reason(primary_gate_report["filters"], "Primary Gate")
@@ -90,9 +106,11 @@ class AIStrategy(AIStrategyProtocol):
         
         forecast = await self.forecaster.generate_forecast(market_state, signal_packet.get("direction"))
         if not forecast.get("forecast_generated"):
-            reason = f"Rejected - {REJECTION_CODE_MAP['FORECAST_UNAVAILABLE']}"
-            self.logger.warning(f"REJECTED: {reason}")
-            return {"reason": reason, "validator_report": final_validator_log}
+            return self._reject("FORECAST_UNAVAILABLE", "", final_validator_log)
+        reversal_risk = float(forecast.get("reversal_likelihood_score", 0.0))
+        if reversal_risk > self.config.ai_max_reversal_risk:
+            # Deterministic backstop: do not even ask the model to trade into a forecast reversal.
+            return self._reject("REVERSAL_RISK", f"{reversal_risk:.2f} > {self.config.ai_max_reversal_risk:.2f}", final_validator_log)
         
         # Create flat context_packet for AIClient
         snapshot = market_state.get_latest_data_snapshot()
@@ -101,6 +119,7 @@ class AIStrategy(AIStrategyProtocol):
             self.logger.warning(f"Invalid live_reconstructed_candle: {candle}")
             candle = [0, market_state.mark_price or 3200.0, 0.0, 0.0, market_state.mark_price or 3200.0, 0.0, 0.0, 0.0, "0"]
         
+        orderbook_report = final_validator_log.get("OrderBookReversalZoneDetector", {})
         context_packet = {
             "open": candle[1],
             "close": candle[4],
@@ -109,8 +128,13 @@ class AIStrategy(AIStrategyProtocol):
             # Canonical key (2026-09-15): the forecaster emits exactly this name (review findings 1/9/10).
             "reversal_likelihood_score": forecast.get("reversal_likelihood_score", 0.0),
             "cts_score": final_validator_log.get("CtsFilter", {}).get("score", 0.0),
-            "orderbook_score": final_validator_log.get("OrderBookReversalZoneDetector", {}).get("score", 0.0)
+            "orderbook_score": orderbook_report.get("score", 0.0),
+            # Which side the strongest wall sits on. A resistance wall opposes a LONG, a support wall a SHORT;
+            # without this the model saw a wall directly against the trade as "strong confirmation".
+            "orderbook_zone": (orderbook_report.get("metrics") or {}).get("detected_zone", "none"),
         }
+        signal_price = float(market_state.mark_price or 0.0)
+        decided_at = time.time()
         
         # Log context_packet and validator_audit_log
         self.logger.info(f"Context packet for AI: {json.dumps(context_packet, indent=2)}")
@@ -134,7 +158,9 @@ class AIStrategy(AIStrategyProtocol):
         if confidence < self.config.ai_confidence_threshold:
             reason = f"Rejected - {REJECTION_CODE_MAP['AI_CONFIDENCE']} ({confidence:.2f}/{self.config.ai_confidence_threshold})"
             self.logger.warning(f"REJECTED: {reason}")
-            return {"reason": reason, "ai_verdict": ai_verdict, "validator_report": final_validator_log}
+            # The returned verdict must not still say Execute: the engine keys on the action.
+            rejected_verdict = {**ai_verdict, "action": "🤔 Reanalyze"}
+            return {"reason": reason, "ai_verdict": rejected_verdict, "validator_report": final_validator_log}
 
         final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
 
@@ -145,8 +171,15 @@ class AIStrategy(AIStrategyProtocol):
             return final_signal
 
         if ai_verdict.get("action") == "✅ Execute":
+            # The verdict was formed on a snapshot taken before the model call; re-check it is still actionable.
+            entry_price = float(market_state.mark_price or 0.0)
+            if entry_price <= 0:
+                return self._reject("NO_ENTRY_PRICE", "", final_validator_log)
+            stale = stale_market_reason(market_state, self.config.max_data_staleness_s) or stale_decision_reason(
+                decided_at, signal_price, entry_price, self.config.max_decision_age_s, self.config.max_entry_drift_pct)
+            if stale:
+                return self._reject("STALE_DECISION", stale, final_validator_log)
             self.logger.info(f"Forecast data for risk check: {json.dumps(forecast, indent=2)}")
-            entry_price = market_state.mark_price or 0.0
             is_safe, risk_reason = self.entry_simulator.check_liquidation_risk(entry_price, final_signal["direction"], forecast)
             if not is_safe:
                 final_signal["ai_verdict"]["action"] = "⛔ Abort"

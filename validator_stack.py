@@ -48,10 +48,14 @@ class ValidatorStack:
         report = {"filters": {}, "hard_blocks": 0}
         valid_results = []
 
-        for result in filter_results:
+        for flt, result in zip(filters, filter_results):
             if isinstance(result, Exception):
-                logger.error(f"A {group_name} filter failed", extra={"error": str(result)}, exc_info=True)
-                continue
+                # FAIL CLOSED: a crashing safety gate counts as a hard block, never as a pass.
+                filter_name = type(flt).__name__
+                logger.error(f"{group_name} filter {filter_name} raised; counting it as a Block",
+                             extra={"error": repr(result)}, exc_info=result)
+                result = {"filter_name": filter_name, "score": 0.0, "flag": "❌ Block",
+                          "metrics": {"reason": "FILTER_EXCEPTION", "error": repr(result)}}
 
             filter_name = result.get("filter_name", "UnknownFilter")
             flag = result.get("flag", "N/A")
