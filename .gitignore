@@ -21,3 +21,7 @@ dryrun/.cursor.json
 dryrun/__pycache__/
 dryrun/walls.jsonl
 dryrun/wall_recorder.log
+logs/*.db-shm
+logs/*.db-wal
+logs/run*-start.txt
+logs/run*-stdout.log
