@@ -130,6 +130,8 @@ async def get_stats():
         "mark_price": market_state.mark_price if market_state else None,
         "market_data_age_s": round(market_data_age_s(market_state), 2) if market_state else None,
         "klines": len(market_state.klines) if market_state else 0,
+        "verdict_cache_hits": getattr(engine.ai_strategy, "cache_hits", None) if engine else None,
+        "cycles_while_position_open": getattr(engine, "cycles_while_open", None) if engine else None,
     }
 
 @app.get("/")

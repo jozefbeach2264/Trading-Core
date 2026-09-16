@@ -35,6 +35,8 @@ class Engine:
         self._main_task: asyncio.Task = None
         self._display_task: asyncio.Task = None
         self.event_queue = asyncio.Queue(maxsize=self.config.event_queue_max_size)
+        self.cycles_while_open = 0
+        self._last_open_candle_logged = None
         
         logger.info("System Engine (Kernel) Initialized.")
 
@@ -127,8 +129,13 @@ class Engine:
                 # 8 s apart are visible in the old simulation_state.json).
                 await self._settle_open_position()
                 if self._position_is_open():
-                    log_failed_signal({}, f"POSITION OPEN (Rolling5 C{self._lifecycle().candle_count})", self.config)
+                    self.cycles_while_open += 1
+                    candle = self._lifecycle().candle_count
+                    if candle != self._last_open_candle_logged:   # once per candle, not five times a second
+                        self._last_open_candle_logged = candle
+                        log_failed_signal({}, f"POSITION OPEN (Rolling5 C{candle})", self.config)
                     continue
+                self._last_open_candle_logged = None
 
                 # The AIStrategy module now handles the entire validation and signal generation flow
                 final_signal = await self.ai_strategy.generate_signal(self.market_state, self.validator_stack)

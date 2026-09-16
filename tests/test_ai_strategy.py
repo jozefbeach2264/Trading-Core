@@ -159,3 +159,26 @@ def test_price_drift_during_the_verdict_rejects_the_decision(config):
     strategy = AIStrategy(config, _Router(), _Forecaster(), _DriftingAI(ms), _Simulator(), _Memory())
     result = run(strategy.generate_signal(ms, _Gate()))
     assert result["reason"].startswith("Rejected - STALE DECISION")
+
+
+def test_identical_setup_is_not_re_asked_within_the_cache_window(config):
+    ai = _AIClient()
+    strategy = AIStrategy(config, _Router(), _Forecaster(), ai, _Simulator(), _Memory())
+    ms = fresh_state(config)
+    first = run(strategy.generate_signal(ms, _Gate()))
+    second = run(strategy.generate_signal(ms, _Gate()))
+    assert len(ai.packets) == 1 and strategy.cache_hits == 1
+    assert first["ai_verdict"] == second["ai_verdict"]
+    ms.live_reconstructed_candle[0] += 60_000          # a new candle is a new question
+    ms.live_reconstructed_candle[0] = int(time.time() * 1000) - 5_000
+    run(strategy.generate_signal(ms, _Gate()))
+    assert len(ai.packets) == 2
+
+
+def test_cache_can_be_disabled(config):
+    config.ai_verdict_cache_s = 0
+    ai = _AIClient()
+    strategy = AIStrategy(config, _Router(), _Forecaster(), ai, _Simulator(), _Memory())
+    ms = fresh_state(config)
+    run(strategy.generate_signal(ms, _Gate())); run(strategy.generate_signal(ms, _Gate()))
+    assert len(ai.packets) == 2

@@ -44,8 +44,13 @@ class TradeModuleScalpel:
         breakout_level_low = float(previous_candle[3])
         breakout_range = breakout_level_high - breakout_level_low
         
-        retest_of_high_confirmed = abs(live_close - breakout_level_high) / breakout_level_high < 0.005 # within 0.5%
-        retest_of_low_confirmed = abs(live_close - breakout_level_low) / breakout_level_low < 0.005 # within 0.5%
+        if breakout_range <= 0:
+            return None
+        # A retest means price is back AT the level, within a fraction of that candle's own range. The old
+        # 0.5%-of-price band (~$12 on ETH, several candle ranges) was true on almost every cycle.
+        tolerance = breakout_range * self.config.scalpel_retest_range_fraction
+        retest_of_high_confirmed = abs(live_close - breakout_level_high) <= tolerance
+        retest_of_low_confirmed = abs(live_close - breakout_level_low) <= tolerance
 
         if trend_is_up and retest_of_high_confirmed:
             entry_price = live_close

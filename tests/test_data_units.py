@@ -84,3 +84,12 @@ def test_scalpel_uses_the_newest_closed_candle(config):
     signal = run(TradeModuleScalpel(config).generate_signal(ms))
     assert signal is not None
     assert abs(signal["stop_loss"] - (signal["entry_price"] - (klines[0][2] - klines[0][3]))) < 1e-9
+
+
+def test_scalpel_retest_band_is_a_fraction_of_the_candle_range(config):
+    ms = make_market_state(config, n_klines=120, trend=0.5, kline_range=10.0)   # level candle range 10 → band 2.5
+    high = list(ms.klines)[0][2]
+    ms.live_reconstructed_candle = make_live_candle(high - 4.0, high - 3.0, high - 5.0, high - 4.0)   # 4 away: not a retest
+    assert run(TradeModuleScalpel(config).generate_signal(ms)) is None
+    ms.live_reconstructed_candle = make_live_candle(high - 2.0, high - 1.0, high - 3.0, high - 2.0)   # 2 away: retest
+    assert run(TradeModuleScalpel(config).generate_signal(ms)) is not None

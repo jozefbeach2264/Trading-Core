@@ -68,7 +68,35 @@ class AIStrategy(AIStrategyProtocol):
         self.entry_simulator = entry_simulator
         self.memory_tracker = memory_tracker
         self.logger = setup_ai_strategy_logger(config)
+        self._verdict_cache: Dict[tuple, tuple] = {}
+        self.cache_hits = 0
         self.logger.info("AIStrategy initialized.")
+
+    @staticmethod
+    def _setup_key(signal_packet: Dict[str, Any], market_state: MarketState, context_packet: Dict[str, Any]) -> tuple:
+        """Identity of a setup: strategy, direction, the live candle's minute, the gate scores rounded to 0.1
+        and the wall zone. The same key within AI_VERDICT_CACHE_S is the same question."""
+        candle = market_state.live_reconstructed_candle
+        return (signal_packet.get("trade_type"), signal_packet.get("direction"), candle[0] if candle else None,
+                round(float(context_packet.get("reversal_likelihood_score", 0.0)), 1),
+                round(float(context_packet.get("cts_score", 0.0)), 1),
+                round(float(context_packet.get("orderbook_score", 0.0)), 1),
+                context_packet.get("orderbook_zone"))
+
+    def _cached_verdict(self, key: tuple):
+        ttl = self.config.ai_verdict_cache_s
+        entry = self._verdict_cache.get(key) if ttl > 0 else None
+        if entry and time.time() - entry[0] <= ttl:
+            return entry[1]
+        return None
+
+    def _remember_verdict(self, key: tuple, verdict: Dict[str, Any]) -> None:
+        if self.config.ai_verdict_cache_s <= 0:
+            return
+        now = time.time()
+        self._verdict_cache[key] = (now, dict(verdict))
+        if len(self._verdict_cache) > 256:   # drop expired entries; keys change every candle anyway
+            self._verdict_cache = {k: v for k, v in self._verdict_cache.items() if now - v[0] <= self.config.ai_verdict_cache_s}
 
     def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
         reason = f"Rejected - {REJECTION_CODE_MAP[code]}: {detail}" if detail else f"Rejected - {REJECTION_CODE_MAP[code]}"
@@ -141,8 +169,16 @@ class AIStrategy(AIStrategyProtocol):
         self.logger.info(f"Validator audit log: {json.dumps(final_validator_log, indent=2)}")
         
         try:
-            ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
-            ai_verdict["action"] = normalize_ai_action(ai_verdict.get("action"))
+            cache_key = self._setup_key(signal_packet, market_state, context_packet)
+            cached = self._cached_verdict(cache_key)
+            if cached is not None:
+                ai_verdict = dict(cached)
+                self.cache_hits += 1
+                self.logger.info(f"AI VERDICT (cached for this setup): {ai_verdict.get('action')} {ai_verdict.get('confidence')}")
+            else:
+                ai_verdict = await self.ai_client.get_ai_verdict(context_packet)
+                ai_verdict["action"] = normalize_ai_action(ai_verdict.get("action"))
+                self._remember_verdict(cache_key, ai_verdict)
             confidence = ai_verdict.get("confidence", 0.0)
         except Exception as e:
             self.logger.error(f"Error fetching AI verdict: {e}", exc_info=True)

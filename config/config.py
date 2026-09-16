@@ -118,6 +118,12 @@ class Config:
         self.max_entry_drift_pct: float = float(os.getenv('MAX_ENTRY_DRIFT_PCT', '0.15'))
         # One position at a time: no new entry while the Rolling5 lifecycle is within this many candles.
         self.max_position_candles: int = int(os.getenv('MAX_POSITION_CANDLES', '5'))
+        # One model verdict per setup per candle: an identical setup asked again within this window reuses
+        # the verdict instead of re-rolling the model until it says yes (0 disables the cache).
+        self.ai_verdict_cache_s: float = float(os.getenv('AI_VERDICT_CACHE_S', '60'))
+        # Scalpel "retest": live close must be within this fraction of the level candle's own range of the level
+        # (the old rule was 0.5% of PRICE — several candle ranges on ETH, so it fired on every cycle).
+        self.scalpel_retest_range_fraction: float = float(os.getenv('SCALPEL_RETEST_RANGE_FRACTION', '0.25'))
         # Live only: push LEVERAGE to the exchange at start-up (otherwise the account's stored leverage governs).
         self.exchange_set_leverage: bool = _env_bool('EXCHANGE_SET_LEVERAGE', False)
 
@@ -172,6 +178,10 @@ class Config:
             raise ValueError("MAX_DATA_STALENESS_S, MAX_DECISION_AGE_S and MAX_ENTRY_DRIFT_PCT must be positive.")
         if self.max_position_candles <= 0:
             raise ValueError("MAX_POSITION_CANDLES must be a positive integer.")
+        if self.ai_verdict_cache_s < 0:
+            raise ValueError("AI_VERDICT_CACHE_S must be >= 0.")
+        if not 0 < self.scalpel_retest_range_fraction <= 2.0:
+            raise ValueError("SCALPEL_RETEST_RANGE_FRACTION must be in (0, 2].")
 
         # Validate Numerical Ranges
         if not 0 < self.risk_cap_percent <= MAX_RISK_CAP_PERCENT:
