@@ -203,7 +203,11 @@ class AIStrategy(AIStrategyProtocol):
         # judge the stop and before sizing uses it, since the stop width sets the position size.
         stop_note = apply_predicted_stop(signal_packet, self.forecaster.predicted_band(market_state), self.config)
         if stop_note:
-            self.logger.info(stop_note)
+            # Debug, not info: this runs on every cycle a setup is live, so at a 0.2 s cycle an info line here
+            # writes thousands of identical records per signal and buries everything else in the log. The note
+            # rides along on the signal instead, so it is preserved on the trade record if the trade opens.
+            signal_packet["stop_note"] = stop_note
+            self.logger.debug(stop_note)
 
         # A target that does not clear the round-trip fee several times over cannot make money even when the
         # trade is right. Refuse it before spending a model call on it.
