@@ -142,6 +142,16 @@ class Config:
         # Scalpel "retest": live close must be within this fraction of the level candle's own range of the level
         # (the old rule was 0.5% of PRICE — several candle ranges on ETH, so it fired on every cycle).
         self.scalpel_retest_range_fraction: float = float(os.getenv('SCALPEL_RETEST_RANGE_FRACTION', '0.25'))
+        # Scalpel's EMA100 trend gate. Measured 2026-09-16 over 7.7 days: with the gate 571 LONG / 629 SHORT and
+        # +0.0060% gross per trade; without it 784 LONG / 797 SHORT and +0.0050% — the same (zero) edge, 32% more
+        # trades, and BOTH directions available in every session. With it on, a session sits inside one regime
+        # (169 of 174 minutes below the EMA in the first live run) and can only trade one way. Default OFF.
+        self.scalpel_require_trend: bool = _env_bool('SCALPEL_REQUIRE_TREND', False)
+        # TrapX wick test: the wick must exceed this multiple of the BODY and this fraction of the candle's RANGE.
+        # The range test kills the degenerate case where a live candle's body is ~0 for the first seconds of every
+        # minute, which made both wicks qualify and handed every tie to SHORT (63% short vs 49% when ties are fair).
+        self.trapx_wick_body_multiplier: float = float(os.getenv('TRAPX_WICK_BODY_MULTIPLIER', '1.5'))
+        self.trapx_wick_min_range_fraction: float = float(os.getenv('TRAPX_WICK_MIN_RANGE_FRACTION', '0.3'))
         # Live only: push LEVERAGE to the exchange at start-up (otherwise the account's stored leverage governs).
         self.exchange_set_leverage: bool = _env_bool('EXCHANGE_SET_LEVERAGE', False)
 
@@ -212,6 +222,10 @@ class Config:
             raise ValueError("AI_VERDICT_CACHE_S must be >= 0.")
         if not 0 < self.scalpel_retest_range_fraction <= 2.0:
             raise ValueError("SCALPEL_RETEST_RANGE_FRACTION must be in (0, 2].")
+        if self.trapx_wick_body_multiplier <= 0:
+            raise ValueError("TRAPX_WICK_BODY_MULTIPLIER must be positive.")
+        if not 0 < self.trapx_wick_min_range_fraction < 1.0:
+            raise ValueError("TRAPX_WICK_MIN_RANGE_FRACTION must be in (0, 1).")
 
         # Validate Numerical Ranges
         if not 0 < self.risk_cap_percent <= MAX_RISK_CAP_PERCENT:

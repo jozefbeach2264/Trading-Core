@@ -34,8 +34,13 @@ class TradeModuleScalpel:
             return None
 
         live_close = float(live_candle[4])
-        trend_is_up = live_close > ema100
-        trend_is_down = live_close < ema100
+        # The EMA100 trend gate is OFF by default: it added no measurable edge and locked each session to one
+        # direction (see config.scalpel_require_trend). With it off, a retest is tradeable both ways.
+        if self.config.scalpel_require_trend:
+            trend_is_up = live_close > ema100
+            trend_is_down = live_close < ema100
+        else:
+            trend_is_up = trend_is_down = True
         
         # In 'Base mode', retest is the primary confirmation.
         # The breakout level is considered the high/low of the previously closed candle.
@@ -52,16 +57,23 @@ class TradeModuleScalpel:
         retest_of_high_confirmed = abs(live_close - breakout_level_high) <= tolerance
         retest_of_low_confirmed = abs(live_close - breakout_level_low) <= tolerance
 
+        # When both levels are in range (a tiny candle), take the nearer one rather than always the high.
+        if retest_of_high_confirmed and retest_of_low_confirmed and trend_is_up and trend_is_down:
+            if abs(live_close - breakout_level_low) < abs(live_close - breakout_level_high):
+                retest_of_high_confirmed = False
+            else:
+                retest_of_low_confirmed = False
+
         if trend_is_up and retest_of_high_confirmed:
             entry_price = live_close
             stop_loss = entry_price - breakout_range
             take_profit = entry_price + (breakout_range * 1.5)
-            return {"trade_type": "Scalpel", "direction": "LONG", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: Uptrend continuation confirmed on retest."}
+            return {"trade_type": "Scalpel", "direction": "LONG", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: LONG on retest of the prior high."}
         
         elif trend_is_down and retest_of_low_confirmed:
             entry_price = live_close
             stop_loss = entry_price + breakout_range
             take_profit = entry_price - (breakout_range * 1.5)
-            return {"trade_type": "Scalpel", "direction": "SHORT", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: Downtrend continuation confirmed on retest."}
+            return {"trade_type": "Scalpel", "direction": "SHORT", "entry_price": entry_price, "take_profit": take_profit, "stop_loss": stop_loss, "reason": "Scalpel: SHORT on retest of the prior low."}
             
         return None
