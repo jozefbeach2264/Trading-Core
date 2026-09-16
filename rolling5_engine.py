@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import Dict, Any, List, Optional
 import numpy as np
 from config.config import Config
@@ -8,10 +9,14 @@ logger = logging.getLogger(__name__)
 
 TREND_LOOKBACK_CANDLES = 10
 FORECAST_HORIZON_CANDLES = 6
-TREND_WEIGHT = 0.5
-PRESSURE_WEIGHT = 0.3
-SENTIMENT_WEIGHT = 0.2
+# 2026-09-16 backtest on 299 real 1m candles: the 10-close regression slope called the next-6-candle direction
+# 48% of the time and its projected band was WORSE than "price stays put" (35% vs 53% containment). The slope
+# therefore carries no weight, and the forecast band is realized volatility around the last close.
+TREND_WEIGHT = 0.0
+PRESSURE_WEIGHT = 0.6
+SENTIMENT_WEIGHT = 0.4
 NEUTRAL_TERM = 0.5
+BAND_HALF_WIDTH_RANGES = 0.5     # c_i band = last close ± 0.5 × average range × √i
 
 
 def _clamp01(value: float) -> float:
@@ -189,21 +194,18 @@ class Rolling5Engine:
             logger.debug("Insufficient klines for forecast: %d", len(klines))
             return report
 
-        trend = self._calculate_trend(klines)
-        slope, intercept = trend["slope"], trend["intercept"]
+        trend = self._calculate_trend(klines)          # diagnostics only (logged); no longer drives the forecast
+        slope = trend["slope"]
         average_range = self._calculate_average_range(klines)
 
-        # Project the next 6 candle close prices based on the trend
-        recent_len = min(len(klines), TREND_LOOKBACK_CANDLES)
-        last_index = max(recent_len - 1, 0)
-        projected_prices = [intercept + slope * (last_index + i) for i in range(1, FORECAST_HORIZON_CANDLES + 1)]
-
+        # Expected price band for the next 6 candles: realized volatility around the LAST CLOSE, widening with
+        # √horizon (a diffusive price). No drift term — see the note on TREND_WEIGHT above.
+        last_close = float(klines[0][4])
+        anchor = float(market_state.mark_price) if market_state.mark_price else last_close
         predictions = {}
-        for i, pred_price in enumerate(projected_prices, 1):
-            predictions[f"c{i}"] = {
-                "high": round(pred_price + (average_range / 2), 4),
-                "low": round(pred_price - (average_range / 2), 4)
-            }
+        for i in range(1, FORECAST_HORIZON_CANDLES + 1):
+            half = BAND_HALF_WIDTH_RANGES * average_range * math.sqrt(i)
+            predictions[f"c{i}"] = {"high": round(anchor + half, 4), "low": round(anchor - half, 4)}
 
         sentiment_report = market_state.filter_audit_report.get("SentimentDivergenceFilter", {})
         reversal_score = self._reversal_likelihood(direction, float(slope), average_range,
@@ -213,6 +215,7 @@ class Rolling5Engine:
             "forecast_generated": True,
             "reversal_likelihood_score": reversal_score,
             "forecast": predictions,
+            "trend_slope_diag": round(float(slope), 6),
             "lifecycle": lifecycle_meta
         })
 
