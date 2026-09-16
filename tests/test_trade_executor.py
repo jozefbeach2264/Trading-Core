@@ -264,3 +264,31 @@ def test_sim_stats_reports_orphaned_opens():
     assert stats["orphaned_opens"] == 1, "only the superseded open is an orphan"
     assert stats["open_now"] == 1, "the trailing open position must be reported"
     assert compute_stats([o, c, o, c], 100.0)["open_now"] == 0
+
+
+def test_simulation_state_is_written_atomically(config, tmp_path):
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG", "stop_loss": 2990.0, "take_profit": 3015.0}))
+    import os, json as _json
+    path = config.simulation_state_file_path
+    assert os.path.exists(path) and not os.path.exists(path + ".tmp"), "no temp file left behind"
+    _json.load(open(path))                                   # always valid JSON on disk
+
+
+def test_a_corrupt_ledger_is_preserved_not_silently_reset(config, tmp_path, caplog):
+    import glob, os
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG", "stop_loss": 2990.0, "take_profit": 3015.0}))
+    open(config.simulation_state_file_path, "w").write("{ this is not json")
+    state = ex._get_simulation_state()
+    assert state["balance"] == config.simulation_initial_capital and state["history"] == []
+    assert glob.glob(config.simulation_state_file_path + ".corrupt-*"), "the corrupt ledger must be kept"
+    assert not os.path.exists(config.simulation_state_file_path) or _json_ok(config.simulation_state_file_path)
+
+
+def _json_ok(path):
+    import json as _json
+    try:
+        _json.load(open(path)); return True
+    except Exception:
+        return False

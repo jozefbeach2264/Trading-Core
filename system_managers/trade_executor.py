@@ -303,16 +303,37 @@ class TradeExecutor:
         try:
             with open(path, 'r') as f:
                 return json.load(f)
-        except Exception as e:
-            logger.error(f"Error reading simulation state: %s", e)
-            return {"balance": self.config.simulation_initial_capital, "positions": {}, "history": []}
+        except (OSError, ValueError) as e:
+            # A corrupt ledger must never be silently replaced by a fresh account: that would erase the run's
+            # history and quietly restate the balance. Preserve the file and start a clearly-marked new one.
+            salvage = f"{path}.corrupt-{int(time.time())}"
+            try:
+                os.replace(path, salvage)
+                logger.critical("Simulation state was unreadable (%s). Preserved as %s and starting a FRESH ledger — "
+                                "the earlier balance and history are NOT carried over.", e, salvage)
+            except OSError:
+                logger.critical("Simulation state unreadable (%s) and could not be preserved.", e)
+            return {"balance": self.config.simulation_initial_capital,
+                    "initial_capital": self.config.simulation_initial_capital,
+                    "positions": {}, "history": []}
 
     def _save_simulation_state(self, state: Dict[str, Any]):
+        """Atomic: write a temp file then rename, so a reader can never see a half-written ledger and a crash
+        mid-write cannot corrupt it."""
+        path = self.config.simulation_state_file_path
+        tmp = f"{path}.tmp"
         try:
-            with open(self.config.simulation_state_file_path, 'w') as f:
+            with open(tmp, 'w') as f:
                 json.dump(state, f, indent=4)
-        except IOError as e:
-            logger.error(f"Could not save simulation state: %s", e)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, path)
+        except OSError as e:
+            logger.error("Could not save simulation state: %s", e)
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
 
     async def _execute_simulated_trade(self, signal: Dict[str, Any]):
         entry_price = self.market_state.mark_price
