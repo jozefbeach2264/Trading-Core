@@ -19,3 +19,5 @@ dryrun/samples*.jsonl
 dryrun/learned_weights.json
 dryrun/.cursor.json
 dryrun/__pycache__/
+dryrun/walls.jsonl
+dryrun/wall_recorder.log
