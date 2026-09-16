@@ -50,3 +50,33 @@ def test_opposing_wall_caps_the_target_at_the_recheck():
 def test_stops_never_widen():
     assert tighten(2990.0, 2985.0, 1.0) == 2990.0 and tighten(2990.0, 2995.0, 1.0) == 2995.0
     assert tighten(3010.0, 3015.0, -1.0) == 3010.0 and tighten(3010.0, 3005.0, -1.0) == 3005.0
+
+
+def test_a_target_can_never_be_moved_to_a_loss(config):
+    """A wall between the mark and the target must not cap the target at a losing price. Observed live:
+    a SHORT from 2393.93 had its target capped at a bid wall at 2399.00 and exited there for a loss,
+    booked as TAKE_PROFIT."""
+    walls = {"bid_walls": [{"price": 2399.00, "qty": 900.0}], "ask_walls": []}
+    pos = {"direction": "SHORT", "entry_price": 2393.93, "stop_loss": 2403.70, "take_profit": 2374.38,
+           "initial_risk": 9.78, "best_price": 2393.93, "ob_rechecked": True}
+    _, target, _, notes = plan_exits(pos, 2399.39, {"reversal_likelihood_score": 0.3, "order_book_metrics": walls},
+                                     config, ob_recheck=True)
+    assert target < pos["entry_price"], f"a SHORT's target must stay below entry, got {target}"
+    assert "not a profit" in notes[-1]
+
+
+def test_a_wall_in_profit_still_caps_the_target(config):
+    walls = {"ask_walls": [{"price": 3008.0, "qty": 900.0}], "bid_walls": []}
+    pos = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2990.0, "take_profit": 3020.0,
+           "initial_risk": 10.0, "best_price": 3000.0, "ob_rechecked": True}
+    _, target, _, notes = plan_exits(pos, 3003.0, {"reversal_likelihood_score": 0.2, "order_book_metrics": walls},
+                                     config, ob_recheck=True)
+    assert target == 3008.0 and "target capped" in notes[-1]
+
+
+def test_take_profit_now_on_a_losing_trade_does_not_lock_the_loss(config):
+    pos = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2990.0, "take_profit": 3020.0,
+           "initial_risk": 10.0, "best_price": 3000.0}
+    stop, target, _, notes = plan_exits(pos, 2996.0, {"reversal_likelihood_score": 0.95}, config)
+    assert target is None or target > 3000.0, "never take a 'profit' below entry"
+    assert stop == 2995.0            # it cuts the loss short instead

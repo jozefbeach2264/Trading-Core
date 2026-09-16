@@ -88,4 +88,19 @@ def plan_exits(position: Dict[str, Any], mark: float, forecast: Dict[str, Any], 
             target = wall
             notes.append(f"wall at {wall}: target capped")
 
+    # A TARGET IS A PROFIT. It may never be moved to a price at or worse than entry — a wall cap or a
+    # "take profit now" on a losing trade would otherwise lock in a loss and book it as TAKE_PROFIT.
+    # (Observed live 2026-09-16: a SHORT from 2393.93 had its target capped at a bid wall at 2399.00 and
+    # exited there for a loss, recorded as a take-profit.)
+    floor = entry * (1.0 + sign * min_profit_fraction(config))
+    if target is not None and sign * (target - floor) < 0:
+        target = None if position.get("take_profit") is None else max(position["take_profit"], floor) if sign > 0 else min(position["take_profit"], floor)
+        notes.append("target refused: it was not a profit")
+
     return stop, target, best, notes
+
+
+def min_profit_fraction(config: Any) -> float:
+    """Smallest move that still leaves something after costs, as a fraction of entry."""
+    fee = getattr(config, "round_trip_fee_percent", 0.0) or 0.0
+    return fee / 100.0
