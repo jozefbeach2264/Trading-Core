@@ -87,6 +87,8 @@ def flatten_ai_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
 
 def parse_ai_strategy_log(log_file_path: str) -> List[Dict[str, Any]]:
     parsed_data: List[Dict[str, Any]] = []
+    if not os.path.exists(log_file_path):
+        return parsed_data
     with open(log_file_path, 'r') as f:
         lines = f.readlines()
 
@@ -212,7 +214,10 @@ def flatten_filter_payload(filter_name: str, payload: Dict[str, Any]) -> Dict[st
 def collect_all_flattened() -> Dict[str, List[Dict[str, Any]]]:
     output: Dict[str, List[Dict[str, Any]]] = {}
 
-    ai_path = os.path.join(LOG_DIR, "ai_strategy.log")
+    ai_path = os.getenv("AI_STRATEGY_LOG_PATH") or os.path.join(LOG_DIR, "ai_strategy.log")
+    if not os.path.exists(ai_path):
+        fallback = os.path.join(ROOT, "logs", "ai_strategy.log")
+        ai_path = fallback if os.path.exists(fallback) else ai_path
     ai_entries = parse_ai_strategy_log(ai_path)
     output["ai_strategy"] = [flatten_ai_entry(e) for e in ai_entries]
 

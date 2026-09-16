@@ -19,3 +19,11 @@ def test_file_logger_is_idempotent(tmp_path):
     a = file_logger("TestIdem", str(tmp_path / "a.log"))
     b = file_logger("TestIdem", str(tmp_path / "b.log"))
     assert a is b and len(a.handlers) == 1
+
+
+def test_file_logger_rotates(tmp_path):
+    import logging.handlers
+    from log_utils import _listeners
+    file_logger("TestRotate", str(tmp_path / "r.log"))
+    handler = _listeners["TestRotate"].handlers[0]
+    assert isinstance(handler, logging.handlers.RotatingFileHandler) and handler.maxBytes > 0

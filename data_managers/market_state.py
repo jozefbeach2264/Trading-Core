@@ -8,6 +8,9 @@ from data_managers.orderbook_parser import OrderBookParser
 
 logger = logging.getLogger(__name__)
 
+SPOOF_WINDOW_S = 1.0   # publish the worst thinning seen within the last second of book ticks
+
+
 class MarketState:
     def __init__(self, symbol: str, config: Config):
         self.symbol = symbol
@@ -40,7 +43,18 @@ class MarketState:
         self.previous_depth_20: Dict[str, Any] = {"bids": [], "asks": []}
         self.filter_audit_report: Dict[str, Any] = {}
 
+        # OKX SWAP sizes (trade sz, candle vol) are in CONTRACTS; ctVal converts to the base asset (ETH).
+        # Every consumer (volume guard, CVD, HUD, AI packet) assumes base-asset units.
+        self.contract_value: float = 1.0
+        # Per-tick thinning readings; the published spoof_thin_rate is the max over SPOOF_WINDOW_S so the
+        # 0.2 s engine cycle cannot miss a pull that lasted one 100 ms book tick.
+        self._spoof_ticks: deque = deque(maxlen=64)
+
         logger.debug(f"MarketState for symbol {self.symbol} initialized.")
+
+    def set_contract_value(self, contract_value: float) -> None:
+        if contract_value and contract_value > 0:
+            self.contract_value = float(contract_value)
 
     async def update_from_ws_books(self, data: dict):
         """
@@ -79,15 +93,24 @@ class MarketState:
             logger.debug("Order book metrics are dirty. Recalculating...")
             self.order_book_pressure = self.order_book_parser.calculate_pressure_vectors(self.depth_20)
             self.order_book_walls = self.order_book_parser.find_wall_clusters(self.depth_20, self.config.orderbook_reversal_wall_multiplier)
-            self.spoof_metrics = self.order_book_parser.analyze_thinning_and_spoofing(
+            tick = self.order_book_parser.analyze_thinning_and_spoofing(
                 self.previous_depth_20, self.depth_20,
                 self.config.spoof_distance_percent, self.config.spoof_large_order_multiplier)
+            now = time.time()
+            self._spoof_ticks.append((now, tick))
+            window = [t for ts, t in self._spoof_ticks if now - ts <= SPOOF_WINDOW_S]
+            worst = max(window, key=lambda t: t.get("spoof_thin_rate", 0.0), default=tick)
+            self.spoof_metrics = {
+                **worst,
+                "tick_thin_rate": tick.get("spoof_thin_rate", 0.0),
+                "snapshot_ts": self.last_update_time,
+            }
             self._is_ob_metrics_dirty = False # Mark the cache as clean
 
     async def update_from_ws_agg_trade(self, data: dict):
         try:
             trade_time = int(data['ts'])
-            trade_qty = float(data['sz'])
+            trade_qty = float(data['sz']) * self.contract_value   # contracts → base asset
             trade_side = data['side']
             trade = {'time': trade_time, 'price': float(data['px']), 'qty': trade_qty, 'side': trade_side}
 
@@ -151,8 +174,12 @@ class MarketState:
         self.klines.clear()
         for k in klines_data:
             try:
-                self.klines.append([int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5]), float(k[6]), float(k[7]), str(k[8])])
-            except (ValueError, TypeError) as e:
+                if str(k[8]) != "1":
+                    continue  # the in-progress minute is reconstructed live from trades, not stored as closed
+                self.klines.append([int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]),
+                                    float(k[5]) * self.contract_value,   # vol: contracts → base asset
+                                    float(k[6]), float(k[7]), str(k[8])])
+            except (ValueError, TypeError, IndexError) as e:
                 logger.error("Error parsing historical kline", extra={"kline": k, "error": str(e)})
 
     async def update_open_interest(self, oi_data: Dict[str, Any]):

@@ -8,18 +8,29 @@ class CandleReconstructor:
     Reconstructs a 1-minute OHLCV candle in real-time by aggregating
     live trade data. Now includes hard finalization logic.
     """
-    def __init__(self):
+    def __init__(self, contract_value: float = 1.0):
+        self.contract_value = contract_value   # OKX SWAP sz is in contracts; convert to the base asset
         self.current_candle: Optional[List[Any]] = None
         self.current_minute_timestamp: Optional[int] = None
+        # The first candle after a (re)connect starts at the first trade SEEN, not at the minute open.
+        # It must never be finalised as a closed candle (it would poison every lookback average).
+        self.current_is_partial: bool = False
         logger.info("CandleReconstructor initialized.")
 
-    def _start_new_candle(self, trade: Dict[str, Any]) -> None:
+    def reset(self) -> None:
+        """Call on websocket reconnect: whatever we were building has a gap in it."""
+        self.current_candle = None
+        self.current_minute_timestamp = None
+        self.current_is_partial = False
+
+    def _start_new_candle(self, trade: Dict[str, Any], partial: bool = False) -> None:
         """Initializes a new 1-minute candle based on the first trade of the minute."""
         price = float(trade['px'])
-        volume = float(trade['sz'])
+        volume = float(trade['sz']) * self.contract_value
         timestamp = int(trade['ts'])
-        
+
         self.current_minute_timestamp = timestamp - (timestamp % 60000)
+        self.current_is_partial = partial
 
         # Structure: [ts,o,h,l,c,vol,volCcy,volCcyQuote,confirm]
         # 'confirm' flag (index 8) is "0" for in-progress.
@@ -45,18 +56,23 @@ class CandleReconstructor:
 
         completed_candle = None
 
+        trade_volume *= self.contract_value
+
         if self.current_candle is None:
-            self._start_new_candle(trade)
-            logger.debug(f"Initial candle state: {self.current_candle}")
+            self._start_new_candle(trade, partial=True)
+            logger.debug(f"Initial (partial) candle state: {self.current_candle}")
             return None
 
         # Check if the trade belongs to a new minute.
         if trade_time >= self.current_minute_timestamp + 60000:
-            # Finalize the old candle by setting the 'confirm' flag to "1".
-            self.current_candle[8] = "1"
-            completed_candle = self.current_candle.copy()
-            logger.info(f"Finalized 1m candle: {completed_candle}")
-            
+            if self.current_is_partial:
+                logger.info("Discarding partial first candle %s (started mid-minute)", self.current_minute_timestamp)
+            else:
+                # Finalize the old candle by setting the 'confirm' flag to "1".
+                self.current_candle[8] = "1"
+                completed_candle = self.current_candle.copy()
+                logger.info(f"Finalized 1m candle: {completed_candle}")
+
             # Start the next candle with the current trade's data.
             self._start_new_candle(trade)
         else:

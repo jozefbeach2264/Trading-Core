@@ -39,7 +39,7 @@ class TradeModuleScalpel:
         
         # In 'Base mode', retest is the primary confirmation.
         # The breakout level is considered the high/low of the previously closed candle.
-        previous_candle = klines[1]
+        previous_candle = klines[0]   # newest CLOSED candle (the deque is newest-first)
         breakout_level_high = float(previous_candle[2])
         breakout_level_low = float(previous_candle[3])
         breakout_range = breakout_level_high - breakout_level_low

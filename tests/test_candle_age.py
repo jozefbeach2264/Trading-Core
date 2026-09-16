@@ -41,3 +41,9 @@ def test_partial_candle_that_is_really_compressed_still_blocks(config):
     ms = make_market_state(config, live=_live_aged(30, 2999.5, 3000.5, 2999.5, 3000.5), mark_price=3000.0)
     assert run(CtsFilter(config).generate_report(ms))["flag"] == "❌ Block"
     assert run(CompressionDetector(config).generate_report(ms))["flag"] == "❌ Block"
+
+
+def test_zero_range_young_candle_is_too_young_not_invalid(config):
+    ms = make_market_state(config, live=_live_aged(2, 3000.0, 3000.0, 3000.0, 3000.0), mark_price=3000.0)
+    report = run(CtsFilter(config).generate_report(ms))
+    assert report["metrics"]["reason"] == "CANDLE_TOO_YOUNG" and report["flag"] == "⚠️ Soft Flag"

@@ -2,6 +2,7 @@ import logging
 import json
 from typing import Dict, Any
 from config.config import Config
+from filters.candle_age import MIN_AGE_FRACTION, candle_age_fraction
 from log_utils import file_logger
 from data_managers.market_state import MarketState
 
@@ -39,11 +40,15 @@ class LowVolumeGuard:
         mark_price = market_state.mark_price or 0.0
         volume_notional = current_volume * mark_price if mark_price > 0 else None
 
-        # Prefer notional (quote currency) threshold when mark price is available
+        # Prefer notional (quote currency) threshold when mark price is available. The threshold is for a
+        # FULL minute; a candle 10 s old is expected to have ~1/6 of it (volume accrues linearly in time).
+        age_fraction = max(candle_age_fraction(live_candle), MIN_AGE_FRACTION)
         if volume_notional is not None:
+            scaled_threshold = self.config.low_volume_min_notional * age_fraction
             report["metrics"]["candle_volume_notional"] = round(volume_notional, 4)
-            report["metrics"]["min_notional_threshold"] = self.config.low_volume_min_notional
-            threshold_met = volume_notional >= self.config.low_volume_min_notional
+            report["metrics"]["min_notional_threshold"] = round(scaled_threshold, 4)
+            report["metrics"]["candle_age_s"] = round(age_fraction * 60.0, 1)
+            threshold_met = volume_notional >= scaled_threshold
             threshold_reason = "VOLUME_OK" if threshold_met else "LOW_NOTIONAL_THRESHOLD_NOT_MET"
         else:
             # Fallback to base asset volume threshold

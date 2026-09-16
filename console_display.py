@@ -102,7 +102,7 @@ def format_market_state_for_console(market_state: MarketState) -> str:
         for trade in recent_trades:
             trade_time = int(trade.get('time', 0))
             qty = float(trade.get('qty', 0.0))
-            is_buy = not trade.get('isBuyerMaker', False)
+            is_buy = str(trade.get('side', '')).lower() == 'buy'
             
             for tf_name, tf_ms in timeframes.items():
                 if (now_ms - tf_ms) <= trade_time:
@@ -125,7 +125,7 @@ def format_market_state_for_console(market_state: MarketState) -> str:
         # 5. Trend
         change_1m = 0.0
         if klines:
-            last_kline = klines[-1]
+            last_kline = klines[0]   # newest closed candle (deque is newest-first)
             k_open = float(last_kline[1])
             k_close = float(last_kline[4])
             if k_open > 0:

@@ -65,11 +65,6 @@ class CtsFilter:
             
         current_body = abs(c - o)
         
-        if average_range <= 0 or current_range <= 0:
-            report["metrics"]["reason"] = "INVALID_CANDLE_DATA"
-            self.logger.warning(report["metrics"]["reason"])
-            return report
-
         # Compare against what a candle of this AGE should have shown (√t), not a full closed candle;
         # otherwise the opening seconds of every minute read as "compression".
         age_fraction = candle_age_fraction(live_candle)
@@ -80,6 +75,11 @@ class CtsFilter:
             report["metrics"] = {"reason": "CANDLE_TOO_YOUNG", "candle_age_s": round(age_fraction * 60.0, 1),
                                  "average_range": round(average_range, 4), "mark_price": round(mark_price, 4)}
             await market_state.update_filter_audit_report("CtsFilter", report)
+            return report
+
+        if average_range <= 0 or current_range <= 0:
+            report["metrics"]["reason"] = "INVALID_CANDLE_DATA"
+            self.logger.warning(report["metrics"]["reason"])
             return report
 
         is_compressed = current_range < (expected_range * self.narrow_range_ratio)

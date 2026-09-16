@@ -15,6 +15,7 @@ class SpoofFilter:
         self.logger = setup_spoof_logger(self.config)
         self._recent_rates = collections.deque(maxlen=100)
         self._recent_blocks = collections.deque(maxlen=5)
+        self._last_snapshot_ts = None
 
     async def generate_report(self, market_state: MarketState) -> Dict[str, Any]:
         
@@ -41,7 +42,13 @@ class SpoofFilter:
         spoof_thin_rate = spoof_metrics.get("spoof_thin_rate", 0.0)
         wall_delta_pct = spoof_metrics.get("wall_delta_pct", 0.0)
 
-        self._recent_rates.append(spoof_thin_rate)
+        # The engine can evaluate the same cached book snapshot on consecutive cycles; the sustained-spike
+        # counter must only advance on NEW snapshots or one pull becomes "sustained" by itself.
+        snapshot_ts = spoof_metrics.get("snapshot_ts")
+        is_new_snapshot = snapshot_ts != self._last_snapshot_ts
+        self._last_snapshot_ts = snapshot_ts
+        if is_new_snapshot:
+            self._recent_rates.append(spoof_thin_rate)
         median_rate = 0.0
         if self._recent_rates:
             sorted_rates = sorted(self._recent_rates)
@@ -60,10 +67,8 @@ class SpoofFilter:
 
         # Smooth out bursty single-sample spikes: require sustained spike (track last few blocks)
         block = spoof_thin_rate > dynamic_block
-        if block:
-            self._recent_blocks.append(True)
-        else:
-            self._recent_blocks.append(False)
+        if is_new_snapshot:
+            self._recent_blocks.append(block)
         sustained_block = sum(self._recent_blocks) >= 2  # at least 2 recent spikes
 
         if sustained_block:

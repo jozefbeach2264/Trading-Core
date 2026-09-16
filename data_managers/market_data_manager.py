@@ -11,6 +11,9 @@ from reconstructors.candle_reconstructor import CandleReconstructor
 
 logger = logging.getLogger(__name__)
 
+OKX_HISTORY_CANDLES_MAX = 300   # /market/history-candles silently caps limit at 300
+
+
 class MarketDataManager:
     def __init__(self, config: Config, market_state: MarketState, httpx_client: httpx.AsyncClient):
         self.config = config
@@ -29,6 +32,7 @@ class MarketDataManager:
         self._last_spoof_thin_rate: Optional[float] = None
         self._acknowledged_channels = set()
         self._logged_ws_subscription = False
+        self._connections = 0
         logger.debug(f"MarketDataManager configured for OKX with instrument ID: {self.inst_id}")
 
     def set_event_queue(self, queue: asyncio.Queue):
@@ -148,7 +152,12 @@ class MarketDataManager:
             if data.get("code") != "0" or not data.get("data"):
                 logger.error("Invalid instId", extra={"instId": self.inst_id, "response": data.get('msg', 'Unknown error')})
                 raise ValueError(f"Invalid instId: {self.inst_id}")
-            logger.debug(f"Validated instId: {self.inst_id}")
+            instrument = data["data"][0]
+            contract_value = float(instrument.get("ctVal") or 1.0)
+            self.market_state.set_contract_value(contract_value)
+            self.candle_reconstructor.contract_value = contract_value
+            logger.info("Validated instId %s: ctVal=%s %s (sizes are converted from contracts)",
+                        self.inst_id, contract_value, instrument.get("ctValCcy"))
         except Exception as e:
             logger.error(f"Failed to validate instId {self.inst_id}", extra={"error": str(e)}, exc_info=True)
             raise
@@ -156,7 +165,8 @@ class MarketDataManager:
     async def _fetch_initial_data(self):
         async def fetch_klines():
             klines_endpoint = "/api/v5/market/history-candles"
-            klines_params = {"instId": self.inst_id, "bar": "1m", "limit": str(self.config.kline_deque_maxlen)}
+            klines_params = {"instId": self.inst_id, "bar": "1m",
+                             "limit": str(min(self.config.kline_deque_maxlen, OKX_HISTORY_CANDLES_MAX))}
             try:
                 response = await self.client.get(klines_endpoint, params=klines_params)
                 response.raise_for_status()
@@ -308,6 +318,11 @@ class MarketDataManager:
                     logger.info("Connected to OKX WebSocket.")
                     self._acknowledged_channels.clear()
                     self._logged_ws_subscription = False
+                    self._connections += 1
+                    if self._connections > 1:
+                        # Reconnect: the candle being built has a gap and whole minutes may be missing.
+                        self.candle_reconstructor.reset()
+                        asyncio.create_task(self._fetch_initial_data())
                     await ws.send(json.dumps(ws_payload))
                     while self.is_running:
                         try:
