@@ -86,10 +86,34 @@ def main():
         if lo:
             print(f"           confidence <  0.90: {len(lo):3d} trades, {pct(sum(1 for x in lo if x>0), len(lo))} won, avg {statistics.mean(lo):+.3f}")
         print(f"           → the model adds value only if the first line beats the second")
-    # 4. exits: did winners run?
+    # 4. carry: how much of the move available to it did Rolling5 actually take home?
+    #    This is the question "can R5 carry a trade into profit" reduced to one number. A trade that ran
+    #    +0.20% in its favour and closed at +0.02% captured 10% of what the market offered it.
+    capture = []
+    for c in closes:
+        best = c.get("mfe_pct")
+        got = c.get("realised_pct")
+        if got is None and c.get("entry_price") and c.get("exit_price") and c.get("direction"):
+            sign = 1.0 if str(c["direction"]).upper() == "LONG" else -1.0
+            got = 100.0 * sign * (float(c["exit_price"]) - float(c["entry_price"])) / float(c["entry_price"])
+        if best and best > 0 and got is not None:
+            capture.append(100.0 * got / best)
+    if capture:
+        print(f"  CARRY    median capture of the best available move: {statistics.median(capture):.0f}%"
+              f"  (mean {statistics.mean(capture):.0f}%, n={len(capture)})")
+        print(f"           gave back everything or worse: {pct(sum(1 for x in capture if x <= 0), len(capture))}")
+
+    # 5. exits: did winners run?
     for reason in sorted({c["reason"] for c in closes}):
         g = [c["pnl"] for c in closes if c["reason"] == reason]
-        print(f"  EXIT     {reason:16s} {len(g):3d}  avg {statistics.mean(g):+.3f}  total {sum(g):+.2f}")
+        flag = ""
+        if reason == "TAKE_PROFIT" and statistics.mean(g) <= 0:
+            flag = "   <-- REGRESSION: a take-profit that loses money means a target was moved to a losing price"
+        print(f"  EXIT     {reason:16s} {len(g):3d}  avg {statistics.mean(g):+.3f}  total {sum(g):+.2f}{flag}")
+    losing_tps = [c for c in closes if c["reason"] == "TAKE_PROFIT" and c["pnl"] <= 0]
+    if losing_tps:
+        print(f"           {len(losing_tps)} of {sum(1 for c in closes if c['reason'] == 'TAKE_PROFIT')} "
+              f"take-profits LOST money — see position_manager.plan_exits (fixed 2026-09-16, 1c93711)")
     # 5. context at entry
     for field in ("orderbook_zone",):
         groups = defaultdict(list)
