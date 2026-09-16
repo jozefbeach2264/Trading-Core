@@ -164,8 +164,8 @@ def test_sim_stop_loss_closes_at_the_stop(config, tmp_path):
     assert run(ex.mark_to_market(2994.5)) is True
     close = ex._get_simulation_state()["history"][-1]
     assert close["reason"] == "STOP_LOSS" and close["exit_price"] == 2995.0
-    qty = 100.0 * 0.10 * 200 / 3000.0
-    assert abs(close["pnl"] - (2995.0 - 3000.0) * qty) < 1e-9
+    # risk-based sizing: hitting the stop costs exactly RISK_PER_TRADE_PERCENT of the account, whatever the width
+    assert abs(close["pnl"] + 100.0 * config.risk_per_trade_percent / 100.0) < 1e-6
 
 
 def test_sim_take_profit_closes_at_the_target_for_a_short(config, tmp_path):

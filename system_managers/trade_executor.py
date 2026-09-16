@@ -130,6 +130,27 @@ class TradeExecutor:
         except Exception as e:
             logger.error(f"Failed to fetch exchange info: %s", e, exc_info=True)
 
+    def position_size(self, balance: float, entry_price: float, stop_loss: Optional[float]) -> Dict[str, Any]:
+        """Size by RISK: the position is chosen so that hitting the stop costs RISK_PER_TRADE_PERCENT of the
+        account, then the margin is capped at RISK_CAP_PERCENT (the operator's 10% rule) — so a wide stop means
+        a smaller position rather than a bigger loss. Falls back to the cap when no stop is known."""
+        cap_margin = balance * self.config.risk_cap_percent
+        risk_pct = self.config.risk_per_trade_percent
+        stop_distance = abs(entry_price - float(stop_loss)) if stop_loss else 0.0
+        if risk_pct <= 0 or stop_distance <= 0 or entry_price <= 0:
+            margin, mode = cap_margin, "margin_cap"
+        else:
+            risk_amount = balance * risk_pct / 100.0
+            notional = risk_amount * entry_price / stop_distance     # loss at the stop == risk_amount
+            margin = notional / self.config.leverage
+            mode = "risk_based"
+            if margin > cap_margin:
+                margin, mode = cap_margin, "risk_based_capped"
+        notional = margin * self.config.leverage
+        return {"margin": margin, "notional": notional, "quantity": notional / entry_price if entry_price > 0 else 0.0,
+                "sizing_mode": mode,
+                "risk_at_stop": notional * stop_distance / entry_price if entry_price > 0 else 0.0}
+
     async def _record_failure(self, direction: Any, reason: str) -> None:
         logger.error("Live trade aborted: %s", reason)
         await self.memory_tracker.update_memory(trade_data={"direction": direction, "reason": reason, "failed": True})
@@ -219,12 +240,12 @@ class TradeExecutor:
             await self._record_failure(direction, "Exchange filters unknown (exchangeInfo fetch failed)")
             return
 
-        # Same math as the simulation: margin = balance × RISK_CAP_PERCENT, notional = margin × LEVERAGE.
-        margin_usd = Decimal(str(self.market_state.account_balance)) * Decimal(str(self.config.risk_cap_percent))
-        notional_usd = margin_usd * Decimal(str(self.config.leverage))
-        position_size_qty = notional_usd / Decimal(str(entry_price))
-        logger.info("Sizing: balance=%s margin=%s notional=%s at %sx", self.market_state.account_balance, margin_usd, notional_usd,
-                    self.config.leverage)
+        # Same math as the simulation: risk-based, capped at RISK_CAP_PERCENT of the account.
+        sizing = self.position_size(float(self.market_state.account_balance), float(entry_price), _as_float(signal.get("stop_loss")))
+        position_size_qty = Decimal(str(sizing["quantity"]))
+        logger.info("Sizing (%s): balance=%s margin=%.2f notional=%.2f at %sx, loss at stop %.2f",
+                    sizing["sizing_mode"], self.market_state.account_balance, sizing["margin"], sizing["notional"],
+                    self.config.leverage, sizing["risk_at_stop"])
         final_qty, _ = self._adjust_to_filters(position_size_qty, Decimal(str(entry_price)))
         rejection = self._check_order_filters(final_qty, Decimal(str(entry_price)))
         if rejection:
@@ -326,9 +347,11 @@ class TradeExecutor:
             return None
         direction = str(signal.get("direction", "")).upper()
         sign = 1.0 if direction == "LONG" else -1.0
-        margin = balance * self.config.risk_cap_percent
-        notional = margin * self.config.leverage
-        quantity = notional / entry_price
+        sizing = self.position_size(balance, entry_price, _as_float(signal.get("stop_loss")))
+        margin, notional, quantity = sizing["margin"], sizing["notional"], sizing["quantity"]
+        if quantity <= 0:
+            logger.error("SIMULATION: computed a zero position size; refusing to open")
+            return None
         fee = notional * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = balance - fee
         # Liquidation ≈ the move that consumes the whole margin (maintenance margin ignored → slightly optimistic).
@@ -343,6 +366,8 @@ class TradeExecutor:
             "entry_price": entry_price,
             "margin": margin,
             "notional": notional,
+            "sizing_mode": sizing["sizing_mode"],
+            "risk_at_stop": sizing["risk_at_stop"],
             "fee": fee,
             "stop_loss": _as_float(signal.get("stop_loss")),
             "take_profit": _as_float(signal.get("take_profit")),

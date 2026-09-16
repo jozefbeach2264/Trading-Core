@@ -68,6 +68,11 @@ class Config:
         # Fraction of the account posted as MARGIN per trade (operator decision 2026-09-16: never more than 10%).
         # Position notional = margin × LEVERAGE, identically in simulation and live.
         self.risk_cap_percent: float = float(os.getenv('RISK_CAP_PERCENT', '0.10'))
+        # How much of the account a trade loses when its stop is hit. Sizing is RISK-based: the position is
+        # sized so the stop costs this much, and RISK_CAP_PERCENT above becomes a ceiling on the margin rather
+        # than a fixed bet. Measured 2026-09-16: with fixed-10%-margin sizing a 0.487% stop at 200x cost 12.9%
+        # of the account in ONE trade, because the loss scales with the stop width. 0 restores fixed sizing.
+        self.risk_per_trade_percent: float = float(os.getenv('RISK_PER_TRADE_PERCENT', '2.0'))
         self.max_liquidation_threshold: float = float(os.getenv('MAX_LIQUIDATION_THRESHOLD', '8.0'))
         self.exchange_fee_rate_taker: float = float(os.getenv('EXCHANGE_FEE_RATE_TAKER', '0.08'))
         self.max_roi_limit: float = float(os.getenv('MAX_ROI_LIMIT', '0'))
@@ -246,6 +251,8 @@ class Config:
             raise ValueError("TRAPX_WICK_MIN_RANGE_FRACTION must be in (0, 1).")
 
         # Validate Numerical Ranges
+        if not 0 <= self.risk_per_trade_percent < 100:
+            raise ValueError("RISK_PER_TRADE_PERCENT must be in [0, 100).")
         if not 0 < self.risk_cap_percent <= MAX_RISK_CAP_PERCENT:
             raise ValueError(f"RISK_CAP_PERCENT is the margin fraction per trade and must be in (0, {MAX_RISK_CAP_PERCENT}] "
                              f"(operator rule: never post more than 10% of the account).")
