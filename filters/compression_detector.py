@@ -2,6 +2,7 @@ import logging
 import json
 from typing import Dict, Any
 from config.config import Config
+from filters.candle_age import candle_age_fraction, expected_partial_range, is_too_young
 from log_utils import file_logger
 from data_managers.market_state import MarketState
 import statistics
@@ -59,7 +60,16 @@ class CompressionDetector:
             report["metrics"]["reason"] = "INVALID_HISTORICAL_DATA"; report["score"] = 1.0; report["flag"] = "✅ Hard Pass"
             return report
 
-        compression_ratio = current_range / avg_range
+        # Age-aware: a live candle 10 s into its minute is expected to show ≈√(10/60) of a full range.
+        age_fraction = candle_age_fraction(live_candle)
+        expected_range = expected_partial_range(avg_range, age_fraction)
+        if is_too_young(age_fraction) or expected_range <= 0:
+            report["score"] = 0.5
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"] = {"reason": "CANDLE_TOO_YOUNG", "candle_age_s": round(age_fraction * 60.0, 1),
+                                 "average_range": round(avg_range, 4)}
+            return report
+        compression_ratio = current_range / expected_range
 
         # Rolling stats are DIAGNOSTICS ONLY, computed from the PRIOR window (current sample excluded).
         # Review finding 5: deriving thresholds from a window that includes the current sample means the
@@ -79,6 +89,7 @@ class CompressionDetector:
         report["score"] = round(score, 4)
         report["metrics"] = {
             "average_range": round(avg_range, 4), "current_range": round(current_range, 4),
+            "expected_range": round(expected_range, 4), "candle_age_s": round(age_fraction * 60.0, 1),
             "compression_ratio": round(compression_ratio, 2), "config_threshold_ratio": self.range_ratio,
             "soft_threshold": round(soft_threshold, 4),
             "hard_threshold": round(hard_threshold, 4),

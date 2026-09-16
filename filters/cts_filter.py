@@ -2,6 +2,7 @@ import logging
 import json
 from typing import Dict, Any
 from config.config import Config
+from filters.candle_age import candle_age_fraction, expected_partial_range, is_too_young
 from log_utils import file_logger
 from data_managers.market_state import MarketState
 
@@ -69,8 +70,20 @@ class CtsFilter:
             self.logger.warning(report["metrics"]["reason"])
             return report
 
-        is_compressed = current_range < (average_range * self.narrow_range_ratio)
-        grind_ratio = current_range / average_range
+        # Compare against what a candle of this AGE should have shown (√t), not a full closed candle;
+        # otherwise the opening seconds of every minute read as "compression".
+        age_fraction = candle_age_fraction(live_candle)
+        expected_range = expected_partial_range(average_range, age_fraction)
+        if is_too_young(age_fraction) or expected_range <= 0:
+            report["score"] = 0.5
+            report["flag"] = "⚠️ Soft Flag"
+            report["metrics"] = {"reason": "CANDLE_TOO_YOUNG", "candle_age_s": round(age_fraction * 60.0, 1),
+                                 "average_range": round(average_range, 4), "mark_price": round(mark_price, 4)}
+            await market_state.update_filter_audit_report("CtsFilter", report)
+            return report
+
+        is_compressed = current_range < (expected_range * self.narrow_range_ratio)
+        grind_ratio = current_range / expected_range
         
         upper_wick = h - max(o, c)
         lower_wick = min(o, c) - l
@@ -88,6 +101,7 @@ class CtsFilter:
             
         report["metrics"] = {
             "average_range": round(average_range, 4), "current_range": round(current_range, 4),
+            "expected_range": round(expected_range, 4), "candle_age_s": round(age_fraction * 60.0, 1),
             "grind_ratio": round(grind_ratio, 2), "is_compressed": is_compressed,
             "wick_signal": wick_signal, "wick_strength_ratio": round(wick_strength, 2),
             "mark_price": round(mark_price, 4)

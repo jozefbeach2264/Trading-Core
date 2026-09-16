@@ -89,12 +89,22 @@ def test_nan_confidence_is_rejected(client, records):
     assert 0.0 <= verdict["confidence"] <= 1.0
 
 
-def test_empty_content_uses_fallback(client, records):
+def test_empty_content_uses_fallback_but_never_executes_by_default(client, records):
     _mock_post(client, payload=_chat_payload(""))
     verdict = run(client.get_ai_verdict(STRONG_LONG))
-    assert verdict["action"] == "Execute"
-    assert verdict["confidence"] >= 0.7
+    assert verdict["action"] == "Reanalyze"
+    assert verdict["confidence"] >= 0.7          # the corrected mean is still reported
+    assert "AI_FALLBACK_CAN_EXECUTE" in verdict["reasoning"]
     assert any(r["type"] == "fallback" for r in records)
+
+
+def test_fallback_execute_is_an_operator_opt_in(config, records):
+    config.ai_fallback_can_execute = True
+    client = AIClient(config)
+    _mock_post(client, payload=_chat_payload(""))
+    verdict = run(client.get_ai_verdict(STRONG_LONG))
+    run(client.close())
+    assert verdict["action"] == "Execute" and verdict["confidence"] >= 0.7
 
 
 def test_malformed_json_uses_fallback(client, records):
@@ -113,8 +123,16 @@ def test_unknown_action_uses_fallback(client, records):
 def test_fallback_confidence_is_a_mean_not_capped(client):
     verdict = client._fallback_from_context(STRONG_LONG)
     expected = ((1.0 - 0.10) + 0.91 + 0.95) / 3.0
-    assert verdict["action"] == "Execute"
-    assert abs(verdict["confidence"] - expected) < 1e-9
+    assert verdict["action"] == "Reanalyze"       # default: heuristic may not open a position
+    assert abs(verdict["confidence"] - expected) < 1e-4
+    client.config.ai_fallback_can_execute = True
+    assert client._fallback_from_context(STRONG_LONG)["action"] == "Execute"
+
+
+def test_fallback_unknown_direction_is_reanalyze(client):
+    client.config.ai_fallback_can_execute = True
+    verdict = client._fallback_from_context({**STRONG_LONG, "direction": "N/A"})
+    assert verdict["action"] == "Reanalyze" and verdict["confidence"] == 0.0
 
 
 def test_fallback_high_reversal_risk_does_not_execute(client):

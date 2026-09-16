@@ -66,3 +66,19 @@ def test_context_packet_carries_real_reversal_score(config):
     assert packet["cts_score"] == 0.9 and packet["orderbook_score"] == 0.8
     assert packet["direction"] == "SHORT"
     assert forecaster.calls == ["SHORT"]
+
+
+def test_non_execute_verdict_carries_an_explicit_reason(config):
+    strategy = AIStrategy(config, _Router(), _Forecaster(), _AIClient(), _Simulator(), _Memory())
+    result = run(strategy.generate_signal(make_market_state(config), _Gate()))
+    assert result["reason"].startswith("Rejected - AI VERDICT: ⛔ Abort")
+
+
+def test_missing_forecast_skips_the_ai_call(config):
+    class _NoForecast(_Forecaster):
+        async def generate_forecast(self, market_state, direction=None):
+            return {"forecast_generated": False, "reversal_likelihood_score": 0.0, "forecast": {}}
+    ai = _AIClient()
+    strategy = AIStrategy(config, _Router(), _NoForecast(), ai, _Simulator(), _Memory())
+    result = run(strategy.generate_signal(make_market_state(config), _Gate()))
+    assert result["reason"] == "Rejected - FORECAST UNAVAILABLE" and ai.packets == []

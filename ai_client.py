@@ -234,14 +234,22 @@ class AIClient:
         orderbook_score = _clamp01(context_packet.get("orderbook_score", 0.0) or 0.0)
 
         confidence = round(((1.0 - reversal_risk) + cts_score + orderbook_score) / 3.0, 4)
+        if direction not in ("long", "short"):
+            return {"action": "Reanalyze", "confidence": 0.0,
+                    "reasoning": f"Unknown trade direction {direction!r}; heuristic cannot judge."}
         gates_strong = (cts_score > FALLBACK_EXECUTE_MIN_SCORE and orderbook_score > FALLBACK_EXECUTE_MIN_SCORE
                         and reversal_risk < FALLBACK_EXECUTE_MAX_REVERSAL and volume > 0)
         is_short = direction == "short"
         price_with_trade = close_price < open_price if is_short else close_price > open_price
         price_against_trade = close_price > open_price if is_short else close_price < open_price
-        label = "short" if is_short else "long"
+        label = direction
 
         if price_with_trade and gates_strong:
+            if not getattr(self.config, "ai_fallback_can_execute", False):
+                # The heuristic only runs when the model returned nothing usable. Opening a 200x
+                # position on it is an operator decision (AI_FALLBACK_CAN_EXECUTE), off by default.
+                return {"action": "Reanalyze", "confidence": confidence,
+                        "reasoning": f"Model output unusable; heuristic favours the {label} but AI_FALLBACK_CAN_EXECUTE is off."}
             return {"action": "Execute", "confidence": confidence,
                     "reasoning": f"Price moving with the {label} and strong filter scores support the trade."}
         if price_against_trade:

@@ -79,6 +79,8 @@ class Config:
         self.ai_temperature: float = float(os.getenv('AI_TEMPERATURE', '0.2'))
         # Hard cap on the logged reasoning string, enforced in the JSON grammar. 0 = omit the field.
         self.ai_reasoning_max_chars: int = int(os.getenv('AI_REASONING_MAX_CHARS', '200'))
+        # May the context heuristic (used only when the model returns nothing usable) authorise an Execute?
+        self.ai_fallback_can_execute: bool = os.getenv('AI_FALLBACK_CAN_EXECUTE', 'False').lower() == 'true'
 
         # Memory tracker (SQLite). Filter history is write-only data at ~45 rows/s — off by default.
         self.memory_db_path: str = os.getenv("MEMORY_DB_PATH", "./logs/memory_tracker.db")
@@ -127,8 +129,8 @@ class Config:
             raise ValueError("AI_MAX_TOKENS must be a positive integer.")
         if self.engine_cycle_interval <= 0:
             raise ValueError("ENGINE_CYCLE_INTERVAL must be a positive float.")
-        if not 0 <= self.cts_narrow_range_ratio <= 1.0:
-            raise ValueError("CTS_NARROW_RANGE_RATIO must be between 0 and 1.0.")
+        if not 0 < self.cts_narrow_range_ratio <= 1.0:
+            raise ValueError("CTS_NARROW_RANGE_RATIO must be greater than 0 and at most 1.0.")
         if not 0 < self.compression_range_ratio <= 1.0:
             raise ValueError("COMPRESSION_RANGE_RATIO must be greater than 0 and at most 1.0.")
         if self.cts_wick_rejection_multiplier < 1.0:

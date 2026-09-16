@@ -26,7 +26,9 @@ REJECTION_CODE_MAP = {
     "RetestEntryLogic": "RETEST WEAK", "SentimentDivergenceFilter": "CVD CONFLICT",
     "OrderBookReversalZoneDetector": "OB WALL WEAK", "AI_CONFIDENCE": "AI CONFIDENCE LOW",
     "NO_SIGNAL_GENERATED": "Terminated by TrapX/Scalpel",
-    "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK"
+    "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK",
+    "FORECAST_UNAVAILABLE": "FORECAST UNAVAILABLE",
+    "AI_VERDICT": "AI VERDICT"
 }
 
 def format_rejection_reason(filter_reports: Dict[str, Any], prefix: str) -> Optional[str]:
@@ -87,6 +89,10 @@ class AIStrategy(AIStrategyProtocol):
         self.logger.info("Post-Signal Validators passed. Proceeding to AI Core.")
         
         forecast = await self.forecaster.generate_forecast(market_state, signal_packet.get("direction"))
+        if not forecast.get("forecast_generated"):
+            reason = f"Rejected - {REJECTION_CODE_MAP['FORECAST_UNAVAILABLE']}"
+            self.logger.warning(f"REJECTED: {reason}")
+            return {"reason": reason, "validator_report": final_validator_log}
         
         # Create flat context_packet for AIClient
         snapshot = market_state.get_latest_data_snapshot()
@@ -131,6 +137,12 @@ class AIStrategy(AIStrategyProtocol):
             return {"reason": reason, "ai_verdict": ai_verdict, "validator_report": final_validator_log}
 
         final_signal = {"ai_verdict": ai_verdict, **signal_packet, "validator_report": final_validator_log}
+
+        if ai_verdict.get("action") != "✅ Execute":
+            # Abort / Reanalyze with confidence above the gate: a rejection, with the model's own words.
+            final_signal["reason"] = f"Rejected - {REJECTION_CODE_MAP['AI_VERDICT']}: {ai_verdict.get('action')} ({log_reason})"
+            self.logger.info(f"REJECTED: {final_signal['reason']}")
+            return final_signal
 
         if ai_verdict.get("action") == "✅ Execute":
             self.logger.info(f"Forecast data for risk check: {json.dumps(forecast, indent=2)}")
