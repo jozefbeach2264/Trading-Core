@@ -136,6 +136,14 @@ class Config:
         # trade's stated risk/reward is fiction and the real risk is the whole margin. Observed live
         # 2026-09-16: a stop 4.67% away at 200x leverage, where liquidation is 0.50%.
         self.max_stop_liquidation_fraction: float = float(os.getenv('MAX_STOP_LIQUIDATION_FRACTION', '0.8'))
+        # Margin mode decides what liquidation even means. CROSS (what this account trades) backs every position
+        # with the whole wallet, so liquidation depends on wallet-vs-notional, NOT on the leverage number.
+        # ISOLATED backs it with only the posted margin, which is the 100/LEVERAGE rule.
+        self.margin_mode: str = (os.getenv('MARGIN_MODE', 'cross') or 'cross').strip().lower()
+        self.maintenance_margin_percent: float = float(os.getenv('MAINTENANCE_MARGIN_PERCENT', '0.5'))
+        # The operator's validity rule: a trade is valid unless a stop-out would zero the wallet, or exceed a
+        # set allowed capital amount. 100 = only refuse a trade that would wipe the account.
+        self.max_trade_loss_percent: float = float(os.getenv('MAX_TRADE_LOSS_PERCENT', '100.0'))
 
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
@@ -216,8 +224,36 @@ class Config:
 
     @property
     def liquidation_distance_percent(self) -> float:
-        """How far price must move against the position to consume the margin, ignoring maintenance margin."""
+        """ISOLATED-MARGIN ONLY: the move that consumes the position's own posted margin. In cross margin this
+        number is meaningless — use liquidation_distance_fraction(), which accounts for the whole wallet."""
         return 100.0 / self.leverage if self.leverage else float("inf")
+
+    def notional_to_equity_ratio(self, stop_fraction: float) -> float:
+        """Notional as a multiple of the wallet for a stop this wide, under risk-based sizing with the margin
+        cap. Balance cancels out: risk sizing fixes the LOSS as a share of the wallet, so the position's size
+        relative to the wallet depends only on how wide the stop is."""
+        cap = self.risk_cap_percent * self.leverage
+        if stop_fraction <= 0 or self.risk_per_trade_percent <= 0:
+            return cap
+        return min((self.risk_per_trade_percent / 100.0) / stop_fraction, cap)
+
+    def loss_fraction_at_stop(self, stop_fraction: float) -> float:
+        """Fraction of the wallet a stop-out costs. This is the number the operator's validity rule tests."""
+        return self.notional_to_equity_ratio(stop_fraction) * stop_fraction
+
+    def liquidation_distance_fraction(self, stop_fraction: float) -> float:
+        """How far price must move against the trade before it is liquidated, as a fraction of entry.
+
+        CROSS: the whole wallet is collateral, so the position survives until equity falls to the maintenance
+        margin — (equity - mmr*notional)/notional, i.e. wallet-vs-notional. A small position against a healthy
+        wallet is liquidated a very long way out, whatever the leverage setting says.
+        ISOLATED: only the posted margin is at stake, which is the 1/LEVERAGE rule."""
+        if self.margin_mode == "isolated":
+            return 1.0 / self.leverage if self.leverage else float("inf")
+        ratio = self.notional_to_equity_ratio(stop_fraction)
+        if ratio <= 0:
+            return float("inf")
+        return max(0.0, 1.0 / ratio - self.maintenance_margin_percent / 100.0)
 
     @property
     def round_trip_fee_percent(self) -> float:
@@ -271,13 +307,22 @@ class Config:
             raise ValueError("MIN_STOP_FEE_MULTIPLE must be >= 0.")
         if not 0 < self.max_stop_liquidation_fraction <= 1.0:
             raise ValueError("MAX_STOP_LIQUIDATION_FRACTION must be in (0, 1].")
-        floor = self.min_stop_fee_multiple * self.round_trip_fee_percent
-        ceiling = self.max_stop_liquidation_fraction * self.liquidation_distance_percent
-        if floor > ceiling:
-            raise ValueError(
-                f"No stop width can satisfy both guards: fees demand >= {floor:.3f}% but liquidation at "
-                f"{self.leverage}x caps it at {ceiling:.3f}%. Lower LEVERAGE, lower the fee (maker orders), "
-                f"or relax MIN_STOP_FEE_MULTIPLE / MAX_STOP_LIQUIDATION_FRACTION.")
+        if self.margin_mode not in ("cross", "isolated"):
+            raise ValueError("MARGIN_MODE must be 'cross' or 'isolated'.")
+        if self.maintenance_margin_percent < 0:
+            raise ValueError("MAINTENANCE_MARGIN_PERCENT must be >= 0.")
+        if not 0 < self.max_trade_loss_percent <= 100.0:
+            raise ValueError("MAX_TRADE_LOSS_PERCENT must be in (0, 100].")
+        # Only isolated margin has a leverage-derived stop ceiling that a fee floor can contradict. Under cross
+        # margin the liquidation point depends on wallet-vs-notional, so there is no fixed ceiling to collide with.
+        if self.margin_mode == "isolated":
+            floor = self.min_stop_fee_multiple * self.round_trip_fee_percent
+            ceiling = self.max_stop_liquidation_fraction * self.liquidation_distance_percent
+            if floor > ceiling:
+                raise ValueError(
+                    f"No stop width can satisfy both guards: fees demand >= {floor:.3f}% but isolated-margin "
+                    f"liquidation at {self.leverage}x caps it at {ceiling:.3f}%. Lower LEVERAGE, lower the fee "
+                    f"(maker orders), or relax MIN_STOP_FEE_MULTIPLE / MAX_STOP_LIQUIDATION_FRACTION.")
         if self.trapx_wick_body_multiplier <= 0:
             raise ValueError("TRAPX_WICK_BODY_MULTIPLIER must be positive.")
         if not 0 < self.trapx_wick_min_range_fraction < 1.0:

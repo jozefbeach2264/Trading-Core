@@ -24,6 +24,9 @@ _PINNED_ENV = {
     "MIN_REWARD_FEE_MULTIPLE": "3.0",
     "MIN_STOP_FEE_MULTIPLE": "2.0",
     "MAX_STOP_LIQUIDATION_FRACTION": "0.8",
+    "MARGIN_MODE": "cross",
+    "MAINTENANCE_MARGIN_PERCENT": "0.5",
+    "MAX_TRADE_LOSS_PERCENT": "100.0",
     "SCALPEL_STOP_RANGE_MULTIPLE": "3.0",
     "SCALPEL_TARGET_RANGE_MULTIPLE": "8.0",
     # exit management: pinned so tuning the live .env cannot change what these tests assert

@@ -375,8 +375,19 @@ class TradeExecutor:
             return None
         fee = notional * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = balance - fee
-        # Liquidation ≈ the move that consumes the whole margin (maintenance margin ignored → slightly optimistic).
-        liquidation_price = entry_price * (1.0 - sign / self.config.leverage)
+        # Liquidation depends on the MARGIN MODE, not on the leverage number alone. Under CROSS margin (what this
+        # account trades) the whole wallet is collateral, so the position survives until equity falls to the
+        # maintenance margin — a small position against a healthy wallet is liquidated a very long way out.
+        # Under ISOLATED margin only the posted margin is at stake, which is the 1/LEVERAGE rule.
+        equity_after_fee = state["balance"]
+        if self.config.margin_mode == "isolated":
+            liq_move = 1.0 / self.config.leverage if self.config.leverage else float("inf")
+        elif notional > 0:
+            maintenance = self.config.maintenance_margin_percent / 100.0 * notional
+            liq_move = max(0.0, (equity_after_fee - maintenance) / notional)
+        else:
+            liq_move = float("inf")
+        liquidation_price = entry_price * (1.0 - sign * liq_move)
         record = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": "open",
@@ -500,8 +511,12 @@ class TradeExecutor:
         exit_price = float(mark_price)
         sign = 1.0 if str(position.get("direction", "")).upper() == "LONG" else -1.0
         pnl = (exit_price - float(position["entry_price"])) * float(position["quantity"]) * sign
-        if reason == "LIQUIDATION":
-            pnl = -float(position.get("margin", abs(pnl)))   # the whole margin is gone, never more
+        if reason == "LIQUIDATION" and self.config.margin_mode == "isolated":
+            # ISOLATED: only the posted margin is at stake, so the loss is capped there however far price ran.
+            # CROSS: the whole wallet is collateral, so the loss is the actual move to the liquidation price —
+            # which is derived from wallet-vs-notional and is far larger than the margin. Capping it at the
+            # margin here understated a cross liquidation ninefold and made the simulator's worst case fiction.
+            pnl = -float(position.get("margin", abs(pnl)))
         fee = float(position.get("notional", 0.0)) * self.config.exchange_fee_rate_taker / 100.0
         state["balance"] = float(state["balance"]) + pnl - fee
         entry = float(position["entry_price"])

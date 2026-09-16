@@ -1,6 +1,8 @@
 """Live order path: a transport error (timeout, connection reset) is recorded and never escapes."""
 import httpx
 
+import pytest
+
 from conftest import run, make_market_state
 from system_managers.trade_executor import TradeExecutor
 
@@ -177,7 +179,9 @@ def test_sim_take_profit_closes_at_the_target_for_a_short(config, tmp_path):
     assert close["reason"] == "TAKE_PROFIT" and close["exit_price"] == 2990.0 and close["pnl"] > 0
 
 
-def test_sim_liquidation_loses_exactly_the_margin(config, tmp_path):
+def test_sim_isolated_liquidation_loses_exactly_the_posted_margin(config, tmp_path):
+    """ISOLATED margin: only the position's own margin is at stake, so it dies 1/LEVERAGE away."""
+    config.margin_mode = "isolated"
     ex, ms = _sim(config, tmp_path)
     run(ex._execute_simulated_trade({"direction": "LONG"}))          # no stop: only liquidation can end it
     liq = 3000.0 * (1 - 1 / 200)                                      # 2985.0
@@ -188,6 +192,26 @@ def test_sim_liquidation_loses_exactly_the_margin(config, tmp_path):
     assert close["reason"] == "LIQUIDATION" and abs(close["pnl"] + 10.0) < 1e-9   # margin = 10% of 100
     assert state["stats"]["trades_closed"] == 1 and state["stats"]["win_rate_pct"] == 0.0
     assert state["stats"]["max_drawdown_pct"] > 10.0
+
+
+def test_sim_cross_liquidation_is_set_by_the_wallet_and_sits_far_further_out(config, tmp_path):
+    """CROSS margin: the whole wallet is collateral, so the position survives until equity reaches the
+    maintenance margin. Same trade, same leverage — liquidation is 4.4% away instead of 0.5%."""
+    config.margin_mode = "cross"
+    ex, ms = _sim(config, tmp_path)
+    run(ex._execute_simulated_trade({"direction": "LONG"}))          # margin-cap sizing: notional 2000
+    notional = 2000.0                                                # margin cap 10% of 100, at 200x
+    equity_after_fee = 100.0 - notional * config.exchange_fee_rate_taker / 100.0
+    maintenance = notional * config.maintenance_margin_percent / 100.0
+    liq = 3000.0 * (1 - (equity_after_fee - maintenance) / notional)  # ~2866.5, not 2985
+
+    assert run(ex.mark_to_market(2985.0 - 0.5)) is False, "the isolated liquidation point must NOT trigger"
+    assert run(ex.mark_to_market(liq + 0.5)) is False
+    assert run(ex.mark_to_market(liq - 0.5)) is True
+    close = ex._get_simulation_state()["history"][-1]
+    assert close["reason"] == "LIQUIDATION"
+    # it takes the wallet down to the maintenance margin — this is what "zeroing the wallet" means in cross
+    assert close["pnl"] == pytest.approx(-(equity_after_fee - maintenance), rel=1e-6)
 
 
 def test_run_statistics(tmp_path):

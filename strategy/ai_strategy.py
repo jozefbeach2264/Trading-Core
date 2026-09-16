@@ -137,17 +137,36 @@ class AIStrategy(AIStrategyProtocol):
         return ""
 
     def _stop_beyond_liquidation(self, signal_packet: Dict[str, Any]) -> str:
-        """'' when the stop can actually be reached before the position is liquidated; otherwise why not."""
-        fraction = self.config.max_stop_liquidation_fraction
+        """'' when the trade is valid; otherwise why not.
+
+        The operator's rule (2026-09-16): a trade is valid so long as a stop-out does not zero the wallet or
+        exceed a set allowed capital amount. This account trades CROSS margin, where the whole wallet is
+        collateral — so the old 100/LEVERAGE test was measuring isolated margin and refused stops that were
+        nowhere near liquidation (57 of 60 rejections on 2026-09-16 were this).
+
+        Two things can still make a stop invalid, and only these two:
+          * it would cost more of the wallet than the allowed capital, or
+          * liquidation would arrive before the stop, which makes the stop fiction.
+        """
         entry = float(signal_packet.get("entry_price") or 0.0)
         stop = signal_packet.get("stop_loss")
-        if entry <= 0 or stop is None or fraction <= 0:
+        if entry <= 0 or stop is None:
             return ""
-        stop_pct = abs(float(stop) - entry) / entry * 100.0
-        liq_pct = self.config.liquidation_distance_percent
-        if stop_pct > fraction * liq_pct:
-            return (f"stop {stop_pct:.3f}% exceeds {fraction:g}x the {liq_pct:.3f}% liquidation distance at "
-                    f"{self.config.leverage}x — it could never be reached")
+        stop_fraction = abs(float(stop) - entry) / entry
+        if stop_fraction <= 0:
+            return ""
+
+        loss_pct = self.config.loss_fraction_at_stop(stop_fraction) * 100.0
+        allowed = self.config.max_trade_loss_percent
+        if loss_pct >= allowed:
+            return (f"a stop-out would cost {loss_pct:.2f}% of the wallet, at or beyond the {allowed:g}% allowed")
+
+        buffer = self.config.max_stop_liquidation_fraction
+        liq_pct = self.config.liquidation_distance_fraction(stop_fraction) * 100.0
+        stop_pct = stop_fraction * 100.0
+        if buffer > 0 and stop_pct > buffer * liq_pct:
+            return (f"stop {stop_pct:.3f}% exceeds {buffer:g}x the {liq_pct:.3f}% {self.config.margin_mode}-margin "
+                    f"liquidation distance — liquidation would come first")
         return ""
 
     def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
