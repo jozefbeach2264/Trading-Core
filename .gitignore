@@ -14,3 +14,8 @@ stuff
 =*
 .pytest_cache/
 .env.*
+dryrun/candles*.json
+dryrun/samples*.jsonl
+dryrun/learned_weights.json
+dryrun/.cursor.json
+dryrun/__pycache__/
