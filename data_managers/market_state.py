@@ -58,9 +58,11 @@ class MarketState:
                         price, qty = entry[0], entry[1]
                         parsed.append((float(price), float(qty)))
                 return parsed
+            # OKX sends bids best-first (descending) and asks best-first (ascending) — verified 2026-09-15.
+            # Keep that order: index 0 is top-of-book on both sides (the parser's wall threshold and the
+            # console HUD depend on it). The old .reverse() made asks[0] the DEEPEST level.
             self.depth_20['bids'] = _parse_side(bids_data)
             self.depth_20['asks'] = _parse_side(asks_data)
-            self.depth_20['asks'].reverse()  # ascending for asks
             
             # Mark the cache as dirty; calculations will be done on-demand.
             self._is_ob_metrics_dirty = True
@@ -77,7 +79,9 @@ class MarketState:
             logger.debug("Order book metrics are dirty. Recalculating...")
             self.order_book_pressure = self.order_book_parser.calculate_pressure_vectors(self.depth_20)
             self.order_book_walls = self.order_book_parser.find_wall_clusters(self.depth_20, self.config.orderbook_reversal_wall_multiplier)
-            self.spoof_metrics = self.order_book_parser.analyze_thinning_and_spoofing(self.previous_depth_20, self.depth_20, self.config.spoof_distance_percent)
+            self.spoof_metrics = self.order_book_parser.analyze_thinning_and_spoofing(
+                self.previous_depth_20, self.depth_20,
+                self.config.spoof_distance_percent, self.config.spoof_large_order_multiplier)
             self._is_ob_metrics_dirty = False # Mark the cache as clean
 
     async def update_from_ws_agg_trade(self, data: dict):
@@ -140,8 +144,12 @@ class MarketState:
         if not klines_data:
             logger.warning("No klines data provided to update.")
             return
+        # OKX /market/history-candles returns NEWEST first (verified 2026-09-15), which is exactly this
+        # deque's convention (index 0 = newest; websocket candles are appendleft'ed). The previous
+        # reversed() stored the block oldest-first, so every lookback window mixed the newest live
+        # candles with the OLDEST history until 500 websocket candles had pushed it out.
         self.klines.clear()
-        for k in reversed(klines_data):
+        for k in klines_data:
             try:
                 self.klines.append([int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5]), float(k[6]), float(k[7]), str(k[8])])
             except (ValueError, TypeError) as e:

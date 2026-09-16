@@ -73,33 +73,66 @@ class OrderBookParser:
             logger.warning("Failed to find wall clusters", extra={"error": str(e)})
             return {"bid_walls": [], "ask_walls": []}
 
+    @staticmethod
+    def _mid_price(order_book: Dict[str, Any]) -> float:
+        try:
+            best_bid = max(float(p) for p, _ in order_book.get('bids', []))
+            best_ask = min(float(p) for p, _ in order_book.get('asks', []))
+            return (best_bid + best_ask) / 2.0
+        except (ValueError, TypeError):
+            return 0.0
+
+    @staticmethod
+    def _side_thinning(prev_walls: List[Dict[str, float]], current_levels: List, mid: float,
+                       distance_percent: float) -> Dict[str, float]:
+        """Compare each PREVIOUS wall with the quantity now resting at the SAME price.
+
+        A wall whose price has left the visible window is skipped (unknown, not pulled), and the
+        current snapshot's own wall threshold is irrelevant — so a wall does not "disappear" just
+        because the top-of-book quantity (the threshold reference) changed between ticks."""
+        zero = {"thin_rate": 0.0, "delta_pct": 0.0}
+        if not prev_walls or not current_levels:
+            return zero
+        current_qty = {float(p): float(q) for p, q in current_levels}
+        lowest, highest = min(current_qty), max(current_qty)
+        prev_total = curr_total = 0.0
+        for wall in prev_walls:
+            price, qty = wall["price"], wall["qty"]
+            if mid > 0 and abs(price - mid) / mid * 100.0 > distance_percent:
+                continue
+            if price < lowest or price > highest:
+                continue
+            prev_total += qty
+            curr_total += current_qty.get(price, 0.0)
+        if prev_total <= 0:
+            return zero
+        delta_pct = (curr_total - prev_total) / prev_total * 100.0
+        return {"thin_rate": max(-delta_pct, 0.0), "delta_pct": delta_pct}
+
     def analyze_thinning_and_spoofing(
-        self, previous_ob: Dict[str, Any], current_ob: Dict[str, Any], distance_percent: float = 2.0
+        self, previous_ob: Dict[str, Any], current_ob: Dict[str, Any], distance_percent: float = 2.0,
+        multiplier: float = 10.0
     ) -> Dict[str, Any]:
         """
-        Compares two consecutive order book snapshots to detect wall thinning.
+        Compares two consecutive order book snapshots to detect wall thinning (pulled liquidity).
+        Walls are levels ≥ `multiplier` × top-of-book qty in the PREVIOUS snapshot, within
+        `distance_percent` of mid. Both sides are analysed; spoof_thin_rate reports the worse side.
         """
-        # The following verbose log has been removed to prevent console flooding.
-        # logger.debug("Analyzing thinning/spoofing: prev_ob=%s, curr_ob=%s", previous_ob, current_ob)
-        
         if not previous_ob.get('bids') or not current_ob.get('bids'):
             return {"spoof_thin_rate": 0.0, "wall_delta_pct": 0.0}
-            
+
         try:
-            prev_walls = self.find_wall_clusters(previous_ob)
-            curr_walls = self.find_wall_clusters(current_ob)
-            
-            prev_bid_wall_qty = sum(w['qty'] for w in prev_walls['bid_walls'])
-            curr_bid_wall_qty = sum(w['qty'] for w in curr_walls['bid_walls'])
-            
-            wall_delta = curr_bid_wall_qty - prev_bid_wall_qty
-            wall_delta_pct = (wall_delta / prev_bid_wall_qty) * 100 if prev_bid_wall_qty > 0 else 0
-            
-            logger.debug("Spoofing metrics calculated", extra={"wall_delta_pct": wall_delta_pct})
-            
+            prev_walls = self.find_wall_clusters(previous_ob, multiplier)
+            mid = self._mid_price(previous_ob)
+            bid = self._side_thinning(prev_walls["bid_walls"], current_ob.get('bids', []), mid, distance_percent)
+            ask = self._side_thinning(prev_walls["ask_walls"], current_ob.get('asks', []), mid, distance_percent)
+            worst = bid if bid["thin_rate"] >= ask["thin_rate"] else ask
+            logger.debug("Spoofing metrics calculated", extra={"wall_delta_pct": worst["delta_pct"]})
             return {
-                "spoof_thin_rate": -wall_delta_pct if wall_delta < 0 else 0.0,
-                "wall_delta_pct": wall_delta_pct
+                "spoof_thin_rate": worst["thin_rate"],
+                "wall_delta_pct": worst["delta_pct"],
+                "bid_thin_rate": bid["thin_rate"],
+                "ask_thin_rate": ask["thin_rate"],
             }
         except (ValueError, TypeError) as e:
             logger.warning("Failed to analyze thinning/spoofing", extra={"error": str(e)})

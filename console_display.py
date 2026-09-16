@@ -88,7 +88,7 @@ def format_market_state_for_console(market_state: MarketState) -> str:
         if (not bid_price or not ask_price) and depth_20.get("bids") and depth_20.get("asks"):
             # Fallback to top of book if ticker missing
             bid_price = depth_20["bids"][0][0]
-            ask_price = depth_20["asks"][-1][0] if depth_20["asks"] else 0.0
+            ask_price = depth_20["asks"][0][0] if depth_20["asks"] else 0.0  # asks are best-first
         spread = ask_price - bid_price if bid_price and ask_price else 0.0
         # For display: show more precision to surface small changes
         spread = round(spread, 5)
