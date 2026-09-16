@@ -256,7 +256,11 @@ def test_a_position_survives_a_restart_and_is_not_overwritten(config, tmp_path):
 
 def test_sim_stats_reports_orphaned_opens():
     from sim_stats import compute_stats
-    history = [{"event": "open", "fee": 1.0}, {"event": "open", "fee": 1.0},
-               {"event": "close", "pnl": 2.0, "fee": 1.0, "reason": "TAKE_PROFIT"}]
-    stats = compute_stats(history, 100.0)
-    assert stats["orphaned_opens"] == 1 and stats["open_now"] == 0
+    o = {"event": "open", "fee": 1.0}
+    c = {"event": "close", "pnl": 2.0, "fee": 1.0, "reason": "TAKE_PROFIT"}
+    assert compute_stats([o, o, c], 100.0)["orphaned_opens"] == 1
+    # one orphan must not make every later open look orphaned, and a live position must still show as open
+    stats = compute_stats([o, c, o, o, c, o, c, o], 100.0)
+    assert stats["orphaned_opens"] == 1, "only the superseded open is an orphan"
+    assert stats["open_now"] == 1, "the trailing open position must be reported"
+    assert compute_stats([o, c, o, c], 100.0)["open_now"] == 0
