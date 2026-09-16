@@ -46,11 +46,11 @@ class Config:
         # designed for) or "books5" (5-level snapshots; what the bot used until 2026-09-16, which starved TrapX).
         self.orderbook_channel: str = os.getenv("ORDERBOOK_CHANNEL", "books").strip()
         self.orderbook_depth_levels: int = int(os.getenv("ORDERBOOK_DEPTH_LEVELS", "50"))
-        # Wall detection: "depth_share" (level ≥ WALL_MIN_DEPTH_SHARE of the side's visible depth, beyond the best
+        # Wall detection: "depth_share" (level ≥ WALL_MIN_DEPTH_SHARE of the side's visible depth (hysteresis: stays tracked ≥ half), beyond the best
         # WALL_SKIP_LEVELS, alive ≥ WALL_MIN_AGE_S — calibrated live 2026-09-16) or "multiplier" (legacy: ≥ N × the
         # top-of-book quantity, which on this market is the largest level and therefore never finds anything).
         self.wall_mode: str = os.getenv("WALL_MODE", "depth_share").strip()
-        self.wall_min_depth_share: float = float(os.getenv("WALL_MIN_DEPTH_SHARE", "0.10"))
+        self.wall_min_depth_share: float = float(os.getenv("WALL_MIN_DEPTH_SHARE", "0.07"))
         self.wall_skip_levels: int = int(os.getenv("WALL_SKIP_LEVELS", "3"))
         self.wall_min_age_s: float = float(os.getenv("WALL_MIN_AGE_S", "5"))
         

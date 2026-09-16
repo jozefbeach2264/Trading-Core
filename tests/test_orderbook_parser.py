@@ -86,6 +86,14 @@ def test_wall_tracker_requires_share_distance_and_persistence():
     qtys[10] = 12.0                                          # a level 7 deep holding 12/92 ≈ 13% of the side
     bids = [(3000 - i * 0.1, q) for i, q in enumerate(qtys)]
     asks = [(3000.1 + i * 0.1, 1.0) for i in range(50)]
+    tr.update({"bids": bids, "asks": asks}, now=100.0)
+    dipped = list(qtys); dipped[0] = 90.0                    # touch balloons: the level's share dips to 12/152 ≈ 8% (< 10%, ≥ 5%)
+    tr.update({"bids": [(3000 - i * 0.1, q) for i, q in enumerate(dipped)], "asks": asks}, now=102.0)
+    assert ("bids", 2999.0) in tr._first_seen, "hysteresis keeps the level tracked through a share dip"
+    assert tr.update({"bids": bids, "asks": asks}, now=105.0)["bid_walls"][0]["age_s"] == 5.0
+    tr = WallTracker(min_share=0.10, skip_levels=3, min_age_s=5.0)
+    bids = [(3000 - i * 0.1, q) for i, q in enumerate(qtys)]
+    asks = [(3000.1 + i * 0.1, 1.0) for i in range(50)]
     assert tr.update({"bids": bids, "asks": asks}, now=100.0) == {"bid_walls": [], "ask_walls": []}   # seen, not yet aged
     assert tr.update({"bids": bids, "asks": asks}, now=104.9)["bid_walls"] == []
     walls = tr.update({"bids": bids, "asks": asks}, now=105.0)["bid_walls"]

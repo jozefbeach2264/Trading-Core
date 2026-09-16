@@ -12,7 +12,10 @@ class WallTracker:
     median, ~20% at the 90th percentile) and (3) has been there for at least `min_age_s` (most outsized levels
     live ~1 s; whales park size). Neighbour-relative tests were useless: the window is mostly dust levels."""
 
-    def __init__(self, min_share: float = 0.10, skip_levels: int = 3, min_age_s: float = 5.0):
+    KEEP_FRACTION = 0.5     # a tracked level stays alive while it holds ≥ half the entry share (its share wobbles
+                            # every tick as the side's total changes; without hysteresis nothing ever aged)
+
+    def __init__(self, min_share: float = 0.07, skip_levels: int = 3, min_age_s: float = 5.0):
         self.min_share = min_share
         self.skip_levels = skip_levels
         self.min_age_s = min_age_s
@@ -27,15 +30,17 @@ class WallTracker:
             if total <= 0:
                 continue
             for price, qty in levels[self.skip_levels:]:
-                if qty / total < self.min_share:
-                    continue
+                share = qty / total
                 key = (side, price)
+                tracked = key in self._first_seen
+                if share < self.min_share and not (tracked and share >= self.KEEP_FRACTION * self.min_share):
+                    continue
                 alive.add(key)
                 born = self._first_seen.setdefault(key, now)
                 age = now - born
-                if age >= self.min_age_s:
+                if share >= self.min_share and age >= self.min_age_s:
                     result["bid_walls" if side == "bids" else "ask_walls"].append(
-                        {"price": price, "qty": qty, "share": round(qty / total, 4), "age_s": round(age, 1)})
+                        {"price": price, "qty": qty, "share": round(share, 4), "age_s": round(age, 1)})
         for key in list(self._first_seen):
             if key not in alive:
                 del self._first_seen[key]
