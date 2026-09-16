@@ -65,6 +65,7 @@ def test_spoof_filter_does_not_count_one_snapshot_twice(config):
 
 
 def test_spoof_metrics_keep_the_worst_tick_of_the_last_second(config):
+    config.wall_mode = "multiplier"          # legacy wall rule: a 60-contract level on a 5-level book is a wall at once
     ms = MarketState(symbol="ETH-USDT-SWAP", config=config)
     wall = [["3000", "1", "0", "1"], ["2999.9", "1", "0", "1"], ["2999.8", "60", "0", "1"], ["2999.7", "1", "0", "1"], ["2999.6", "1", "0", "1"]]
     pulled = [["3000", "1", "0", "1"], ["2999.9", "1", "0", "1"], ["2999.8", "1", "0", "1"], ["2999.7", "1", "0", "1"], ["2999.6", "1", "0", "1"]]
