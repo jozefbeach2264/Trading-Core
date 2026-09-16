@@ -119,6 +119,11 @@ class Config:
         # A trade whose target does not clear the round-trip fee by this multiple is refused outright. Without it
         # the bot took trades that lose money even when they win (measured live: break-even win rate 108%).
         self.min_reward_fee_multiple: float = float(os.getenv('MIN_REWARD_FEE_MULTIPLE', '3.0'))
+        # A stop that is tight relative to the fee is worse than it looks: under risk-based sizing a tight stop
+        # buys a LARGE position, and the fee scales with the position, so
+        #     fee as a fraction of the amount risked = round-trip fee % / stop distance %.
+        # Measured 2026-09-16: stops of 0.05-0.12% against a 0.16% fee meant paying 1.3-3.4x the risk in fees.
+        self.min_stop_fee_multiple: float = float(os.getenv('MIN_STOP_FEE_MULTIPLE', '2.0'))
 
         # AI Parameters
         self.ai_confidence_threshold: float = float(os.getenv('AI_CONFIDENCE_THRESHOLD', '0.7'))
@@ -245,6 +250,8 @@ class Config:
             raise ValueError("SCALPEL_STOP_RANGE_MULTIPLE and SCALPEL_TARGET_RANGE_MULTIPLE must be positive.")
         if self.min_reward_fee_multiple < 0:
             raise ValueError("MIN_REWARD_FEE_MULTIPLE must be >= 0.")
+        if self.min_stop_fee_multiple < 0:
+            raise ValueError("MIN_STOP_FEE_MULTIPLE must be >= 0.")
         if self.trapx_wick_body_multiplier <= 0:
             raise ValueError("TRAPX_WICK_BODY_MULTIPLIER must be positive.")
         if not 0 < self.trapx_wick_min_range_fraction < 1.0:

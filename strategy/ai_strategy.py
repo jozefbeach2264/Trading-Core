@@ -31,6 +31,7 @@ REJECTION_CODE_MAP = {
     "HIGH_LIQUIDATION_RISK": "HIGH LIQUIDATION RISK",
     "FORECAST_UNAVAILABLE": "FORECAST UNAVAILABLE",
     "REWARD_TOO_SMALL": "REWARD BELOW FEES",
+    "STOP_TOO_TIGHT": "STOP TOO TIGHT FOR FEES",
     "AI_VERDICT": "AI VERDICT",
     "STALE_DATA": "STALE MARKET DATA",
     "STALE_DECISION": "STALE DECISION",
@@ -114,6 +115,26 @@ class AIStrategy(AIStrategyProtocol):
             return f"target {reward_pct:.3f}% < {required:g}x the {fee_pct:.3f}% round-trip fee"
         return ""
 
+    def _stop_too_tight(self, signal_packet: Dict[str, Any]) -> str:
+        """'' when the stop is wide enough that fees stay a modest share of the risk; otherwise why not.
+
+        Under risk-based sizing the position is risk / stop-distance, so a tight stop means a big position and
+        the fee-to-risk ratio is simply fee% / stop%. A stop narrower than the fee means paying more in fees
+        than the trade puts at risk."""
+        required = self.config.min_stop_fee_multiple
+        if required <= 0:
+            return ""
+        entry = float(signal_packet.get("entry_price") or 0.0)
+        stop = signal_packet.get("stop_loss")
+        if entry <= 0 or stop is None:
+            return ""
+        stop_pct = abs(float(stop) - entry) / entry * 100.0
+        fee_pct = self.config.round_trip_fee_percent
+        if fee_pct > 0 and stop_pct < required * fee_pct:
+            return (f"stop {stop_pct:.3f}% < {required:g}x the {fee_pct:.3f}% fee "
+                    f"(fees would be {fee_pct/stop_pct:.1f}x the risk)")
+        return ""
+
     def _reject(self, code: str, detail: str, validator_report: Dict[str, Any], level: str = "warning") -> Dict[str, Any]:
         reason = f"Rejected - {REJECTION_CODE_MAP[code]}: {detail}" if detail else f"Rejected - {REJECTION_CODE_MAP[code]}"
         getattr(self.logger, level)(f"REJECTED: {reason}")
@@ -145,6 +166,9 @@ class AIStrategy(AIStrategyProtocol):
         reward_reason = self._reward_too_small(signal_packet)
         if reward_reason:
             return self._reject("REWARD_TOO_SMALL", reward_reason, primary_gate_report["filters"], level="info")
+        stop_reason = self._stop_too_tight(signal_packet)
+        if stop_reason:
+            return self._reject("STOP_TOO_TIGHT", stop_reason, primary_gate_report["filters"], level="info")
 
         market_state.pending_signal_direction = str(signal_packet.get("direction") or "").upper() or None
         try:
