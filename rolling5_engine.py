@@ -165,6 +165,30 @@ class Rolling5Engine:
         score = (TREND_WEIGHT * trend_term + PRESSURE_WEIGHT * pressure_term + SENTIMENT_WEIGHT * sentiment_term)
         return round(_clamp01(score), 4)
 
+    def predicted_band(self, market_state: MarketState,
+                       average_range: Optional[float] = None) -> Dict[str, Dict[str, float]]:
+        """Where Rolling5 expects price to be over the next candles: realized volatility around the current
+        anchor, widening with √horizon (a diffusive price). No drift term — nothing here predicts direction.
+
+        This is deliberately separate from generate_forecast() so the stop can be set from it BEFORE the
+        entry guards run, without advancing the trade lifecycle or needing the post-signal filter audit that
+        the reversal score depends on. Pure function of the candles and the mark.
+        """
+        klines = list(market_state.klines)
+        if len(klines) < TREND_LOOKBACK_CANDLES:
+            return {}
+        if average_range is None:
+            average_range = self._calculate_average_range(klines)
+        if average_range <= 0:
+            return {}
+        last_close = float(klines[0][4])
+        anchor = float(market_state.mark_price) if market_state.mark_price else last_close
+        band: Dict[str, Dict[str, float]] = {}
+        for i in range(1, FORECAST_HORIZON_CANDLES + 1):
+            half = BAND_HALF_WIDTH_RANGES * average_range * math.sqrt(i)
+            band[f"c{i}"] = {"high": round(anchor + half, 4), "low": round(anchor - half, 4)}
+        return band
+
     async def generate_forecast(self, market_state: MarketState, direction: Optional[str] = None) -> Dict[str, Any]:
         """
         Generates a 6-candle forecast including a projected high/low range and a
@@ -198,14 +222,7 @@ class Rolling5Engine:
         slope = trend["slope"]
         average_range = self._calculate_average_range(klines)
 
-        # Expected price band for the next 6 candles: realized volatility around the LAST CLOSE, widening with
-        # √horizon (a diffusive price). No drift term — see the note on TREND_WEIGHT above.
-        last_close = float(klines[0][4])
-        anchor = float(market_state.mark_price) if market_state.mark_price else last_close
-        predictions = {}
-        for i in range(1, FORECAST_HORIZON_CANDLES + 1):
-            half = BAND_HALF_WIDTH_RANGES * average_range * math.sqrt(i)
-            predictions[f"c{i}"] = {"high": round(anchor + half, 4), "low": round(anchor - half, 4)}
+        predictions = self.predicted_band(market_state, average_range=average_range)
 
         sentiment_report = market_state.filter_audit_report.get("SentimentDivergenceFilter", {})
         reversal_score = self._reversal_likelihood(direction, float(slope), average_range,

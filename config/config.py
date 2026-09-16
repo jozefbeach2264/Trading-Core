@@ -139,6 +139,13 @@ class Config:
         # Margin mode decides what liquidation even means. CROSS (what this account trades) backs every position
         # with the whole wallet, so liquidation depends on wallet-vs-notional, NOT on the leverage number.
         # ISOLATED backs it with only the posted margin, which is the 100/LEVERAGE rule.
+        # Rolling5 owns the stop. Scalpel and TrapX say WHERE and WHICH WAY to trade; the stop comes from R5's
+        # own forecast band so a trade is only stopped out when that forecast is WRONG, never by the entry
+        # module's geometry. Measured 2026-09-16: Scalpel set stops of 0.05-0.14% while price routinely moved
+        # 0.16% against the trade, so the entry module's stop sat inside R5's own predicted noise.
+        self.r5_stop_horizon_candles: int = int(os.getenv('R5_STOP_HORIZON_CANDLES', '5'))
+        self.r5_stop_band_multiple: float = float(os.getenv('R5_STOP_BAND_MULTIPLE', '1.5'))
+        self.r5_trail_band_multiple: float = float(os.getenv('R5_TRAIL_BAND_MULTIPLE', '1.0'))
         self.margin_mode: str = (os.getenv('MARGIN_MODE', 'cross') or 'cross').strip().lower()
         self.maintenance_margin_percent: float = float(os.getenv('MAINTENANCE_MARGIN_PERCENT', '0.5'))
         # The operator's validity rule: a trade is valid unless a stop-out would zero the wallet, or exceed a
@@ -307,6 +314,10 @@ class Config:
             raise ValueError("MIN_STOP_FEE_MULTIPLE must be >= 0.")
         if not 0 < self.max_stop_liquidation_fraction <= 1.0:
             raise ValueError("MAX_STOP_LIQUIDATION_FRACTION must be in (0, 1].")
+        if self.r5_stop_horizon_candles <= 0:
+            raise ValueError("R5_STOP_HORIZON_CANDLES must be a positive integer.")
+        if self.r5_stop_band_multiple < 0 or self.r5_trail_band_multiple < 0:
+            raise ValueError("R5_STOP_BAND_MULTIPLE and R5_TRAIL_BAND_MULTIPLE must be >= 0.")
         if self.margin_mode not in ("cross", "isolated"):
             raise ValueError("MARGIN_MODE must be 'cross' or 'isolated'.")
         if self.maintenance_margin_percent < 0:

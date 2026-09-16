@@ -1,10 +1,17 @@
 """Rolling5 position management — the trade is re-assessed every cycle, not killed on a clock.
 
+ROLLING5 OWNS THE STOP. Scalpel and TrapX say where and which way to trade; they do not get to decide when the
+trade dies. Their stops come from candle geometry and have nothing to do with how far price is expected to move,
+so when that geometry lands inside R5's own predicted band the trade is killed by movement the forecast
+anticipated and the forecast never gets to be right or wrong. predicted_stop() places the stop beyond the
+predicted adverse wander; apply_predicted_stop() widens an incoming signal to it before the trade is sized.
+
 Given the open position, the current mark and a fresh forecast (reversal risk + walls, computed AGAINST the
 open trade's direction), decide the new stop and target:
   * once the trade has earned TRAIL_BREAKEVEN_R of its initial risk, the stop moves to breakeven and then trails
-    TRAIL_DISTANCE_R behind the best price; the target extends TARGET_EXTEND_R beyond the best price so a winner is
-    never capped while it keeps going;
+    the PREDICTED noise behind the best price (R5_TRAIL_BAND_MULTIPLE x the band half-width, falling back to
+    TRAIL_DISTANCE_R when no band is available); the target extends TARGET_EXTEND_R beyond the best price so a
+    winner is never capped while it keeps going;
   * when reversal risk rises to EXIT_REVERSAL_RISK the trade is taken off risk: target pulled to the mark if in
     profit, stop tightened to half the initial risk if not;
   * at the C4 order-book recheck (and every cycle after) an opposing wall between the mark and the target caps the
@@ -40,6 +47,56 @@ def extend(current: Optional[float], candidate: Optional[float], sign: float) ->
     return max(current, candidate) if sign > 0 else min(current, candidate)
 
 
+def band_half_width(band: Optional[Dict[str, Dict[str, float]]], horizon: int) -> Optional[float]:
+    """Half the width of Rolling5's predicted price band at `horizon` candles — how far price is expected to
+    wander either way by then. Anchor-independent, so it can be applied to any entry price."""
+    if not band:
+        return None
+    cell = band.get(f"c{horizon}")
+    if not isinstance(cell, dict) or "high" not in cell or "low" not in cell:
+        return None
+    half = (float(cell["high"]) - float(cell["low"])) / 2.0
+    return half if half > 0 else None
+
+
+def predicted_stop(direction: Any, entry: float, band: Optional[Dict[str, Dict[str, float]]],
+                   config: Any) -> Optional[float]:
+    """The stop Rolling5's forecast implies: far enough beyond the predicted adverse wander that the trade is
+    stopped only when the forecast is WRONG.
+
+    This is the whole point of the module. Scalpel and TrapX size their stops from candle geometry — a
+    fraction of the previous candle's range, or a fixed dollar offset — which has nothing to do with how far
+    price is actually expected to move. When that geometry lands inside R5's own predicted noise the trade is
+    killed by ordinary movement the forecast anticipated, and the forecast never gets to be right or wrong.
+    """
+    sign = _sign(direction)
+    half = band_half_width(band, config.r5_stop_horizon_candles)
+    if half is None or entry <= 0:
+        return None
+    return entry - sign * half * config.r5_stop_band_multiple
+
+
+def apply_predicted_stop(signal: Dict[str, Any], band: Optional[Dict[str, Dict[str, float]]],
+                         config: Any) -> Optional[str]:
+    """Widen a signal's stop to Rolling5's predicted stop, in place. Returns a note when it moved.
+
+    Only ever WIDENS. A narrower R5 stop would buy a larger position for the same risk budget and hand the
+    fee a bigger notional to feed on, so the entry module's stop stays the floor.
+    """
+    entry = float(signal.get("entry_price") or 0.0)
+    proposed = predicted_stop(signal.get("direction"), entry, band, config)
+    if proposed is None:
+        return None
+    sign = _sign(signal.get("direction"))
+    current = signal.get("stop_loss")
+    if current is not None and sign * (float(current) - proposed) <= 0:
+        return None                                   # the module's stop is already at least this wide
+    signal["stop_loss"] = proposed
+    was = f"{abs(float(current) - entry) / entry * 100:.4f}%" if current is not None else "none"
+    return (f"Rolling5 widened the stop from {was} to {abs(proposed - entry) / entry * 100:.4f}% "
+            f"(predicted {config.r5_stop_horizon_candles}-candle band x{config.r5_stop_band_multiple:g})")
+
+
 def opposing_wall(direction: Any, mark: float, target: Optional[float], walls: Dict[str, List[Dict[str, float]]]) -> Optional[float]:
     """Price of the nearest wall sitting between the mark and the target on the side that opposes the trade."""
     sign = _sign(direction)
@@ -68,10 +125,15 @@ def plan_exits(position: Dict[str, Any], mark: float, forecast: Dict[str, Any], 
     notes: List[str] = []
 
     if gain_r >= config.trail_breakeven_r:
+        # The trail follows the PREDICTED noise, not a fixed multiple of the original risk. Measured live
+        # 2026-09-16: a fixed 0.5R giveback cost exactly 0.500R on every trade (capture 53%, 38%, 27% as the
+        # trades ran shorter), because on stops this tight half a risk-unit is ordinary one-minute wander.
+        half = band_half_width((forecast or {}).get("forecast"), config.r5_stop_horizon_candles)
+        trail_distance = half * config.r5_trail_band_multiple if half else config.trail_distance_r * risk
         stop = tighten(stop, entry + sign * ENTRY_LOCK_R * risk, sign)
-        stop = tighten(stop, best - sign * config.trail_distance_r * risk, sign)
+        stop = tighten(stop, best - sign * trail_distance, sign)
         target = extend(target, best + sign * config.target_extend_r * risk, sign)
-        notes.append(f"trail gain={gain_r:.2f}R")
+        notes.append(f"trail gain={gain_r:.2f}R" + ("" if half else " (no band; fixed R)"))
 
     reversal = float(forecast.get("reversal_likelihood_score", 0.0) or 0.0)
     if reversal >= config.exit_reversal_risk:

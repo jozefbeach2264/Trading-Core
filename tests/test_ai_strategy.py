@@ -39,6 +39,10 @@ class _Forecaster:
         self.calls = []
 
     reversal = 0.5
+    band = {}            # no band by default: the signal's own stop stands, as it did before R5 owned it
+
+    def predicted_band(self, market_state, average_range=None):
+        return self.band
 
     async def generate_forecast(self, market_state, direction=None):
         self.calls.append(direction)

@@ -13,6 +13,7 @@ from rolling5_engine import Rolling5Engine
 from simulators.entry_range_simulator import EntryRangeSimulator
 from ai_client import AIClient
 from freshness import stale_market_reason, stale_decision_reason
+from position_manager import apply_predicted_stop
 from memory_tracker import MemoryTracker
 
 main_logger = logging.getLogger(__name__)
@@ -194,6 +195,15 @@ class AIStrategy(AIStrategyProtocol):
             self.logger.info(f"HALTED: {reason}")
             return {"reason": reason, "validator_report": primary_gate_report["filters"]}
         self.logger.info(f"Signal Packet Generated: Type={signal_packet.get('trade_type')}, Direction={signal_packet.get('direction')}")
+
+        # ROLLING5 OWNS THE STOP. Scalpel and TrapX found the trade; they do not get to decide when it dies.
+        # Their stops come from candle geometry (a fraction of the previous candle's range, or a fixed dollar
+        # offset) and can easily sit inside the movement R5 already expects — in which case ordinary wander
+        # kills the trade and the forecast is never tested. Widen to the predicted band BEFORE the guards
+        # judge the stop and before sizing uses it, since the stop width sets the position size.
+        stop_note = apply_predicted_stop(signal_packet, self.forecaster.predicted_band(market_state), self.config)
+        if stop_note:
+            self.logger.info(stop_note)
 
         # A target that does not clear the round-trip fee several times over cannot make money even when the
         # trade is right. Refuse it before spending a model call on it.

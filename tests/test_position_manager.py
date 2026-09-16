@@ -3,7 +3,8 @@ from types import SimpleNamespace
 
 from position_manager import opposing_wall, plan_exits, tighten
 
-CFG = SimpleNamespace(trail_breakeven_r=0.5, trail_distance_r=1.0, target_extend_r=1.5, exit_reversal_risk=0.8)
+CFG = SimpleNamespace(trail_breakeven_r=0.5, trail_distance_r=1.0, target_extend_r=1.5, exit_reversal_risk=0.8,
+                     r5_stop_horizon_candles=5, r5_stop_band_multiple=1.5, r5_trail_band_multiple=1.0)
 
 
 def _pos(direction="LONG", entry=3000.0, stop=2990.0, target=3015.0, best=None, risk=10.0):
