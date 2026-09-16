@@ -134,9 +134,20 @@ class TradeExecutor:
         """Size by RISK: the position is chosen so that hitting the stop costs RISK_PER_TRADE_PERCENT of the
         account, then the margin is capped at RISK_CAP_PERCENT (the operator's 10% rule) — so a wide stop means
         a smaller position rather than a bigger loss. Falls back to the cap when no stop is known."""
+        stop_distance = abs(entry_price - float(stop_loss)) if stop_loss else 0.0
+        if self.config.fixed_size_mode:
+            # The operator pinned the size: post exactly this much, never more than the wallet holds. This
+            # deliberately supersedes the RISK_CAP_PERCENT share-of-account rule, which is what they asked for.
+            wanted = self.config.fixed_margin_usd
+            margin = min(wanted, balance)
+            mode = "fixed" if margin >= wanted else "fixed_capped_by_balance"
+            notional = margin * self.config.leverage
+            return {"margin": margin, "notional": notional,
+                    "quantity": notional / entry_price if entry_price > 0 else 0.0, "sizing_mode": mode,
+                    "risk_at_stop": notional * stop_distance / entry_price if entry_price > 0 else 0.0}
+
         cap_margin = balance * self.config.risk_cap_percent
         risk_pct = self.config.risk_per_trade_percent
-        stop_distance = abs(entry_price - float(stop_loss)) if stop_loss else 0.0
         if risk_pct <= 0 or stop_distance <= 0 or entry_price <= 0:
             margin, mode = cap_margin, "margin_cap"
         else:

@@ -103,6 +103,25 @@ def apply_predicted_stop(signal: Dict[str, Any], band: Optional[Dict[str, Dict[s
             f"(predicted {config.r5_stop_horizon_candles}-candle band x{config.r5_stop_band_multiple:g})")
 
 
+def apply_fixed_stop(signal: Dict[str, Any], config: Any) -> Optional[str]:
+    """Fixed-size mode: put the stop exactly where the operator's dollar allowance runs out.
+
+    "$10 per trade and we allow it to move against us by $10 before close" makes the stop a consequence of
+    arithmetic rather than of anything the market is doing: a position of `fixed_notional` loses $10 when
+    price moves 10/notional against it. That is deliberately NOT a prediction, so it overrides both the entry
+    module's geometry and Rolling5's band — it is the operator pinning the risk instead of inferring it.
+    """
+    fraction = getattr(config, "fixed_stop_fraction", None)
+    entry = float(signal.get("entry_price") or 0.0)
+    if fraction is None or entry <= 0:
+        return None
+    sign = _sign(signal.get("direction"))
+    signal["module_stop"] = signal.get("module_stop", signal.get("stop_loss"))
+    signal["stop_loss"] = entry - sign * entry * fraction
+    return (f"fixed size: ${config.max_loss_usd:g} against ${config.fixed_margin_usd:g} at {config.leverage}x "
+            f"puts the stop {fraction * 100:.4f}% away")
+
+
 def opposing_wall(direction: Any, mark: float, target: Optional[float], walls: Dict[str, List[Dict[str, float]]]) -> Optional[float]:
     """Price of the nearest wall sitting between the mark and the target on the side that opposes the trade."""
     sign = _sign(direction)

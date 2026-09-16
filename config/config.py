@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -139,6 +141,12 @@ class Config:
         # Margin mode decides what liquidation even means. CROSS (what this account trades) backs every position
         # with the whole wallet, so liquidation depends on wallet-vs-notional, NOT on the leverage number.
         # ISOLATED backs it with only the posted margin, which is the 100/LEVERAGE rule.
+        # FIXED-SIZE MODE (operator, 2026-09-16): "$10 per trade and we allow it to move against us by $10
+        # before close". Margin is a fixed dollar amount rather than a share of the account, and the stop sits
+        # wherever that many dollars are lost. Both must be set for the mode to engage; 0 leaves risk-based
+        # sizing and the Rolling5 stop in charge.
+        self.fixed_margin_usd: float = float(os.getenv('FIXED_MARGIN_USD', '0'))
+        self.max_loss_usd: float = float(os.getenv('MAX_LOSS_USD', '0'))
         # Rolling5 owns the stop. Scalpel and TrapX say WHERE and WHICH WAY to trade; the stop comes from R5's
         # own forecast band so a trade is only stopped out when that forecast is WRONG, never by the entry
         # module's geometry. Measured 2026-09-16: Scalpel set stops of 0.05-0.14% while price routinely moved
@@ -235,6 +243,24 @@ class Config:
         number is meaningless — use liquidation_distance_fraction(), which accounts for the whole wallet."""
         return 100.0 / self.leverage if self.leverage else float("inf")
 
+    @property
+    def fixed_size_mode(self) -> bool:
+        """True when the operator has pinned both the position size and the dollars allowed against it."""
+        return self.fixed_margin_usd > 0 and self.max_loss_usd > 0
+
+    @property
+    def fixed_notional(self) -> float:
+        return self.fixed_margin_usd * self.leverage
+
+    @property
+    def fixed_stop_fraction(self) -> Optional[float]:
+        """The stop implied by "$X of margin, $Y allowed against it". A position of `fixed_notional` loses $Y
+        when price moves Y/notional against it, so that fraction IS the stop. Independent of the balance."""
+        if not self.fixed_size_mode:
+            return None
+        notional = self.fixed_notional
+        return self.max_loss_usd / notional if notional > 0 else None
+
     def notional_to_equity_ratio(self, stop_fraction: float) -> float:
         """Notional as a multiple of the wallet for a stop this wide, under risk-based sizing with the margin
         cap. Balance cancels out: risk sizing fixes the LOSS as a share of the wallet, so the position's size
@@ -244,8 +270,14 @@ class Config:
             return cap
         return min((self.risk_per_trade_percent / 100.0) / stop_fraction, cap)
 
-    def loss_fraction_at_stop(self, stop_fraction: float) -> float:
-        """Fraction of the wallet a stop-out costs. This is the number the operator's validity rule tests."""
+    def loss_fraction_at_stop(self, stop_fraction: float, equity: Optional[float] = None) -> float:
+        """Fraction of the wallet a stop-out costs. This is the number the operator's validity rule tests.
+
+        Under fixed-size mode the loss is a fixed number of DOLLARS, so it is only a fixed share of the wallet
+        once the wallet is known; without an equity figure, report it against the starting capital."""
+        if self.fixed_size_mode:
+            base = equity if equity and equity > 0 else self.simulation_initial_capital
+            return self.max_loss_usd / base if base > 0 else 1.0
         return self.notional_to_equity_ratio(stop_fraction) * stop_fraction
 
     def liquidation_distance_fraction(self, stop_fraction: float) -> float:
@@ -261,6 +293,12 @@ class Config:
         if ratio <= 0:
             return float("inf")
         return max(0.0, 1.0 / ratio - self.maintenance_margin_percent / 100.0)
+
+    def validate_fixed_size(self) -> None:
+        if self.fixed_margin_usd < 0 or self.max_loss_usd < 0:
+            raise ValueError("FIXED_MARGIN_USD and MAX_LOSS_USD must be >= 0.")
+        if (self.fixed_margin_usd > 0) != (self.max_loss_usd > 0):
+            raise ValueError("FIXED_MARGIN_USD and MAX_LOSS_USD must be set together (both > 0) or both left at 0.")
 
     @property
     def round_trip_fee_percent(self) -> float:
@@ -314,6 +352,7 @@ class Config:
             raise ValueError("MIN_STOP_FEE_MULTIPLE must be >= 0.")
         if not 0 < self.max_stop_liquidation_fraction <= 1.0:
             raise ValueError("MAX_STOP_LIQUIDATION_FRACTION must be in (0, 1].")
+        self.validate_fixed_size()
         if self.r5_stop_horizon_candles <= 0:
             raise ValueError("R5_STOP_HORIZON_CANDLES must be a positive integer.")
         if self.r5_stop_band_multiple < 0 or self.r5_trail_band_multiple < 0:

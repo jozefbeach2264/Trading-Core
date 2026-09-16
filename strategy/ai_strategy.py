@@ -13,7 +13,7 @@ from rolling5_engine import Rolling5Engine
 from simulators.entry_range_simulator import EntryRangeSimulator
 from ai_client import AIClient
 from freshness import stale_market_reason, stale_decision_reason
-from position_manager import apply_predicted_stop
+from position_manager import apply_fixed_stop, apply_predicted_stop
 from memory_tracker import MemoryTracker
 
 main_logger = logging.getLogger(__name__)
@@ -201,7 +201,10 @@ class AIStrategy(AIStrategyProtocol):
         # offset) and can easily sit inside the movement R5 already expects — in which case ordinary wander
         # kills the trade and the forecast is never tested. Widen to the predicted band BEFORE the guards
         # judge the stop and before sizing uses it, since the stop width sets the position size.
-        stop_note = apply_predicted_stop(signal_packet, self.forecaster.predicted_band(market_state), self.config)
+        # Fixed-size mode, when the operator has pinned both numbers, replaces this entirely: the stop is
+        # where their dollar allowance runs out, not where any forecast says.
+        stop_note = (apply_fixed_stop(signal_packet, self.config) if self.config.fixed_size_mode
+                     else apply_predicted_stop(signal_packet, self.forecaster.predicted_band(market_state), self.config))
         if stop_note:
             # Debug, not info: this runs on every cycle a setup is live, so at a 0.2 s cycle an info line here
             # writes thousands of identical records per signal and buries everything else in the log. The note
