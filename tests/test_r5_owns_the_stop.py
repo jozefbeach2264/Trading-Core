@@ -121,3 +121,54 @@ def test_both_stops_are_recorded_whichever_one_wins():
     no_band = {"direction": "LONG", "entry_price": 3000.0, "stop_loss": 2997.0}
     apply_predicted_stop(no_band, {}, CFG)
     assert no_band["r5_stop"] is None, "None means Rolling5 had no band, not that it agreed"
+
+
+# --- breakeven has to be a real breakeven ----------------------------------------------------------------
+
+FEE_CFG = SimpleNamespace(trail_breakeven_r=0.25, trail_distance_r=1.0, target_extend_r=3.0,
+                          exit_reversal_risk=0.8, round_trip_fee_percent=0.16,
+                          r5_stop_horizon_candles=5, r5_stop_band_multiple=1.5, r5_trail_band_multiple=1.0)
+
+
+def test_the_trail_does_not_arm_while_breakeven_is_inside_the_fee():
+    """A 0.02% stop against a 0.16% round-trip fee means the fee is 8x the amount risked: there is no
+    breakeven to lock until the trade has earned that much. Arming early books a gross scratch and a net
+    loss of nearly the whole fee, which is what two of run 5's first three trades did."""
+    entry, risk = 3000.0, 0.6            # 0.02% stop -> fee is 8R
+    position = {"direction": "LONG", "entry_price": entry, "stop_loss": entry - risk,
+                "take_profit": entry + 20.0, "initial_risk": risk, "best_price": entry}
+    forecast = {"reversal_likelihood_score": 0.0, "forecast": {}}
+    stop, _t, _b, notes = plan_exits(position, entry + 2.0, forecast, FEE_CFG)    # +3.3R, well past 0.25R
+    assert stop == pytest.approx(entry - risk), "the stop must not move while breakeven does not exist"
+    assert not any("trail" in n for n in notes)
+
+
+def test_once_the_fee_is_covered_the_stop_locks_at_a_real_breakeven():
+    entry, risk = 3000.0, 0.6
+    position = {"direction": "LONG", "entry_price": entry, "stop_loss": entry - risk,
+                "take_profit": entry + 40.0, "initial_risk": risk, "best_price": entry}
+    forecast = {"reversal_likelihood_score": 0.0, "forecast": {}}
+    stop, _t, _b, notes = plan_exits(position, entry + 5.0, forecast, FEE_CFG)    # +8.3R, just past the 8R fee
+    assert stop == pytest.approx(entry + 4.8), "breakeven is entry plus the 0.16% round trip, not entry plus a hair"
+    assert any("arm=" in n for n in notes)
+
+
+def test_the_trail_may_pass_breakeven_but_never_sits_inside_it():
+    entry, risk = 3000.0, 0.6
+    position = {"direction": "LONG", "entry_price": entry, "stop_loss": entry - risk,
+                "take_profit": entry + 40.0, "initial_risk": risk, "best_price": entry}
+    forecast = {"reversal_likelihood_score": 0.0, "forecast": {}}
+    stop, _t, _b, _n = plan_exits(position, entry + 6.0, forecast, FEE_CFG)       # trail lands above breakeven
+    assert stop == pytest.approx(entry + 5.4)        # best(3006) - 1.0R(0.6), which is tighter than breakeven
+    assert stop >= entry + 4.8
+
+
+def test_a_wide_stop_still_arms_at_the_configured_r():
+    """When the stop is wide the fee is a small fraction of risk, so the configured trigger governs."""
+    entry, risk = 3000.0, 30.0           # 1% stop -> the fee is 0.16R
+    position = {"direction": "LONG", "entry_price": entry, "stop_loss": entry - risk,
+                "take_profit": entry + 200.0, "initial_risk": risk, "best_price": entry}
+    forecast = {"reversal_likelihood_score": 0.0, "forecast": {}}
+    stop, _t, _b, notes = plan_exits(position, entry + 12.0, forecast, FEE_CFG)   # +0.4R, past 0.25R
+    assert stop == pytest.approx(entry + 4.8), "still never inside the fee"
+    assert any("arm=0.25R" in n for n in notes)

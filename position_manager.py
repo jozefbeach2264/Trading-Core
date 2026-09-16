@@ -8,7 +8,9 @@ predicted adverse wander; apply_predicted_stop() widens an incoming signal to it
 
 Given the open position, the current mark and a fresh forecast (reversal risk + walls, computed AGAINST the
 open trade's direction), decide the new stop and target:
-  * once the trade has earned TRAIL_BREAKEVEN_R of its initial risk, the stop moves to breakeven and then trails
+  * once the trade has earned TRAIL_BREAKEVEN_R of its initial risk AND enough to cover the round-trip fee
+    (whichever is larger — a "breakeven" inside the fee is a guaranteed net loss), the stop moves to a real
+    breakeven, entry plus the fee, and then trails
     the PREDICTED noise behind the best price (R5_TRAIL_BAND_MULTIPLE x the band half-width, falling back to
     TRAIL_DISTANCE_R when no band is available); the target extends TARGET_EXTEND_R beyond the best price so a
     winner is never capped while it keeps going;
@@ -128,16 +130,24 @@ def plan_exits(position: Dict[str, Any], mark: float, forecast: Dict[str, Any], 
     gain_r = sign * (best - entry) / risk if risk > 0 else 0.0
     notes: List[str] = []
 
-    if gain_r >= config.trail_breakeven_r:
+    # BREAKEVEN MUST ACTUALLY BE BREAKEVEN. Locking a stop a hair above entry when that hair is inside the
+    # round-trip fee books a gross scratch and a net loss of most of the fee — the same class of mistake as
+    # calling a losing exit a take-profit. On a stop of 0.02% the fee is 7.5x the amount risked, so there is
+    # no breakeven to lock at all until the trade has earned that much. Observed live 2026-09-16: two of the
+    # first three trades of run 5 armed the trail, locked a few cents of gross and cost a full fee each.
+    fee_fraction = min_profit_fraction(config)                  # round-trip fee as a fraction of entry
+    fee_in_r = (fee_fraction * entry) / risk if risk > 0 else float("inf")
+    arm_at = max(config.trail_breakeven_r, fee_in_r)
+    if gain_r >= arm_at:
         # The trail follows the PREDICTED noise, not a fixed multiple of the original risk. Measured live
         # 2026-09-16: a fixed 0.5R giveback cost exactly 0.500R on every trade (capture 53%, 38%, 27% as the
         # trades ran shorter), because on stops this tight half a risk-unit is ordinary one-minute wander.
         half = band_half_width((forecast or {}).get("forecast"), config.r5_stop_horizon_candles)
         trail_distance = half * config.r5_trail_band_multiple if half else config.trail_distance_r * risk
-        stop = tighten(stop, entry + sign * ENTRY_LOCK_R * risk, sign)
+        stop = tighten(stop, entry + sign * max(ENTRY_LOCK_R * risk, fee_fraction * entry), sign)
         stop = tighten(stop, best - sign * trail_distance, sign)
         target = extend(target, best + sign * config.target_extend_r * risk, sign)
-        notes.append(f"trail gain={gain_r:.2f}R" + ("" if half else " (no band; fixed R)"))
+        notes.append(f"trail gain={gain_r:.2f}R arm={arm_at:.2f}R" + ("" if half else " (no band; fixed R)"))
 
     reversal = float(forecast.get("reversal_likelihood_score", 0.0) or 0.0)
     if reversal >= config.exit_reversal_risk:

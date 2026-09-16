@@ -56,7 +56,9 @@ def test_position_guard_holds_while_the_trade_lives_and_manages_exits(config):
     ms.mark_price = 2994.0                                             # +0.6R in the SHORT's favour
     run(engine._settle_open_position())
     assert engine._position_is_open() and ex.closed == []
-    assert ex.updates and ex.updates[-1][0] == 2999.5 and ex.updates[-1][1] == 2979.0   # BE lock + extended target
+    # Breakeven for a SHORT from 3000 is 3000 minus the 0.16% round-trip fee = 2995.2, NOT entry minus a
+    # hair. A stop at 2999.5 would book a gross scratch and lose most of the fee.
+    assert ex.updates and ex.updates[-1][0] == 2995.2 and ex.updates[-1][1] == 2979.0
     # the safety ceiling, not a 5-candle kill, ends a trade that never resolves
     lc = engine._lifecycle()
     for i in range(1, config.max_position_candles + 1):
