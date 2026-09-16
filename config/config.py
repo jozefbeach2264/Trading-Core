@@ -42,6 +42,10 @@ class Config:
         self.okx_base_url: str = os.getenv("OKX_BASE_URL", "https://www.okx.com")
         self.asterdex_base_url: str = os.getenv("ASTERDEX_BASE_URL", "https://fapi.asterdex.com")
         self.okx_ws_url: str = os.getenv("OKX_WS_URL", "wss://ws.okx.com:8443/ws/v5/public")
+        # Order book feed: "books" (400 levels, snapshot + deltas merged locally — the 50-level book TrapX was
+        # designed for) or "books5" (5-level snapshots; what the bot used until 2026-09-16, which starved TrapX).
+        self.orderbook_channel: str = os.getenv("ORDERBOOK_CHANNEL", "books").strip()
+        self.orderbook_depth_levels: int = int(os.getenv("ORDERBOOK_DEPTH_LEVELS", "50"))
         
         # System & Operational Parameters
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -167,6 +171,10 @@ class Config:
         if not self.dry_run_mode:
             if not self.asterdex_api_key or not self.asterdex_api_secret:
                 raise ValueError("ASTERDEX_API_KEY and ASTERDEX_API_SECRET must be provided when not in dry run mode.")
+        if self.orderbook_channel not in ("books", "books5"):
+            raise ValueError("ORDERBOOK_CHANNEL must be 'books' or 'books5'.")
+        if self.orderbook_depth_levels <= 0:
+            raise ValueError("ORDERBOOK_DEPTH_LEVELS must be a positive integer.")
         if not self.ai_provider_url:
             raise ValueError("AI_PROVIDER_URL must be set (OpenAI-compatible chat-completions base URL).")
         expected = expected_exchange_symbol(self.trading_symbol)

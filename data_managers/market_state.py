@@ -4,6 +4,7 @@ from collections import deque
 import time
 from typing import Dict, Any, Optional, List
 from config.config import Config
+from data_managers.orderbook_l2 import L2Book, SequenceGap
 from data_managers.orderbook_parser import OrderBookParser
 
 logger = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ class MarketState:
         self.config = config
         self.last_update_time: float = time.time()
         self.order_book_parser = OrderBookParser()
+        self.l2_book = L2Book()
         self.initial_data_ready = asyncio.Event()
 
         # --- Caching Flag ---
@@ -58,6 +60,28 @@ class MarketState:
     def set_contract_value(self, contract_value: float) -> None:
         if contract_value and contract_value > 0:
             self.contract_value = float(contract_value)
+
+    def reset_l2_book(self) -> None:
+        self.l2_book.reset()
+
+    async def apply_l2_message(self, action: str, data: dict) -> bool:
+        """Merge one `books` message into the local L2 book and publish its top N levels as depth_20.
+        Returns False when the sequence chain broke (caller must resubscribe)."""
+        try:
+            self.l2_book.apply(action, data)
+        except SequenceGap as e:
+            logger.warning("L2 book sequence gap (%s); book invalidated", e)
+            self.l2_book.reset()
+            return False
+        except Exception as e:  # noqa: BLE001 - a malformed level must not kill the feed
+            logger.error("L2 book update failed: %r", e, exc_info=True)
+            return True
+        top = self.l2_book.top(self.config.orderbook_depth_levels)
+        self.previous_depth_20 = self.depth_20
+        self.depth_20 = top
+        self._is_ob_metrics_dirty = True
+        self.last_update_time = time.time()
+        return True
 
     async def update_from_ws_books(self, data: dict):
         """

@@ -130,6 +130,10 @@ async def get_stats():
         "mark_price": market_state.mark_price if market_state else None,
         "market_data_age_s": round(market_data_age_s(market_state), 2) if market_state else None,
         "klines": len(market_state.klines) if market_state else 0,
+        "book_levels": {"bids": len(market_state.depth_20.get("bids", [])), "asks": len(market_state.depth_20.get("asks", [])),
+                        "l2_updates": market_state.l2_book.updates, "channel": config.orderbook_channel} if market_state else None,
+        "walls": {k: len(v) for k, v in (market_state.order_book_walls or {}).items()} if market_state else None,
+        "spoof_metrics": market_state.spoof_metrics if market_state else None,
         "verdict_cache_hits": getattr(engine.ai_strategy, "cache_hits", None) if engine else None,
         "cycles_while_position_open": getattr(engine, "cycles_while_open", None) if engine else None,
     }

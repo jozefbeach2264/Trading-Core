@@ -33,6 +33,8 @@ class MarketDataManager:
         self._acknowledged_channels = set()
         self._logged_ws_subscription = False
         self._connections = 0
+        self._ws = None
+        self.book_resubscribes = 0
         logger.debug(f"MarketDataManager configured for OKX with instrument ID: {self.inst_id}")
 
     def set_event_queue(self, queue: asyncio.Queue):
@@ -264,7 +266,17 @@ class MarketDataManager:
                 except Exception as e:
                     logger.error("Error processing trade data", extra={"error": str(e)}, exc_info=True)
 
-            elif channel in ("books", "books5"):
+            elif channel == "books":
+                try:
+                    ok = await self.market_state.apply_l2_message(data.get("action", "update"), event_data)
+                    if not ok:
+                        await self._resubscribe_books()
+                        return
+                    await self._maybe_emit_orderbook_events()
+                except Exception as e:
+                    logger.error("Error processing L2 book data", extra={"error": str(e)}, exc_info=True)
+
+            elif channel == "books5":
                 try:
                     if not event_data.get('bids') or not event_data.get('asks'):
                         logger.debug("Empty books update received", extra={"data": event_data})
@@ -301,12 +313,27 @@ class MarketDataManager:
                 except Exception as e:
                     logger.error("Error processing open-interest data", extra={"error": str(e)}, exc_info=True)
 
+    async def _resubscribe_books(self) -> None:
+        """Sequence gap in the L2 book: drop it and ask OKX for a fresh snapshot (unsubscribe + subscribe)."""
+        ws = self._ws
+        if ws is None:
+            return
+        arg = {"channel": "books", "instId": self.inst_id}
+        try:
+            self.market_state.reset_l2_book()
+            await ws.send(json.dumps({"op": "unsubscribe", "args": [arg]}))
+            await ws.send(json.dumps({"op": "subscribe", "args": [arg]}))
+            self.book_resubscribes += 1
+            logger.warning("Resubscribed to the L2 book after a sequence gap (%d so far)", self.book_resubscribes)
+        except Exception as e:  # noqa: BLE001
+            logger.error("L2 resubscribe failed: %r", e)
+
     async def _websocket_handler(self):
         ws_payload = {
             "op": "subscribe",
             "args": [
                 {"channel": "trades", "instId": self.inst_id},
-                {"channel": "books5", "instId": self.inst_id, "sz": "50"},
+                {"channel": self.config.orderbook_channel, "instId": self.inst_id},
                 {"channel": "tickers", "instId": self.inst_id},
                 {"channel": "mark-price", "instId": self.inst_id},
                 {"channel": "open-interest", "instId": self.inst_id}
@@ -315,6 +342,8 @@ class MarketDataManager:
         while self.is_running:
             try:
                 async with websockets.connect(self.ws_url) as ws:
+                    self._ws = ws
+                    self.market_state.reset_l2_book()      # a new connection always starts with a fresh snapshot
                     logger.info("Connected to OKX WebSocket.")
                     self._acknowledged_channels.clear()
                     self._logged_ws_subscription = False
